@@ -2,10 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/MPChartLib/MPChartLib.iml" filepath="$PROJECT_DIR$/MPChartLib/MPChartLib.iml" />
-      <module fileurl="file://$PROJECT_DIR$/StockChart-MPAndroidChart.iml" filepath="$PROJECT_DIR$/StockChart-MPAndroidChart.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/rxeasyhttp/rxeasyhttp.iml" filepath="$PROJECT_DIR$/rxeasyhttp/rxeasyhttp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/StockChart-MPAndroidChart.iml" filepath="$PROJECT_DIR$/.idea/modules/StockChart-MPAndroidChart.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/MPChartLib/StockChart-MPAndroidChart.MPChartLib.iml" filepath="$PROJECT_DIR$/.idea/modules/MPChartLib/StockChart-MPAndroidChart.MPChartLib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/StockChart-MPAndroidChart.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/StockChart-MPAndroidChart.app.iml" />
     </modules>
   </component>
 </project>
