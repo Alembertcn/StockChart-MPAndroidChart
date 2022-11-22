@@ -50,7 +50,8 @@ public class KLineDataManage {
     //SMA参数
     public int SMAN = 14;
     //BOLL参数
-    public int BOLLN = 26;
+//    public int BOLLN = 26;
+    public int BOLLN = 20;
 
     //MACD参数
     public int SHORT = 12;
@@ -116,9 +117,9 @@ public class KLineDataManage {
                 xVal.clear();
                 ArrayList<CandleEntry> candleEntries = new ArrayList<>();
                 ArrayList<BarEntry> barEntries = new ArrayList<>();
-                ArrayList<Entry> line5Entries = new ArrayList<>();
-                ArrayList<Entry> line10Entries = new ArrayList<>();
-                ArrayList<Entry> line20Entries = new ArrayList<>();
+                List<Entry> line5Entries = new ArrayList<>();
+                List<Entry> line10Entries = new ArrayList<>();
+                List<Entry> line20Entries = new ArrayList<>();
                 for (int i = 0; i < data.length(); i++) {
                     KLineDataModel klineDatamodel = new KLineDataModel();
                     klineDatamodel.setDateMills(data.optJSONArray(i).optLong(0, 0L));
@@ -131,9 +132,24 @@ public class KLineDataManage {
                     klineDatamodel.setMa5(data.optJSONArray(i).optDouble(7));
                     klineDatamodel.setMa10(data.optJSONArray(i).optDouble(8));
                     klineDatamodel.setMa20(data.optJSONArray(i).optDouble(9));
-                    klineDatamodel.setMa30(data.optJSONArray(i).optDouble(10));
-                    klineDatamodel.setMa60(data.optJSONArray(i).optDouble(11));
-                    klineDatamodel.setPreClose(data.optJSONArray(i).optDouble(12));
+                    klineDatamodel.setMa30(0.0);
+                    klineDatamodel.setMa60(0.0);
+                    klineDatamodel.setPreClose(data.optJSONArray(i).optDouble(10));
+
+//                    klineDatamodel.setDateMills(data.optJSONArray(i).optLong(0, 0L));
+//                    klineDatamodel.setOpen(data.optJSONArray(i).optDouble(1));
+//                    klineDatamodel.setHigh(data.optJSONArray(i).optDouble(2));
+//                    klineDatamodel.setLow(data.optJSONArray(i).optDouble(3));
+//                    klineDatamodel.setClose(data.optJSONArray(i).optDouble(4));
+//                    klineDatamodel.setVolume(NumberUtils.stringNoE10ForVol(Double.isNaN(data.optJSONArray(i).optDouble(5)) ? 0 : data.optJSONArray(i).optDouble(5)));
+//                    klineDatamodel.setTotal(NumberUtils.stringNoE10ForVol(Double.isNaN(data.optJSONArray(i).optDouble(6)) ? 0 : data.optJSONArray(i).optDouble(6)));
+//                    klineDatamodel.setMa5(data.optJSONArray(i).optDouble(7));
+//                    klineDatamodel.setMa10(data.optJSONArray(i).optDouble(8));
+//                    klineDatamodel.setMa20(data.optJSONArray(i).optDouble(9));
+//                    klineDatamodel.setMa30(data.optJSONArray(i).optDouble(10));
+//                    klineDatamodel.setMa60(data.optJSONArray(i).optDouble(11));
+//                    klineDatamodel.setPreClose(data.optJSONArray(i).optDouble(12));
+
                     preClosePrice = klineDatamodel.getPreClose();
                     kDatas.add(klineDatamodel);
 
@@ -147,6 +163,9 @@ public class KLineDataManage {
                     line10Entries.add(new Entry( i + offSet, (float) getKLineDatas().get(i).getMa10()));
                     line20Entries.add(new Entry(i + offSet, (float) getKLineDatas().get(i).getMa20()));
                 }
+                line5Entries = line5Entries.subList(N1-1, line5Entries.size());
+                line10Entries = line10Entries.subList(N2-1, line10Entries.size());
+                line20Entries = line20Entries.subList(N3-1, line20Entries.size());
                 candleDataSet = setACandle(candleEntries);
                 bollCandleDataSet = setBOLLCandle(candleEntries);
                 volumeDataSet = setABar(barEntries, "成交量");
@@ -201,10 +220,12 @@ public class KLineDataManage {
      */
     public void initBOLL() {
         BOLLEntity bollEntity = new BOLLEntity(getKLineDatas(), BOLLN);
+        lineDataBOLL.clear();
         bollDataUP = new ArrayList<>();
         bollDataMB = new ArrayList<>();
         bollDataDN = new ArrayList<>();
         for (int i = 0; i < bollEntity.getUPs().size(); i++) {
+            if (i<=BOLLN-1)continue;
             bollDataUP.add(new Entry(i + offSet, bollEntity.getUPs().get(i)));
             bollDataMB.add(new Entry(i + offSet, bollEntity.getMBs().get(i)));
             bollDataDN.add(new Entry(i + offSet, bollEntity.getDNs().get(i)));
@@ -269,22 +290,22 @@ public class KLineDataManage {
         return candleDataSet;
     }
 
-    private LineDataSet setALine(ColorType ma, ArrayList<Entry> lineEntries) {
+    private LineDataSet setALine(ColorType ma, List<Entry> lineEntries) {
         String label = "ma" + ma;
         return setALine(ma, lineEntries, label);
     }
 
-    private LineDataSet setALine(ColorType ma, ArrayList<Entry> lineEntries, boolean highlightEnable) {
+    private LineDataSet setALine(ColorType ma, List<Entry> lineEntries, boolean highlightEnable) {
         String label = "ma" + ma;
         return setALine(ma, lineEntries, label, highlightEnable);
     }
 
-    private LineDataSet setALine(ColorType ma, ArrayList<Entry> lineEntries, String label) {
+    private LineDataSet setALine(ColorType ma, List<Entry> lineEntries, String label) {
         boolean highlightEnable = false;
         return setALine(ma, lineEntries, label, highlightEnable);
     }
     //行情走势线属性设置
-    private LineDataSet setALine(ColorType colorType, ArrayList<Entry> lineEntries, String label, boolean highlightEnable) {
+    private LineDataSet setALine(ColorType colorType, List<Entry> lineEntries, String label, boolean highlightEnable) {
         LineDataSet lineDataSetMa = new LineDataSet(lineEntries, label);
         lineDataSetMa.setDrawHorizontalHighlightIndicator(false);
         lineDataSetMa.setHighlightEnabled(highlightEnable);//是否画高亮十字线

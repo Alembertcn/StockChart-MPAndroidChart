@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
         MyApplication.getApplication().initDayNight();
     }
 
-    @OnClick({R.id.btn_test, R.id.btn_mp})
+    @OnClick({R.id.btn_test, R.id.btn_mp,R.id.btn_test_custom})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_test:
@@ -37,6 +37,9 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.btn_mp:
                 startActivity(new Intent(MainActivity.this, MPMainActivity.class));
+                break;
+            case R.id.btn_test_custom:
+                startActivity(new Intent(MainActivity.this, CustomStockActivity.class));
                 break;
         }
     }
