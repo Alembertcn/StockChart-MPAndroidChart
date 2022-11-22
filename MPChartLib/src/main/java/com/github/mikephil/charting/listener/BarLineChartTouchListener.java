@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.animation.AnimationUtils;
 
 import com.github.mikephil.charting.charts.BarLineChartBase;
@@ -93,6 +94,16 @@ public class BarLineChartTouchListener extends ChartTouchListener<BarLineChartBa
         this.mMinScalePointerDistance = Utils.convertDpToPixel(3.5f);
     }
 
+    /**
+     * 手指按下X
+     */
+    private float downX = 0f;
+    /**
+     * 手指按下Y
+     */
+    private float downY = 0f;
+    int touchSlop = ViewConfiguration.get(mChart.getContext()).getScaledTouchSlop();
+
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouch(View v, MotionEvent event) {
@@ -121,6 +132,8 @@ public class BarLineChartTouchListener extends ChartTouchListener<BarLineChartBa
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
 
             case MotionEvent.ACTION_DOWN:
+                downX = event.getX();
+                downY = event.getY();
 
                 startAction(event);
 
@@ -166,9 +179,9 @@ public class BarLineChartTouchListener extends ChartTouchListener<BarLineChartBa
                 }
                 break;
             case MotionEvent.ACTION_MOVE:
+                v.getParent().requestDisallowInterceptTouchEvent(mTouchMode != NONE);
 
                 if (mTouchMode == DRAG) {
-
                     mChart.disableScroll();
 
                     float x = mChart.isDragXEnabled() ? event.getX() - mTouchStartPoint.x : 0.f;
@@ -189,46 +202,63 @@ public class BarLineChartTouchListener extends ChartTouchListener<BarLineChartBa
 //                    if (mChart.isHighlightEnabled()) {
                     performHighlightDrag(event);
 //                    }
-                } else if (mTouchMode == NONE
-                        && Math.abs(distance(event.getX(), mTouchStartPoint.x, event.getY(),
-                        mTouchStartPoint.y)) > mDragTriggerDist) {
+                } else if (mTouchMode == NONE) {
+                    float xOffset = event.getX() - downX;
+                    float yOffset = event.getY() - downY;
 
-                    if (mChart.isDragEnabled()) {
+                    //不算滑动
+                    if (Math.abs(xOffset) < touchSlop && Math.abs(yOffset) < touchSlop) { //不算滑动
+                        v.getParent().requestDisallowInterceptTouchEvent(false);//不监听竖向滑动
+                        return true;
+                    }else {
+                        //过滤竖向滑动滑动
+                        if (Math.abs(xOffset) < Math.abs(yOffset)) { //屏蔽竖向滑动监听
+                            return false;
+                        }
+                    }
 
-                        boolean shouldPan = !mChart.isFullyZoomedOut() ||
-                                !mChart.hasNoDragOffset();
 
-                        if (shouldPan) {
+                    if(Math.abs(distance(event.getX(), mTouchStartPoint.x, event.getY(),
+                            mTouchStartPoint.y)) > mDragTriggerDist){
+                        if (mChart.isDragEnabled()) {
 
-                            float distanceX = Math.abs(event.getX() - mTouchStartPoint.x);
-                            float distanceY = Math.abs(event.getY() - mTouchStartPoint.y);
+                            boolean shouldPan = !mChart.isFullyZoomedOut() ||
+                                    !mChart.hasNoDragOffset();
 
-                            // Disable dragging in a direction that's disallowed
-                            if ((mChart.isDragXEnabled() || distanceY >= distanceX) &&
-                                    (mChart.isDragYEnabled() || distanceY <= distanceX)) {
+                            if (shouldPan) {
 
+                                float distanceX = Math.abs(event.getX() - mTouchStartPoint.x);
+                                float distanceY = Math.abs(event.getY() - mTouchStartPoint.y);
+
+                                // Disable dragging in a direction that's disallowed
+                                if ((mChart.isDragXEnabled() || distanceY >= distanceX) &&
+                                        (mChart.isDragYEnabled() || distanceY <= distanceX)) {
+
+                                    mLastGesture = ChartGesture.DRAG;
+                                    mTouchMode = DRAG;
+                                }
+
+                            } else if (mChart.isDragEnabled()) {
                                 mLastGesture = ChartGesture.DRAG;
                                 mTouchMode = DRAG;
-                            }
-
-                        } else if (mChart.isDragEnabled()) {
-                            mLastGesture = ChartGesture.DRAG;
-                            mTouchMode = DRAG;
-                        } else {
-
-                            if (mChart.isHighlightPerDragEnabled()) {
-                                mLastGesture = ChartGesture.DRAG;
+                            } else {
 
                                 if (mChart.isHighlightPerDragEnabled()) {
-                                    performHighlightDrag(event);
+                                    mLastGesture = ChartGesture.DRAG;
+
+                                    if (mChart.isHighlightPerDragEnabled()) {
+                                        performHighlightDrag(event);
+                                    }
                                 }
                             }
                         }
                     }
+
                 }
                 break;
 
             case MotionEvent.ACTION_UP:
+                v.getParent().requestDisallowInterceptTouchEvent(false);
 
                 final VelocityTracker velocityTracker = mVelocityTracker;
                 final int pointerId = event.getPointerId(0);
@@ -280,13 +310,14 @@ public class BarLineChartTouchListener extends ChartTouchListener<BarLineChartBa
 
                 break;
             case MotionEvent.ACTION_POINTER_UP:
+                v.getParent().requestDisallowInterceptTouchEvent(false);
                 Utils.velocityTrackerPointerUpCleanUpIfNecessary(event, mVelocityTracker);
 
                 mTouchMode = POST_ZOOM;
                 break;
 
             case MotionEvent.ACTION_CANCEL:
-
+                v.getParent().requestDisallowInterceptTouchEvent(false);
                 mTouchMode = NONE;
                 endAction(event);
                 break;
