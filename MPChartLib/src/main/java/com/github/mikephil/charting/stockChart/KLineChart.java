@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat;
 
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 
 import com.github.mikephil.charting.R;
 import com.github.mikephil.charting.charts.Chart;
@@ -63,7 +64,7 @@ public class KLineChart extends BaseChart {
     private int maxVisibleXCount = 100;
     private boolean isFirst = true;//是否是第一次加载数据
     private int zbColor[];
-
+    private float macdBarWith = 0.95f;//默认是缩放是5
     public Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -87,7 +88,6 @@ public class KLineChart extends BaseChart {
         LayoutInflater.from(context).inflate(R.layout.view_kline, this);
         candleChart = (CandleCombinedChart) findViewById(R.id.candleChart);
         barChart = (MyCombinedChart) findViewById(R.id.barchart);
-
         zbColor = new int[]{ContextCompat.getColor(context, R.color.ma5), ContextCompat.getColor(context, R.color.ma10), ContextCompat.getColor(context, R.color.ma20)};
     }
 
@@ -204,10 +204,22 @@ public class KLineChart extends BaseChart {
 
         //手势联动监听
         gestureListenerCandle = new CoupleChartGestureListener(candleChart, new Chart[]{barChart});
-        gestureListenerBar = new CoupleChartGestureListener(barChart, new Chart[]{candleChart});
+        gestureListenerBar = new CoupleChartGestureListener(barChart, new Chart[]{candleChart}){
+            @Override
+            public void onChartScale(MotionEvent me, float scaleX, float scaleY) {
+                super.onChartScale(me, scaleX, scaleY);
+                if(chartType1 == 2){
+                    barChart.getBarData().setBarWidth(macdBarWith/barChart.getScaleX());
+                    barChart.notifyDataSetChanged();
+                    barChart.postInvalidate();
+                }else{
+                    
+                }
+              
+            }
+        };
         candleChart.setOnChartGestureListener(gestureListenerCandle);
         barChart.setOnChartGestureListener(gestureListenerBar);
-
         //移动十字标数据监听
         candleChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
@@ -397,6 +409,9 @@ public class KLineChart extends BaseChart {
             case 2:
                 kLineData.initMACD();
                 setMACDToChart();
+                barChart.getBarData().setBarWidth(macdBarWith/barChart.getScaleX());
+                barChart.notifyDataSetChanged();
+                barChart.postInvalidate();
                 break;
             case 3:
                 kLineData.initKDJ();
@@ -465,7 +480,9 @@ public class KLineChart extends BaseChart {
 
             CombinedData combinedData = barChart.getData();
             combinedData.setData(new LineData(kLineData.getLineDataMACD()));
-            combinedData.setData(new BarData(kLineData.getBarDataMACD()));
+            BarData data = new BarData(kLineData.getBarDataMACD());
+
+            combinedData.setData(data);
             barChart.notifyDataSetChanged();
             barChart.invalidate();
         }
