@@ -17,6 +17,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ui.main.CustomStockActivity" />
+
         <activity android:name=".ui.market.activity.StockDetailActivity" />
         <activity android:name=".ui.market.activity.StockDetailLandActivity"
             android:screenOrientation="landscape"

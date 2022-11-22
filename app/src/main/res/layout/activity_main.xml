@@ -10,6 +10,13 @@
 
 
     <Button
+        android:id="@+id/btn_test_custom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="自定义测试" />
+
+
+    <Button
         android:id="@+id/btn_test"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
