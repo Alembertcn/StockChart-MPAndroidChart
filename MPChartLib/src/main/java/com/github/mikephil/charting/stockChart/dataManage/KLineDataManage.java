@@ -341,8 +341,8 @@ public class KLineDataManage {
         barDataSet.setIncreasingColor(ContextCompat.getColor(mContext, R.color.up_color));//行情涨势时蜡烛的标识颜色
         barDataSet.setDecreasingColor(ContextCompat.getColor(mContext, R.color.down_color));//行情跌势时蜡烛的标识颜色
 
-        barDataSet.setIncreasingPaintStyle(Paint.Style.FILL_AND_STROKE);//蜡烛实心或空心
-        barDataSet.setDecreasingPaintStyle(Paint.Style.FILL_AND_STROKE);
+        barDataSet.setIncreasingPaintStyle(Paint.Style.FILL);
+        barDataSet.setDecreasingPaintStyle(Paint.Style.FILL);
         return barDataSet;
     }
 

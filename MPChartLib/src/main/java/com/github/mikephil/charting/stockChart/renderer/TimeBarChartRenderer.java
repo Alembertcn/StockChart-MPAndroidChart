@@ -127,8 +127,9 @@ public class TimeBarChartRenderer extends BarChartRenderer {
                 }
             }
 
-
-            c.drawRect(buffer.buffer[j], buffer.buffer[j + 1], buffer.buffer[j + 2],
+            // 防止细到看不到线
+            float top = Math.abs(buffer.buffer[j + 1] - buffer.buffer[j + 3]) <2.0f ? (buffer.buffer[j + 3] - 2.0f) : buffer.buffer[j + 1];
+            c.drawRect(buffer.buffer[j], top, buffer.buffer[j + 2],
                     buffer.buffer[j + 3], mRenderPaint);
 
             if (drawBorder) {

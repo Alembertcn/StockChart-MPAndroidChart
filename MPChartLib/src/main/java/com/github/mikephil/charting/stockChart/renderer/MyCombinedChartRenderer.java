@@ -38,10 +38,6 @@ public class MyCombinedChartRenderer extends CombinedChartRenderer {
                 case BAR:
                     if (chart.getBarData() != null) {
                         TimeBarChartRenderer timeBarChartRenderer = new TimeBarChartRenderer(chart, mAnimator, mViewPortHandler);
-                        Paint paintRender = timeBarChartRenderer.getPaintRender();
-                        //防止细到看不到线
-                        paintRender.setStrokeWidth(2f);
-                        paintRender.setStyle(Paint.Style.FILL_AND_STROKE);
                         mRenderers.add(timeBarChartRenderer);
                     }
                     break;
