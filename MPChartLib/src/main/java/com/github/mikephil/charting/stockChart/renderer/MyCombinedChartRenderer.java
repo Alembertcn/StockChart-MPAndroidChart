@@ -1,5 +1,7 @@
 package com.github.mikephil.charting.stockChart.renderer;
 
+import android.graphics.Paint;
+
 import com.github.mikephil.charting.animation.ChartAnimator;
 import com.github.mikephil.charting.charts.CombinedChart;
 import com.github.mikephil.charting.renderer.BubbleChartRenderer;
@@ -35,7 +37,12 @@ public class MyCombinedChartRenderer extends CombinedChartRenderer {
             switch (order) {
                 case BAR:
                     if (chart.getBarData() != null) {
-                        mRenderers.add(new TimeBarChartRenderer(chart, mAnimator, mViewPortHandler));
+                        TimeBarChartRenderer timeBarChartRenderer = new TimeBarChartRenderer(chart, mAnimator, mViewPortHandler);
+                        Paint paintRender = timeBarChartRenderer.getPaintRender();
+                        //防止细到看不到线
+                        paintRender.setStrokeWidth(2f);
+                        paintRender.setStyle(Paint.Style.FILL_AND_STROKE);
+                        mRenderers.add(timeBarChartRenderer);
                     }
                     break;
                 case BUBBLE:

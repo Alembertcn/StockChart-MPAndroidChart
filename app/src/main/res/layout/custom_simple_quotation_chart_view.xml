@@ -17,6 +17,7 @@
 
     <!-- k线图   -->
     <FrameLayout
+        android:visibility="gone"
         android:id="@+id/flKChart"
         android:layout_width="match_parent"
         android:layout_height="match_parent">

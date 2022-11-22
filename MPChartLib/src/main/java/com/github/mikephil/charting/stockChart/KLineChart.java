@@ -97,7 +97,7 @@ public class KLineChart extends BaseChart {
     public void initChart(boolean landscape) {
         this.landscape = landscape;
         //蜡烛图
-        candleChart.setDrawBorders(true);
+        candleChart.setDrawBorders(false);
         candleChart.setBorderWidth(0.7f);
         candleChart.setBorderColor(ContextCompat.getColor(mContext, R.color.border_color));
         candleChart.setDragEnabled(true);//是否可拖动
@@ -113,7 +113,7 @@ public class KLineChart extends BaseChart {
         candleChart.setNoDataText(getResources().getString(R.string.loading));
 
         //副图
-        barChart.setDrawBorders(true);
+        barChart.setDrawBorders(false);
         barChart.setBorderWidth(0.7f);
         barChart.setBorderColor(ContextCompat.getColor(mContext, R.color.border_color));
         barChart.setDragEnabled(true);
@@ -131,7 +131,7 @@ public class KLineChart extends BaseChart {
         xAxisK = candleChart.getXAxis();
         xAxisK.setDrawLabels(false);
         xAxisK.setLabelCount(landscape ? 5 : 4, true);
-        xAxisK.setDrawGridLines(true);
+        xAxisK.setDrawGridLines(false);
         xAxisK.setDrawAxisLine(false);
         xAxisK.setGridLineWidth(0.7f);
         xAxisK.setGridColor(ContextCompat.getColor(mContext, R.color.grid_color));
@@ -142,7 +142,7 @@ public class KLineChart extends BaseChart {
 
         //蜡烛图左Y轴
         axisLeftK = candleChart.getAxisLeft();
-        axisLeftK.setDrawGridLines(true);
+        axisLeftK.setDrawGridLines(false);
         axisLeftK.setDrawAxisLine(false);
         axisLeftK.setDrawLabels(true);
         axisLeftK.setLabelCount(5, true);
@@ -152,7 +152,8 @@ public class KLineChart extends BaseChart {
         axisLeftK.setGridLineWidth(0.7f);
         axisLeftK.setValueLineInside(true);
         axisLeftK.setDrawTopBottomGridLine(false);
-        axisLeftK.setPosition(landscape ? YAxis.YAxisLabelPosition.OUTSIDE_CHART : YAxis.YAxisLabelPosition.INSIDE_CHART);
+//        axisLeftK.setPosition(landscape ? YAxis.YAxisLabelPosition.OUTSIDE_CHART : YAxis.YAxisLabelPosition.INSIDE_CHART);
+        axisLeftK.setPosition(YAxis.YAxisLabelPosition.INSIDE_CHART);
         axisLeftK.setValueFormatter(new ValueFormatter() {
             @Override
             public String getAxisLabel(float value, AxisBase axis) {
@@ -169,7 +170,7 @@ public class KLineChart extends BaseChart {
 
         //副图X轴
         xAxisBar = barChart.getXAxis();
-        xAxisBar.setDrawGridLines(true);
+        xAxisBar.setDrawGridLines(false);
         xAxisBar.setDrawAxisLine(false);
         xAxisBar.setDrawLabels(true);
         xAxisBar.setLabelCount(landscape ? 5 : 4, true);
@@ -189,7 +190,8 @@ public class KLineChart extends BaseChart {
         axisLeftBar.setDrawLabels(true);
         axisLeftBar.setLabelCount(2, true);
         axisLeftBar.setValueLineInside(true);
-        axisLeftBar.setPosition(landscape ? YAxis.YAxisLabelPosition.OUTSIDE_CHART : YAxis.YAxisLabelPosition.INSIDE_CHART);
+//        axisLeftBar.setPosition(landscape ? YAxis.YAxisLabelPosition.OUTSIDE_CHART : YAxis.YAxisLabelPosition.INSIDE_CHART);
+        axisLeftBar.setPosition(YAxis.YAxisLabelPosition.INSIDE_CHART);
 
         //副图右Y轴
         axisRightBar = barChart.getAxisRight();
@@ -298,7 +300,11 @@ public class KLineChart extends BaseChart {
         candleChart.setData(candleChartData);
         /*************************************成交量数据*****************************************************/
         barChartData = new CombinedData();
-        barChartData.setData(new BarData(kLineData.getVolumeDataSet()));
+        BarData barData = new BarData(kLineData.getVolumeDataSet());
+        float barWidth =1.0f-kLineData.getCandleDataSet().getBarSpace()*2;
+        barData.setBarWidth(barWidth);
+
+        barChartData.setData(barData);
         barChartData.setData(new LineData());
         barChartData.setData(new CandleData());
         //重新请求数据时保持副图指标还是显示原来的指标
@@ -328,11 +334,15 @@ public class KLineChart extends BaseChart {
                 left_right = CommonUtil.dip2px(mContext, pricewidth > volwidth ? pricewidth : volwidth);
                 candleChart.setViewPortOffsets(left_right, CommonUtil.dip2px(mContext, 15), CommonUtil.dip2px(mContext, 5), 0);
                 barChart.setViewPortOffsets(left_right, CommonUtil.dip2px(mContext, 15), CommonUtil.dip2px(mContext, 5), CommonUtil.dip2px(mContext, 16));
+
             } else {
                 left_right = CommonUtil.dip2px(mContext, 5);
                 candleChart.setViewPortOffsets(left_right, CommonUtil.dip2px(mContext, 15), CommonUtil.dip2px(mContext, 5), 0);
                 barChart.setViewPortOffsets(left_right, CommonUtil.dip2px(mContext, 15), CommonUtil.dip2px(mContext, 5), CommonUtil.dip2px(mContext, 16));
             }
+
+            candleChart.setViewPortOffsets(0,CommonUtil.dip2px(mContext, 15),0, 0);
+            barChart.setViewPortOffsets(0,CommonUtil.dip2px(mContext, 15),0, CommonUtil.dip2px(mContext, 16));
 
             setMarkerView(kLineData);
             setBottomMarkerView(kLineData);
@@ -447,7 +457,10 @@ public class KLineChart extends BaseChart {
             axisLeftBar.setValueFormatter(new VolFormatter(mContext, kLineData.getAssetId()));
 
             CombinedData combinedData = barChart.getData();
-            combinedData.setData(new BarData(kLineData.getVolumeDataSet()));
+            BarData data = new BarData(kLineData.getVolumeDataSet());
+            float barWidth =1.0f-kLineData.getCandleDataSet().getBarSpace()*2;
+            data.setBarWidth(barWidth);
+            combinedData.setData(data);
             combinedData.setData(new LineData());
             barChart.notifyDataSetChanged();
             barChart.animateY(1000);
@@ -481,7 +494,6 @@ public class KLineChart extends BaseChart {
             CombinedData combinedData = barChart.getData();
             combinedData.setData(new LineData(kLineData.getLineDataMACD()));
             BarData data = new BarData(kLineData.getBarDataMACD());
-
             combinedData.setData(data);
             barChart.notifyDataSetChanged();
             barChart.invalidate();

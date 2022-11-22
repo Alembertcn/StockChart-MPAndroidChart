@@ -2,6 +2,7 @@ package com.android.stockapp.ui.base
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
@@ -50,6 +51,7 @@ class CustomSimpleQuotationChartView @JvmOverloads constructor (context: Context
 
         combinedchart.initChart(land)
 
+
         combinedchart.getGestureListenerBar().setCoupleClick {
             if (land) {
                 combinedchart.doBarChartSwitch((indexType++)%4+1)
@@ -83,6 +85,7 @@ class CustomSimpleQuotationChartView @JvmOverloads constructor (context: Context
 
                 kTimeData.parseTimeData(srcDate, assetId, preClosePrice)
                 oneDayChart.setDataToChart(kTimeData)
+
             }
             else -> {
                 flOneDayChart.visibility = View.GONE
@@ -90,6 +93,17 @@ class CustomSimpleQuotationChartView @JvmOverloads constructor (context: Context
 
                 //上证指数代码000001.IDX.SH
                 kLineData.parseKlineData(srcDate, assetId, land)
+                kLineData.candleDataSet.apply {
+                    decreasingColor = ColorHelper.getFallColor()
+                    increasingColor = ColorHelper.getRiseColor()
+                    neutralColor = ColorHelper.getEqualColor()
+                }
+
+                kLineData.volumeDataSet.apply {
+                    decreasingColor = ColorHelper.getFallColor()
+                    increasingColor = ColorHelper.getRiseColor()
+                    neutralColor = ColorHelper.getEqualColor()
+                }
                 combinedchart.setDataToChart(kLineData)
             }
         }
