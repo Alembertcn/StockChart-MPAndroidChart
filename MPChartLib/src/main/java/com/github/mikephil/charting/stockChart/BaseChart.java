@@ -2,7 +2,9 @@ package com.github.mikephil.charting.stockChart;
 
 import android.content.Context;
 import android.graphics.Paint;
+
 import androidx.annotation.Nullable;
+
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
@@ -19,6 +21,9 @@ import com.github.mikephil.charting.stockChart.event.BaseEvent;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
+import java.util.List;
+import java.util.function.Consumer;
 
 public class BaseChart extends LinearLayout {
 
@@ -49,9 +54,9 @@ public class BaseChart extends LinearLayout {
     }
 
     public interface OnHighlightValueSelectedListener {
-        void onDayHighlightValueListener(TimeDataManage mData,int index, boolean isSelect);
+        void onDayHighlightValueListener(TimeDataManage mData, int index, boolean isSelect);
 
-        void onKHighlightValueListener(KLineDataManage data,int index, boolean isSelect);
+        void onKHighlightValueListener(KLineDataManage data, int index, boolean isSelect);
     }
 
     public CoupleChartGestureListener getGestureListenerLine() {
@@ -61,55 +66,38 @@ public class BaseChart extends LinearLayout {
     public CoupleChartGestureListener getGestureListenerBar() {
         return gestureListenerBar;
     }
+
     public CoupleChartGestureListener getGestureListenerCandle() {
         return gestureListenerCandle;
     }
 
     /**
      * 分时图最后一点的圆圈动画
+     *
      * @param heartbeatView
      */
     public void playHeartbeatAnimation(final View heartbeatView) {
         AnimationSet swellAnimationSet = new AnimationSet(true);
-        swellAnimationSet.addAnimation(new ScaleAnimation(1.0f, 2.0f, 1.0f, 2.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f));
-        swellAnimationSet.setDuration(1000);
+        ScaleAnimation scaleAnimation = new ScaleAnimation(1.0f, 2.0f, 1.0f, 2.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        scaleAnimation.setRepeatMode(AnimationSet.REVERSE);
+        scaleAnimation.setDuration(1000);
+        scaleAnimation.setRepeatCount(-1);
+        scaleAnimation.setFillBefore(true);
+        swellAnimationSet.addAnimation(scaleAnimation);
         swellAnimationSet.setInterpolator(new AccelerateInterpolator());
-        swellAnimationSet.setFillAfter(true);//动画终止时停留在最后一帧，不然会回到没有执行之前的状态
         heartbeatView.startAnimation(swellAnimationSet);
-        swellAnimationSet.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
+    }
+
+    public void stopHeartbeatAnimation(View heartbeatView) {
+        AnimationSet animation = (AnimationSet) heartbeatView.getAnimation();
+        if(animation!=null && animation.hasStarted()){
+            animation.cancel();
+            List<Animation> animations = animation.getAnimations();
+            for (int i = 0; i < animations.size(); i++) {
+                animations.get(i).cancel();
             }
+        }
 
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                AnimationSet shrinkAnimationSet = new AnimationSet(true);
-                shrinkAnimationSet.addAnimation(new ScaleAnimation(2.0f, 1.0f, 2.0f, 1.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f));
-                shrinkAnimationSet.setDuration(1000);
-                shrinkAnimationSet.setInterpolator(new DecelerateInterpolator());
-                shrinkAnimationSet.setFillAfter(false);
-                heartbeatView.startAnimation(shrinkAnimationSet);// 动画结束时重新开始，实现心跳的View
-                shrinkAnimationSet.setAnimationListener(new Animation.AnimationListener() {
-                    @Override
-                    public void onAnimationStart(Animation animation) {
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animation animation) {
-                        playHeartbeatAnimation(heartbeatView);
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animation animation) {
-
-                    }
-                });
-            }
-        });
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

@@ -95,8 +95,15 @@ public class OneDayChart extends BaseChart {
 
         colorArray = new int[]{ ContextCompat.getColor(mContext, R.color.up_color), ContextCompat.getColor(mContext, R.color.equal_color),ContextCompat.getColor(mContext, R.color.down_color)};
 
-        playHeartbeatAnimation(cirCleView.findViewById(R.id.anim_view));
+        playHeaderAnimation();
 
+    }
+
+    public void playHeaderAnimation() {
+        playHeartbeatAnimation(cirCleView.findViewById(R.id.anim_view));
+    }
+    public void stopHeaderAnimation() {
+        stopHeartbeatAnimation(cirCleView.findViewById(R.id.anim_view));
     }
 
     /**
@@ -267,7 +274,7 @@ public class OneDayChart extends BaseChart {
      */
     public void setDataToChart(TimeDataManage mData) {
         this.mData = mData;
-//        cirCleView.setVisibility(landscape ? View.VISIBLE : View.GONE);
+        cirCleView.setVisibility(landscape ? View.VISIBLE : View.GONE);
         if (mData.getDatas().size() == 0) {
             cirCleView.setVisibility(View.GONE);
             lineChart.setNoDataText(getResources().getString(R.string.no_data));
@@ -544,4 +551,7 @@ public class OneDayChart extends BaseChart {
     }
 
 
+    public void doBarChartSwitch(int indexTypeOnyDay) {
+
+    }
 }
