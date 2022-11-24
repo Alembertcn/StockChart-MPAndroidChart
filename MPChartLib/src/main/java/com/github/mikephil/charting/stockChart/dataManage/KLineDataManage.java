@@ -244,7 +244,7 @@ public class KLineDataManage {
         }
         lineDataBOLL.add(setALine(ColorType.blue, bollDataUP, false));
         lineDataBOLL.add(setALine(ColorType.yellow, bollDataMB, false));
-        lineDataBOLL.add(setALine(ColorType.purple, bollDataDN, true));
+        lineDataBOLL.add(setALine(ColorType.purple, bollDataDN, false));
     }
     /**
      * 初始化自己计算RSI
