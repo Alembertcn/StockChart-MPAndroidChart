@@ -136,8 +136,8 @@ public class KLineDataManage {
                     klineDatamodel.setHigh(data.optJSONArray(i).optDouble(2));
                     klineDatamodel.setLow(data.optJSONArray(i).optDouble(3));
                     klineDatamodel.setClose(data.optJSONArray(i).optDouble(4));
-                    klineDatamodel.setVolume(NumberUtils.stringNoE10ForVol(Double.isNaN(data.optJSONArray(i).optDouble(5)) ? 0 : data.optJSONArray(i).optDouble(5)));
-                    klineDatamodel.setTotal(NumberUtils.stringNoE10ForVol(Double.isNaN(data.optJSONArray(i).optDouble(6)) ? 0 : data.optJSONArray(i).optDouble(6)));
+                    klineDatamodel.setTotal(NumberUtils.stringNoE10ForVol(Double.isNaN(data.optJSONArray(i).optDouble(5)) ? 0 : data.optJSONArray(i).optDouble(5)));
+                    klineDatamodel.setVolume(NumberUtils.stringNoE10ForVol(Double.isNaN(data.optJSONArray(i).optDouble(6)) ? 0 : data.optJSONArray(i).optDouble(6)));
                     klineDatamodel.setMa5(data.optJSONArray(i).optDouble(7));
                     klineDatamodel.setMa10(data.optJSONArray(i).optDouble(8));
                     klineDatamodel.setMa20(data.optJSONArray(i).optDouble(9));

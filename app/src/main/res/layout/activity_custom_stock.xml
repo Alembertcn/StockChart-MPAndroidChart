@@ -41,9 +41,10 @@
         </RadioGroup>
 
         <FrameLayout
-            android:layout_width="match_parent"
+            android:id="@+id/flChart"
+            android:layout_width="300dp"
             android:layout_height="255dp">
-            <com.android.stockapp.ui.base.CustomSimpleQuotationChartView
+            <com.github.mikephil.CustomSimpleQuotationChartView
                 android:id="@+id/chartView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>

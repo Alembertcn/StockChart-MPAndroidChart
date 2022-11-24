@@ -113,6 +113,7 @@ public class KLineChart extends BaseChart {
         candleChart.setDragEnabled(true);//是否可拖动
         candleChart.setScaleXEnabled(true);//x轴方向是否可放大缩小
         candleChart.setScaleYEnabled(false);//Y轴方向是否可放大缩小
+        candleChart.setKeepPositionOnRotation(true);
         candleChart.setHardwareAccelerationEnabled(true);
         Legend mChartKlineLegend = candleChart.getLegend();
         mChartKlineLegend.setEnabled(false);
@@ -131,6 +132,7 @@ public class KLineChart extends BaseChart {
         candleChart.setXAxisRenderer(xAxisRenderer);
 
         //副图
+        barChart.setKeepPositionOnRotation(true);
         barChart.setDrawBorders(false);
         barChart.setBorderWidth(0.7f);
         barChart.setBorderColor(ContextCompat.getColor(mContext, R.color.border_color));
@@ -382,19 +384,16 @@ public class KLineChart extends BaseChart {
                                 break;
                             }
                         }
-
                         String currentStr = kLineData.getxVals().get(index);
-
                         if(lastIndex == -1 || kLineData.getxVals().size()> lastIndex && !currentStr.startsWith(kLineData.getxVals().get(lastIndex).substring(0,4))){
                             return  currentStr;
                         }else {
                             String preStr = kLineData.getxVals().get(lastIndex);
-//                            if(preStr.equals(currentStr)){
-//                                return "";
-//                            }
+                            if(preStr.equals(currentStr)){
+                                return "";
+                            }
                             return currentStr.substring(5);
                         }
-
 //                        return kLineData.getxVals().get(index);
                     }
                 }

@@ -13,12 +13,18 @@ class CustomStockActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_custom_stock)
         test.setOnClickListener {
-            chartView.oneDayChart.stopHeaderAnimation()
+
+            val layoutParams = flChart.layoutParams
+            layoutParams.width = layoutParams.width+10
+            flChart.layoutParams = layoutParams
+            flChart.requestLayout()
+
+//            chartView.oneDayChart.stopHeaderAnimation()
         }
         rg.setOnCheckedChangeListener{_,resId->
             when (resId) {
                 R.id.rb01 -> {
-                    chartView.setKData(JSONObject(Constains.oneDayData),"601818.SH",2.82)
+                    chartView.setKData(JSONObject(Constains.oneDayData),"601818.SH",2.82,0)
                 }
                 R.id.rb02 -> {
                     chartView.setKData(JSONObject(Constains.oneDK),"601818.SH",2.82,1)

@@ -72,16 +72,26 @@ public class BaseChart extends LinearLayout {
     }
 
     /**
-     * 分时图最后一点的圆圈动画
+     * 分时图最后一点的圆圈无限动画
      *
      * @param heartbeatView
      */
     public void playHeartbeatAnimation(final View heartbeatView) {
+        playHeartbeatAnimation(heartbeatView, -1);
+    }
+
+    /**
+     * 分时图最后一点的圆圈动画
+     *
+     * @param heartbeatView
+     * @param repeatCount 重复次数
+     */
+    public void playHeartbeatAnimation(final View heartbeatView,int repeatCount) {
         AnimationSet swellAnimationSet = new AnimationSet(true);
         ScaleAnimation scaleAnimation = new ScaleAnimation(1.0f, 2.0f, 1.0f, 2.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
         scaleAnimation.setRepeatMode(AnimationSet.REVERSE);
         scaleAnimation.setDuration(1000);
-        scaleAnimation.setRepeatCount(-1);
+        scaleAnimation.setRepeatCount(repeatCount);
         scaleAnimation.setFillBefore(true);
         swellAnimationSet.addAnimation(scaleAnimation);
         swellAnimationSet.setInterpolator(new AccelerateInterpolator());

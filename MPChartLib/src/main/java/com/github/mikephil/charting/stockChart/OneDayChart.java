@@ -94,17 +94,17 @@ public class OneDayChart extends BaseChart {
         EventBus.getDefault().register(this);
 
         colorArray = new int[]{ ContextCompat.getColor(mContext, R.color.up_color), ContextCompat.getColor(mContext, R.color.equal_color),ContextCompat.getColor(mContext, R.color.down_color)};
-
-        playHeaderAnimation();
-
     }
 
-    public void playHeaderAnimation() {
-        playHeartbeatAnimation(cirCleView.findViewById(R.id.anim_view));
+
+    public void playHeaderAnimation(int count) {
+        stopHeaderAnimation();
+        playHeartbeatAnimation(cirCleView.findViewById(R.id.anim_view),count);
     }
     public void stopHeaderAnimation() {
         stopHeartbeatAnimation(cirCleView.findViewById(R.id.anim_view));
     }
+
 
     /**
      * 初始化图表属性
@@ -457,6 +457,7 @@ public class OneDayChart extends BaseChart {
         //动态添加或移除数据后， 调用invalidate()刷新图表之前 必须调用 notifyDataSetChanged() .
         lineChart.moveViewToX(index);
         barChart.moveViewToX(index);
+        playHeaderAnimation(1);
     }
 
     /**
@@ -490,6 +491,7 @@ public class OneDayChart extends BaseChart {
         barData.notifyDataChanged();
         barChart.notifyDataSetChanged();
         barChart.moveViewToX(index);
+        playHeaderAnimation(1);
     }
 
     public void cleanData() {
