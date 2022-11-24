@@ -2,6 +2,7 @@ package com.github.mikephil.charting.stockChart.dataManage;
 
 import android.content.Context;
 import android.graphics.Paint;
+
 import androidx.core.content.ContextCompat;
 
 import com.github.mikephil.charting.R;
@@ -11,6 +12,7 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.CandleDataSet;
 import com.github.mikephil.charting.data.CandleEntry;
 import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.GlobaleConfig;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
@@ -71,6 +73,12 @@ public class KLineDataManage {
     //X轴数据
     private ArrayList<String> xVal = new ArrayList<>();
 
+    public Integer[] getxCanUseIndexes() {
+        return  xCanUseIndexes.toArray(new Integer[]{});
+    }
+
+    private ArrayList<Integer> xCanUseIndexes = new ArrayList<>();
+
     private CandleDataSet candleDataSet;//蜡烛图集合
     private BarDataSet volumeDataSet;//成交量集合
     private BarDataSet barDataMACD;//MACD集合
@@ -115,6 +123,7 @@ public class KLineDataManage {
             JSONArray data = object.optJSONArray("data");
             if (data != null) {
                 xVal.clear();
+                xCanUseIndexes.clear();
                 ArrayList<CandleEntry> candleEntries = new ArrayList<>();
                 ArrayList<BarEntry> barEntries = new ArrayList<>();
                 List<Entry> line5Entries = new ArrayList<>();
@@ -153,7 +162,10 @@ public class KLineDataManage {
                     preClosePrice = klineDatamodel.getPreClose();
                     kDatas.add(klineDatamodel);
 
-                    xVal.add(DataTimeUtil.secToDate(getKLineDatas().get(i).getDateMills()));
+                    xVal.add(DataTimeUtil.secToDateMonth(getKLineDatas().get(i).getDateMills()));
+                    if(i>0 && !DataTimeUtil.isSameMoth(getKLineDatas().get(i).getDateMills(),getKLineDatas().get(i-1).getDateMills())){
+                        xCanUseIndexes.add(i);
+                    }
                     candleEntries.add(new CandleEntry(i + offSet, (float) getKLineDatas().get(i).getHigh(), (float) getKLineDatas().get(i).getLow(), (float) getKLineDatas().get(i).getOpen(), (float) getKLineDatas().get(i).getClose()));
 
                     float color = getKLineDatas().get(i).getOpen() == getKLineDatas().get(i).getClose() ? 0f : getKLineDatas().get(i).getOpen() > getKLineDatas().get(i).getClose() ? -1f : 1f;
@@ -163,9 +175,9 @@ public class KLineDataManage {
                     line10Entries.add(new Entry( i + offSet, (float) getKLineDatas().get(i).getMa10()));
                     line20Entries.add(new Entry(i + offSet, (float) getKLineDatas().get(i).getMa20()));
                 }
-                line5Entries = line5Entries.subList(N1-1, line5Entries.size());
-                line10Entries = line10Entries.subList(N2-1, line10Entries.size());
-                line20Entries = line20Entries.subList(N3-1, line20Entries.size());
+                line5Entries =line5Entries.size()>N1 ? line5Entries.subList(N1-1, line5Entries.size()):line5Entries;
+                line10Entries =line10Entries.size()>N2 ? line10Entries.subList(N2-1, line10Entries.size()):line10Entries;
+                line20Entries = line20Entries.size()>N3 ?line20Entries.subList(N3-1, line20Entries.size()):line20Entries;
                 candleDataSet = setACandle(candleEntries);
                 bollCandleDataSet = setBOLLCandle(candleEntries);
                 volumeDataSet = setABar(barEntries, "成交量");
@@ -257,7 +269,7 @@ public class KLineDataManage {
 
     private CandleDataSet setACandle(ArrayList<CandleEntry> candleEntries) {
         CandleDataSet candleDataSet = new CandleDataSet(candleEntries, "蜡烛线");
-        candleDataSet.setDrawHorizontalHighlightIndicator(true);
+        candleDataSet.setDrawHorizontalHighlightIndicator(false);
         candleDataSet.setHighlightEnabled(true);
         candleDataSet.setHighLightColor(ContextCompat.getColor(mContext, R.color.highLight_Color));
         candleDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
@@ -268,7 +280,8 @@ public class KLineDataManage {
         candleDataSet.setIncreasingPaintStyle(Paint.Style.FILL);
         candleDataSet.setNeutralColor(ContextCompat.getColor(mContext, R.color.equal_color));
         candleDataSet.setShadowColorSameAsCandle(true);
-        candleDataSet.setValueTextSize(10);
+        candleDataSet.setValueTextSize(GlobaleConfig.COMMON_TEXT_SIZE);
+        candleDataSet.setValueTextColor(GlobaleConfig.VALUE_COLOR);
         candleDataSet.setDrawValues(true);
 
         return candleDataSet;

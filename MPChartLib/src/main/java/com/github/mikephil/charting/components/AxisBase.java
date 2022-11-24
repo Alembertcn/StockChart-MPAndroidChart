@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.util.Log;
 
+import com.github.mikephil.charting.GlobaleConfig;
 import com.github.mikephil.charting.formatter.DefaultAxisValueFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.utils.Utils;
@@ -156,7 +157,7 @@ public abstract class AxisBase extends ComponentBase {
      * default constructor
      */
     public AxisBase() {
-        this.mTextSize = Utils.convertDpToPixel(10f);
+        this.mTextSize = Utils.convertDpToPixel(GlobaleConfig.COMMON_TEXT_SIZE);
         this.mXOffset = Utils.convertDpToPixel(5f);
         this.mYOffset = Utils.convertDpToPixel(5f);
         this.mLimitLines = new ArrayList<LimitLine>();

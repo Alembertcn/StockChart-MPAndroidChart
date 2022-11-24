@@ -4,6 +4,7 @@ package com.github.mikephil.charting.components;
 import android.graphics.Color;
 import android.graphics.Typeface;
 
+import com.github.mikephil.charting.GlobaleConfig;
 import com.github.mikephil.charting.utils.Utils;
 
 /**
@@ -36,7 +37,7 @@ public abstract class ComponentBase {
     /**
      * the text size of the labels
      */
-    protected float mTextSize = Utils.convertDpToPixel(10f);
+    protected float mTextSize = Utils.convertDpToPixel(GlobaleConfig.COMMON_TEXT_SIZE);
 
     /**
      * the text color to use for the labels
@@ -154,6 +155,15 @@ public abstract class ComponentBase {
     }
 
     /**
+     * Returns true if this comonent is enabled (should be drawn), false if not.
+     *
+     * @return
+     */
+    public boolean isEnabled() {
+        return mEnabled;
+    }
+
+    /**
      * Set this to true if this component should be enabled (should be drawn),
      * false if not. If disabled, nothing of this component will be drawn.
      * Default: true
@@ -162,14 +172,5 @@ public abstract class ComponentBase {
      */
     public void setEnabled(boolean enabled) {
         mEnabled = enabled;
-    }
-
-    /**
-     * Returns true if this comonent is enabled (should be drawn), false if not.
-     *
-     * @return
-     */
-    public boolean isEnabled() {
-        return mEnabled;
     }
 }

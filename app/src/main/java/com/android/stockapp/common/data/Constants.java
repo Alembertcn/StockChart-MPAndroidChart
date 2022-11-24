@@ -1,5 +1,7 @@
 package com.android.stockapp.common.data;
 
+import android.graphics.Color;
+
 /**
  * 公共常量
  */

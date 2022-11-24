@@ -13,7 +13,7 @@ import java.util.List;
 public abstract class LineScatterCandleRadarDataSet<T extends Entry> extends BarLineScatterCandleBubbleDataSet<T> implements ILineScatterCandleRadarDataSet<T> {
 
     protected boolean mDrawVerticalHighlightIndicator = true;
-    protected boolean mDrawHorizontalHighlightIndicator = true;
+    protected boolean mDrawHorizontalHighlightIndicator = false;
 
     /** the width of the highlight indicator lines */
     protected float mHighlightLineWidth = 0.5f;

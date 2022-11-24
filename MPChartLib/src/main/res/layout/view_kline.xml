@@ -8,13 +8,14 @@
         android:id="@+id/candleChart"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:background="@color/border_color"
         android:layout_above="@+id/barchart"
-        android:layout_weight="1.8" />
+        android:layout_weight="252" />
 
     <com.github.mikephil.charting.stockChart.charts.MyCombinedChart
         android:id="@+id/barchart"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1.2" />
+        android:layout_weight="65" />
 
 </LinearLayout>

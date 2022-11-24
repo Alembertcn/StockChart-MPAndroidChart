@@ -107,6 +107,7 @@ public abstract class DataRenderer extends Renderer {
 
         mValuePaint.setTypeface(set.getValueTypeface());
         mValuePaint.setTextSize(set.getValueTextSize());
+        mValuePaint.setColor(set.getValueTextColor());
     }
 
     /**

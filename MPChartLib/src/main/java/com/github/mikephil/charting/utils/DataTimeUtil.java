@@ -113,6 +113,13 @@ public class DataTimeUtil {
     }
 
     // a integer to xxxxxx
+    public static String secToDateMonth(long time) {
+        String timeStr = null;
+        timeStr = new SimpleDateFormat("yyyy/MM").format(new Date(time));
+        return timeStr;
+    }
+
+    // a integer to xxxxxx
     public static String secToDateForFiveDay(long time) {
         String timeStr = null;
         timeStr = new SimpleDateFormat("MM-dd").format(new Date(time));
@@ -378,6 +385,10 @@ public class DataTimeUtil {
 //            yValues.set(i,yValues.get(i)+yValues.get(i-1));
 //        }
         return yValues;
+    }
+
+    public static boolean isSameMoth(long time1, long time2) {
+        return secToDateMonth(time1).equals(secToDateMonth(time2));
     }
 
 }

@@ -1,6 +1,7 @@
 package com.github.mikephil.charting.stockChart;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Handler;
 import android.os.Message;
 
@@ -13,6 +14,7 @@ import android.view.MotionEvent;
 
 import com.github.mikephil.charting.R;
 import com.github.mikephil.charting.charts.Chart;
+import com.github.mikephil.charting.charts.CombinedChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
@@ -32,6 +34,7 @@ import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ICandleDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.github.mikephil.charting.stockChart.charts.TimeXAxis;
 import com.github.mikephil.charting.stockChart.markerView.BarBottomMarkerView;
 import com.github.mikephil.charting.stockChart.charts.CandleCombinedChart;
 import com.github.mikephil.charting.stockChart.charts.CoupleChartGestureListener;
@@ -40,11 +43,16 @@ import com.github.mikephil.charting.stockChart.markerView.LeftMarkerView;
 import com.github.mikephil.charting.stockChart.charts.MyCombinedChart;
 import com.github.mikephil.charting.stockChart.dataManage.KLineDataManage;
 import com.github.mikephil.charting.stockChart.enums.TimeType;
+import com.github.mikephil.charting.stockChart.model.KLineDataModel;
+import com.github.mikephil.charting.stockChart.renderer.DynicDateXAxisRenderer;
 import com.github.mikephil.charting.utils.CommonUtil;
 import com.github.mikephil.charting.utils.DataTimeUtil;
 import com.github.mikephil.charting.utils.NumberUtils;
 import com.github.mikephil.charting.utils.Utils;
 import com.github.mikephil.charting.utils.ViewPortHandler;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * K线
@@ -54,10 +62,12 @@ public class KLineChart extends BaseChart {
     private Context mContext;
     private CandleCombinedChart candleChart;
     private MyCombinedChart barChart;
+    DynicDateXAxisRenderer xAxisRenderer;
 
     private XAxis xAxisBar, xAxisK;
     private YAxis axisLeftBar, axisLeftK;
     private YAxis axisRightBar, axisRightK;
+    private boolean defaultDrawMaket = false;
 
     private KLineDataManage kLineData;
 
@@ -112,6 +122,14 @@ public class KLineChart extends BaseChart {
         candleChart.setDoubleTapToZoomEnabled(false);
         candleChart.setNoDataText(getResources().getString(R.string.loading));
 
+        // draw bars behind lines
+        candleChart.setDrawOrder(new CombinedChart.DrawOrder[]{
+                 CombinedChart.DrawOrder.BAR, CombinedChart.DrawOrder.BUBBLE, CombinedChart.DrawOrder.CANDLE,  CombinedChart.DrawOrder.SCATTER,CombinedChart.DrawOrder.LINE
+        });
+
+        xAxisRenderer = new DynicDateXAxisRenderer(candleChart.getViewPortHandler(), candleChart.getXAxis(), candleChart.getTransformer(YAxis.AxisDependency.LEFT));
+        candleChart.setXAxisRenderer(xAxisRenderer);
+
         //副图
         barChart.setDrawBorders(false);
         barChart.setBorderWidth(0.7f);
@@ -129,16 +147,19 @@ public class KLineChart extends BaseChart {
 
         //蜡烛图X轴
         xAxisK = candleChart.getXAxis();
-        xAxisK.setDrawLabels(false);
-        xAxisK.setLabelCount(landscape ? 5 : 4, true);
+        xAxisK.setEnabled(true);
         xAxisK.setDrawGridLines(false);
         xAxisK.setDrawAxisLine(false);
-        xAxisK.setGridLineWidth(0.7f);
-        xAxisK.setGridColor(ContextCompat.getColor(mContext, R.color.grid_color));
+        xAxisK.setDrawLabels(true);
+        xAxisK.setLabelCount(landscape ? 4 : 4, false);
         xAxisK.setTextColor(ContextCompat.getColor(mContext, R.color.label_text));
         xAxisK.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxisK.setGridColor(ContextCompat.getColor(mContext, R.color.grid_color));
+        xAxisK.setGridLineWidth(0.7f);
         xAxisK.setAvoidFirstLastClipping(true);
         xAxisK.setDrawLimitLinesBehindData(true);
+        xAxisK.setYOffset(12F);
+
 
         //蜡烛图左Y轴
         axisLeftK = candleChart.getAxisLeft();
@@ -170,16 +191,17 @@ public class KLineChart extends BaseChart {
 
         //副图X轴
         xAxisBar = barChart.getXAxis();
-        xAxisBar.setDrawGridLines(false);
-        xAxisBar.setDrawAxisLine(false);
-        xAxisBar.setDrawLabels(true);
-        xAxisBar.setLabelCount(landscape ? 5 : 4, true);
-        xAxisBar.setTextColor(ContextCompat.getColor(mContext, R.color.label_text));
-        xAxisBar.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxisBar.setGridColor(ContextCompat.getColor(mContext, R.color.grid_color));
-        xAxisBar.setGridLineWidth(0.7f);
-        xAxisBar.setAvoidFirstLastClipping(true);
-        xAxisBar.setDrawLimitLinesBehindData(true);
+        xAxisBar.setEnabled(false);
+//        xAxisBar.setDrawGridLines(false);
+//        xAxisBar.setDrawAxisLine(false);
+//        xAxisBar.setDrawLabels(false);
+//        xAxisBar.setLabelCount(landscape ? 5 : 4, false);
+//        xAxisBar.setTextColor(ContextCompat.getColor(mContext, R.color.label_text));
+//        xAxisBar.setPosition(XAxis.XAxisPosition.BOTTOM);
+//        xAxisBar.setGridColor(ContextCompat.getColor(mContext, R.color.grid_color));
+//        xAxisBar.setGridLineWidth(0.7f);
+//        xAxisBar.setAvoidFirstLastClipping(true);
+//        xAxisBar.setDrawLimitLinesBehindData(true);
 
         //副图左Y轴
         axisLeftBar = barChart.getAxisLeft();
@@ -187,25 +209,43 @@ public class KLineChart extends BaseChart {
         axisLeftBar.setDrawGridLines(false);
         axisLeftBar.setDrawAxisLine(false);
         axisLeftBar.setTextColor(ContextCompat.getColor(mContext, R.color.axis_text));
-        axisLeftBar.setDrawLabels(true);
-        axisLeftBar.setLabelCount(2, true);
+        axisLeftBar.setDrawLabels(false);
+        axisLeftBar.setLabelCount(3, true);
         axisLeftBar.setValueLineInside(true);
 //        axisLeftBar.setPosition(landscape ? YAxis.YAxisLabelPosition.OUTSIDE_CHART : YAxis.YAxisLabelPosition.INSIDE_CHART);
+//        axisRightBar.setDrawLabels(false);
+        axisLeftBar.setLabelCount(3, true);
+//        axisLeftBar.setDrawTopBottomGridLine(false);
+        axisLeftBar.setGridColor(ContextCompat.getColor(mContext, R.color.grid_color));
+        axisLeftBar.setGridLineWidth(0.7f);
+        axisLeftBar.enableGridDashedLine(CommonUtil.dip2px(mContext, 4), CommonUtil.dip2px(mContext, 3), 0);
         axisLeftBar.setPosition(YAxis.YAxisLabelPosition.INSIDE_CHART);
-
         //副图右Y轴
         axisRightBar = barChart.getAxisRight();
-        axisRightBar.setDrawLabels(false);
-        axisRightBar.setDrawGridLines(true);
-        axisRightBar.setDrawAxisLine(false);
-        axisRightBar.setLabelCount(3, true);
-        axisRightBar.setDrawTopBottomGridLine(false);
-        axisRightBar.setGridColor(ContextCompat.getColor(mContext, R.color.grid_color));
-        axisRightBar.setGridLineWidth(0.7f);
-        axisRightBar.enableGridDashedLine(CommonUtil.dip2px(mContext, 4), CommonUtil.dip2px(mContext, 3), 0);
+        axisRightBar.setEnabled(false);
+//        axisRightBar.setDrawLabels(false);
+//        axisRightBar.setDrawGridLines(false);
+//        axisRightBar.setDrawAxisLine(false);
+//        axisRightBar.setLabelCount(3, false);
+//        axisRightBar.setDrawTopBottomGridLine(false);
+//        axisRightBar.setGridColor(ContextCompat.getColor(mContext, R.color.grid_color));
+//        axisRightBar.setGridLineWidth(0.7f);
+//        axisRightBar.enableGridDashedLine(CommonUtil.dip2px(mContext, 4), CommonUtil.dip2px(mContext, 3), 0);
 
         //手势联动监听
-        gestureListenerCandle = new CoupleChartGestureListener(candleChart, new Chart[]{barChart});
+        gestureListenerCandle = new CoupleChartGestureListener(candleChart, new Chart[]{barChart}){
+            @Override
+            public void onChartScale(MotionEvent me, float scaleX, float scaleY) {
+                super.onChartScale(me, scaleX, scaleY);
+                if(chartType1 == 2){
+                    barChart.getBarData().setBarWidth(macdBarWith/barChart.getScaleX());
+                    barChart.notifyDataSetChanged();
+                    barChart.postInvalidate();
+                }else{
+
+                }
+            }
+        };
         gestureListenerBar = new CoupleChartGestureListener(barChart, new Chart[]{candleChart}){
             @Override
             public void onChartScale(MotionEvent me, float scaleX, float scaleY) {
@@ -217,7 +257,6 @@ public class KLineChart extends BaseChart {
                 }else{
                     
                 }
-              
             }
         };
         candleChart.setOnChartGestureListener(gestureListenerCandle);
@@ -265,6 +304,7 @@ public class KLineChart extends BaseChart {
             }
         });
 
+        setDrawMarketEnable(defaultDrawMaket);
 
     }
 
@@ -298,6 +338,7 @@ public class KLineChart extends BaseChart {
         candleChartData.setData(new CandleData(candleDataSet));
         candleChartData.setData(new LineData(kLineData.getLineDataMA()));
         candleChart.setData(candleChartData);
+        xAxisRenderer.setSuggessLabelIndex(kLineData.getxCanUseIndexes());
         /*************************************成交量数据*****************************************************/
         barChartData = new CombinedData();
         BarData barData = new BarData(kLineData.getVolumeDataSet());
@@ -324,6 +365,40 @@ public class KLineChart extends BaseChart {
                     }
                 }
             });
+//            candleChart.getXAxis().setGranularity(30);
+            candleChart.getXAxis().setValueFormatter(new ValueFormatter() {
+                @Override
+                public String getAxisLabel(float value, AxisBase axis) {
+                    int index = (int) (value - kLineData.getOffSet());
+                    if (index < 0 || index >= kLineData.getxVals().size()) {
+                        return "";
+                    } else {
+                        float[] mEntries = axis.mEntries;
+                        int lastIndex = -1;
+                        for (int i = 0; i < mEntries.length; i++) {
+                            if(mEntries[i] == value && i>0){
+                                lastIndex = Math.round(mEntries[i - 1]);
+                                //数组是增量的只需要绘制和获取最前面的 后面的是缓存其他的数据
+                                break;
+                            }
+                        }
+
+                        String currentStr = kLineData.getxVals().get(index);
+
+                        if(lastIndex == -1 || kLineData.getxVals().size()> lastIndex && !currentStr.startsWith(kLineData.getxVals().get(lastIndex).substring(0,4))){
+                            return  currentStr;
+                        }else {
+                            String preStr = kLineData.getxVals().get(lastIndex);
+//                            if(preStr.equals(currentStr)){
+//                                return "";
+//                            }
+                            return currentStr.substring(5);
+                        }
+
+//                        return kLineData.getxVals().get(index);
+                    }
+                }
+            });
 
             //请注意，修改视口的所有方法需要在为Chart设置数据之后调用。
             //设置当前视图四周的偏移量。 设置这个，将阻止图表自动计算它的偏移量。使用 resetViewPortOffsets()撤消此设置。
@@ -341,8 +416,11 @@ public class KLineChart extends BaseChart {
                 barChart.setViewPortOffsets(left_right, CommonUtil.dip2px(mContext, 15), CommonUtil.dip2px(mContext, 5), CommonUtil.dip2px(mContext, 16));
             }
 
-            candleChart.setViewPortOffsets(0,CommonUtil.dip2px(mContext, 15),0, 0);
-            barChart.setViewPortOffsets(0,CommonUtil.dip2px(mContext, 15),0, CommonUtil.dip2px(mContext, 16));
+            candleChart.setViewPortOffsets(0,CommonUtil.dip2px(mContext, 32),0, CommonUtil.dip2px(mContext, 28));
+            barChart.setViewPortOffsets(0,CommonUtil.dip2px(mContext, 15),0, 2);
+
+            candleChart.getDescription().setPosition(-20,CommonUtil.dip2px(mContext,10));
+            barChart.getDescription().setPosition(-20,CommonUtil.dip2px(mContext,10));
 
             setMarkerView(kLineData);
             setBottomMarkerView(kLineData);
@@ -396,15 +474,6 @@ public class KLineChart extends BaseChart {
     //副图切换
     private void chartSwitchMain(int index) {
         updateText(index,false);
-//        switch (chartTypeMain) {
-//            case 2:
-//                //更新MA均线数据
-//                candleChart.setDescriptionCustom(zbColor, new String[]{"UPPER:" + (kLineData.getBollDataUP().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getBollDataUP().get(index).getY(), 3)), "MID:" + (kLineData.getBollDataMB().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getBollDataMB().get(index).getY(), 3)), "LOWER:" + (kLineData.getBollDataDN().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getBollDataDN().get(index).getY(), 3))});
-//                break;
-//            default:
-//                candleChart.setDescriptionCustom(zbColor, new String[]{"MA5:" + NumberUtils.keepPrecision(kLineData.getKLineDatas().get(index).getMa5(), 3), "MA10:" + NumberUtils.keepPrecision(kLineData.getKLineDatas().get(index).getMa10(), 3), "MA20:" + NumberUtils.keepPrecision(kLineData.getKLineDatas().get(index).getMa20(), 3)});
-//                break;
-//        }
     }
 
     public void doBarChartSwitch(int chartType) {
@@ -412,8 +481,12 @@ public class KLineChart extends BaseChart {
         if (chartType1 > chartTypes1) {
             chartType1 = 1;
         }
+        barChart.getAxisLeft().setDrawGridLines(true);
+        barChart.getAxisLeft().setDrawLabels(true);
         switch (chartType1) {
             case 1:
+                barChart.getAxisLeft().setDrawGridLines(false);
+                barChart.getAxisLeft().setDrawLabels(false);
                 setVolumeToChart();
                 break;
             case 2:
@@ -535,36 +608,16 @@ public class KLineChart extends BaseChart {
      * 主图指标BOLL
      */
     public void setBOLLToChart() {
-//        if (barChart != null) {
-//            if (barChart.getBarData() != null) {
-//                barChart.getBarData().clearValues();
-//            }
-//            if (barChart.getLineData() != null) {
-//                barChart.getLineData().clearValues();
-//            }
-//            if (barChart.getCandleData() != null) {
-//                barChart.getCandleData().clearValues();
-//            }
-//
-//            axisLeftBar.resetAxisMaximum();
-//            axisLeftBar.resetAxisMinimum();
-//            axisLeftBar.setValueFormatter(new ValueFormatter() {
-//                @Override
-//                public String getAxisLabel(float value, AxisBase axis) {
-//                    return NumberUtils.keepPrecision(value, precision);
-//                }
-//            });
-//
-//            CombinedData combinedData = barChart.getData();
-//            combinedData.setData(new CandleData(kLineData.getBollCandleDataSet()));
-//            combinedData.setData(new LineData(kLineData.getLineDataBOLL()));
-//            barChart.notifyDataSetChanged();
-//            barChart.invalidate();
-//        }
         if (candleChart != null) {
             kLineData.initBOLL();
+            List<ILineDataSet> lineDataBOLL = kLineData.getLineDataBOLL();
+//            boolean horizontalHighlightIndicatorEnabled = defaultDrawMaket;
+//            if(lineDataBOLL!=null && !lineDataBOLL.isEmpty()){
+//                horizontalHighlightIndicatorEnabled = lineDataBOLL.get(0).isHorizontalHighlightIndicatorEnabled();
+//            }
+//            setDrawMarketEnable(horizontalHighlightIndicatorEnabled);
             CombinedData combinedData = candleChart.getData();
-            combinedData.setData(new LineData(kLineData.getLineDataBOLL()));
+            combinedData.setData(new LineData(lineDataBOLL));
             candleChart.notifyDataSetChanged();
             candleChart.invalidate();
         }
@@ -576,6 +629,13 @@ public class KLineChart extends BaseChart {
     public void setMAToChart() {
         if (candleChart != null) {
             CombinedData combinedData = candleChart.getData();
+            List<ILineDataSet> lineDataMA = kLineData.getLineDataMA();
+            boolean horizontalHighlightIndicatorEnabled = defaultDrawMaket;
+            if(lineDataMA!=null && !lineDataMA.isEmpty()){
+                horizontalHighlightIndicatorEnabled = lineDataMA.get(0).isHorizontalHighlightIndicatorEnabled();
+            }
+            setDrawMarketEnable(horizontalHighlightIndicatorEnabled);
+
             combinedData.setData(new LineData(kLineData.getLineDataMA()));
             candleChart.notifyDataSetChanged();
             candleChart.invalidate();
@@ -687,6 +747,12 @@ public class KLineChart extends BaseChart {
         barChart.invalidate();
     }
 
+    public void setDrawMarketEnable(boolean isEnable){
+        candleChart.setDrawMarkers(isEnable);
+        barChart.setDrawMarkers(isEnable);
+    }
+
+
     public void setMarkerView(KLineDataManage kLineData) {
         LeftMarkerView leftMarkerView = new LeftMarkerView(mContext, R.layout.my_markerview, precision);
         KRightMarkerView rightMarkerView = new KRightMarkerView(mContext, R.layout.my_markerview, precision);
@@ -762,7 +828,8 @@ public class KLineChart extends BaseChart {
                 lowEntry = low.getEntriesForXValue(index*1.0f).get(0);
             }
 
-            candleChart.setDescriptionCustom(zbColor, new String[]{"UPPER:" + (upEntry == null ? "--" : NumberUtils.keepPrecision(upEntry.getY(), 3)), "MID:" + (midEntry == null ? "--" : NumberUtils.keepPrecision(midEntry.getY(), 3)), "LOWER:" + (lowEntry == null ? "--" : NumberUtils.keepPrecision(lowEntry.getY(), 3))});
+            candleChart.setDescriptionCustom(new int[]{Color.BLACK,ContextCompat.getColor(getContext(), R.color.ma5), ContextCompat.getColor(getContext(), R.color.ma10), ContextCompat.getColor(getContext(), R.color.ma20)},
+                    new String[]{"BOLL(20,2)","MID:" + (midEntry == null ? "--" : NumberUtils.keepPrecision(midEntry.getY(), 3)),"UPPER:" + (upEntry == null ? "--" : NumberUtils.keepPrecision(upEntry.getY(), 3)),  "LOWER:" + (lowEntry == null ? "--" : NumberUtils.keepPrecision(lowEntry.getY(), 3))});
         }
         chartSwitch(index);
     }

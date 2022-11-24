@@ -442,7 +442,7 @@ public abstract class Chart<T extends ChartData<? extends IDataSet<? extends Ent
                 float xpos = mViewPortHandler.contentLeft();
                 if (position == null) {
                     for (int i = 0; i < mDescriptionLabels.length; i++) {
-                        xpos = xpos + Utils.calcTextWidth(mDescPaint, mDescriptionLabels[i]) + 20;
+                        xpos = xpos + Utils.calcTextWidth(mDescPaint, mDescriptionLabels[i]) + (i==0?0: 20);
                         mDescPaint.setColor(mDescriptionColors[i]);
                         c.drawText(mDescriptionLabels[i], xpos,
                                 mViewPortHandler.contentTop() + 5 - Utils.calcTextHeight(mDescPaint, mDescription.toString()) / 2, mDescPaint);

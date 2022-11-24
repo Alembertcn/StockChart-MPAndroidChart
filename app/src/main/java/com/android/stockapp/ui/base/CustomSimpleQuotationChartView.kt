@@ -8,9 +8,11 @@ import android.view.View
 import android.widget.FrameLayout
 import com.android.stockapp.R
 import com.android.stockapp.ui.market.activity.StockDetailLandActivity
+import com.github.mikephil.charting.stockChart.BaseChart
 import com.github.mikephil.charting.stockChart.charts.CoupleChartGestureListener.CoupleClick
 import com.github.mikephil.charting.stockChart.dataManage.KLineDataManage
 import com.github.mikephil.charting.stockChart.dataManage.TimeDataManage
+import com.github.mikephil.charting.utils.DataTimeUtil
 import kotlinx.android.synthetic.main.custom_simple_quotation_chart_view.view.*
 import org.json.JSONObject
 
@@ -63,6 +65,26 @@ class CustomSimpleQuotationChartView @JvmOverloads constructor (context: Context
         combinedchart.getGestureListenerCandle().setCoupleClick {
             combinedchart.doMainChartSwitch((indexTypeMain++)%2 + 1)
         }
+        combinedchart.setHighlightValueSelectedListener(object:
+            BaseChart.OnHighlightValueSelectedListener {
+            override fun onDayHighlightValueListener(
+                mData: TimeDataManage?,
+                index: Int,
+                isSelect: Boolean
+            ) {
+            }
+
+            override fun onKHighlightValueListener(
+                data: KLineDataManage?,
+                index: Int,
+                isSelect: Boolean
+            ) {
+                data?.let {
+                    tvContent.text =DataTimeUtil.secToDate((it.kLineDatas[index].dateMills))
+                }
+                tvContent.visibility = if(isSelect) View.VISIBLE else View.GONE
+            }
+        })
     }
 
 
