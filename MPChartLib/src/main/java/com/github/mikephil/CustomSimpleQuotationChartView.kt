@@ -136,15 +136,15 @@ class CustomSimpleQuotationChartView @JvmOverloads constructor (context: Context
                 //上证指数代码000001.IDX.SH
                 kLineData.parseKlineData(srcDate, assetId, land)
                 kLineData.candleDataSet.apply {
-                    decreasingColor = GlobaleConfig.getFallColor()
-                    increasingColor = GlobaleConfig.getRiseColor()
-                    neutralColor = GlobaleConfig.getEqualColor()
+//                    decreasingColor = GlobaleConfig.getFallColor()
+//                    increasingColor = GlobaleConfig.getRiseColor()
+//                    neutralColor = GlobaleConfig.getEqualColor()
                 }
 
                 kLineData.volumeDataSet.apply {
-                    decreasingColor = GlobaleConfig.getFallColor()
-                    increasingColor = GlobaleConfig.getRiseColor()
-                    neutralColor = GlobaleConfig.getEqualColor()
+//                    decreasingColor = GlobaleConfig.getFallColor()
+//                    increasingColor = GlobaleConfig.getRiseColor()
+//                    neutralColor = GlobaleConfig.getEqualColor()
                 }
                 combinedchart.setDataToChart(kLineData)
             }

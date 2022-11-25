@@ -44,7 +44,7 @@ public abstract class LineScatterCandleRadarRenderer extends BarLineScatterCandl
             // create vertical path
             mHighlightLinePath.reset();
             mHighlightLinePath.moveTo(x, mViewPortHandler.contentTop());
-            mHighlightLinePath.lineTo(x, mViewPortHandler.contentBottom());
+            mHighlightLinePath.lineTo(x, mViewPortHandler.getChartHeight());
 
             c.drawPath(mHighlightLinePath, mHighlightPaint);
         }

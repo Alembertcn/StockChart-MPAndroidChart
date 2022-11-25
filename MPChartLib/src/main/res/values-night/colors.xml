@@ -8,5 +8,6 @@
     <color name="axis_text">#ffffff</color>
     <color name="highLight_Color">#ffffff</color>
     <color name="fill_Color">#7F2C3840</color>
+    <color name="marker_text_color">#000</color>
 
 </resources>

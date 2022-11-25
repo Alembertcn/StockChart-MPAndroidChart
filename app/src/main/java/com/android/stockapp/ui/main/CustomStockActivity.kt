@@ -18,6 +18,8 @@ class CustomStockActivity: AppCompatActivity() {
             layoutParams.width = layoutParams.width+10
             flChart.layoutParams = layoutParams
             flChart.requestLayout()
+            chartView.combinedchart.setFqLableText("0")
+
 
 //            chartView.oneDayChart.stopHeaderAnimation()
         }

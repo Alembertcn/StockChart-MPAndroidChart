@@ -264,13 +264,27 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
             mAxisRendererRight.renderGridLines(canvas);
         }
 
+        // draw Highlighted
         // if highlighting is enabled
         if (valuesToHighlight()) {
             mRenderer.drawHighlighted(canvas, mIndicesToHighlight);
         }
-
-        // Removes clipping rectangle
         canvas.restoreToCount(clipRestoreCount);
+
+
+//        // 适配项目高亮线 Removes clipping rectangle
+//        // make sure the data cannot be drawn outside the content-rect
+//        clipRestoreCount = canvas.save();
+//        RectF rectF = new RectF();
+//        RectF contentRect = mViewPortHandler.getContentRect();
+//        rectF.set(contentRect.left,contentRect.top,contentRect.right,mViewPortHandler.getChartHeight());
+//        canvas.clipRect(rectF);
+//        // if highlighting is enabled
+//        if (valuesToHighlight()) {
+//            mRenderer.drawHighlighted(canvas, mIndicesToHighlight);
+//        }
+//
+//        canvas.restoreToCount(clipRestoreCount);
 
         //绘制任何额外的信息(例如行 圈)
         mRenderer.drawExtras(canvas);

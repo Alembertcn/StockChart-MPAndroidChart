@@ -11,6 +11,8 @@ import androidx.core.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.View;
+import android.widget.TextView;
 
 import com.github.mikephil.charting.R;
 import com.github.mikephil.charting.charts.Chart;
@@ -34,7 +36,6 @@ import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ICandleDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
-import com.github.mikephil.charting.stockChart.charts.TimeXAxis;
 import com.github.mikephil.charting.stockChart.markerView.BarBottomMarkerView;
 import com.github.mikephil.charting.stockChart.charts.CandleCombinedChart;
 import com.github.mikephil.charting.stockChart.charts.CoupleChartGestureListener;
@@ -43,7 +44,6 @@ import com.github.mikephil.charting.stockChart.markerView.LeftMarkerView;
 import com.github.mikephil.charting.stockChart.charts.MyCombinedChart;
 import com.github.mikephil.charting.stockChart.dataManage.KLineDataManage;
 import com.github.mikephil.charting.stockChart.enums.TimeType;
-import com.github.mikephil.charting.stockChart.model.KLineDataModel;
 import com.github.mikephil.charting.stockChart.renderer.DynicDateXAxisRenderer;
 import com.github.mikephil.charting.utils.CommonUtil;
 import com.github.mikephil.charting.utils.DataTimeUtil;
@@ -51,7 +51,6 @@ import com.github.mikephil.charting.utils.NumberUtils;
 import com.github.mikephil.charting.utils.Utils;
 import com.github.mikephil.charting.utils.ViewPortHandler;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -62,6 +61,7 @@ public class KLineChart extends BaseChart {
     private Context mContext;
     private CandleCombinedChart candleChart;
     private MyCombinedChart barChart;
+    private  TextView fqLable;
     DynicDateXAxisRenderer xAxisRenderer;
 
     private XAxis xAxisBar, xAxisK;
@@ -122,7 +122,10 @@ public class KLineChart extends BaseChart {
         candleChart.setDragDecelerationFrictionCoef(0.6f);//0.92持续滚动时的速度快慢，[0,1) 0代表立即停止。
         candleChart.setDoubleTapToZoomEnabled(false);
         candleChart.setNoDataText(getResources().getString(R.string.no_data));
-
+        candleChart.getDescription().setTextSize(10);
+        View desCripeView = View.inflate(mContext, R.layout.custom_des_label, null);
+        fqLable = desCripeView.findViewById(R.id.tvLabel);
+        candleChart.getDescription().setLabelView(desCripeView);
         // draw bars behind lines
         candleChart.setDrawOrder(new CombinedChart.DrawOrder[]{
                  CombinedChart.DrawOrder.BAR, CombinedChart.DrawOrder.BUBBLE, CombinedChart.DrawOrder.CANDLE,  CombinedChart.DrawOrder.SCATTER,CombinedChart.DrawOrder.LINE
@@ -154,7 +157,7 @@ public class KLineChart extends BaseChart {
         xAxisK.setDrawAxisLine(false);
         xAxisK.setDrawLabels(true);
         xAxisK.setLabelCount(landscape ? 4 : 4, false);
-        xAxisK.setTextColor(ContextCompat.getColor(mContext, R.color.label_text));
+        xAxisK.setTextColor(ContextCompat.getColor(mContext, R.color.axis_x_label));
         xAxisK.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxisK.setGridColor(ContextCompat.getColor(mContext, R.color.grid_color));
         xAxisK.setGridLineWidth(0.7f);
@@ -170,7 +173,7 @@ public class KLineChart extends BaseChart {
         axisLeftK.setDrawLabels(true);
         axisLeftK.setLabelCount(5, true);
         axisLeftK.enableGridDashedLine(CommonUtil.dip2px(mContext, 4), CommonUtil.dip2px(mContext, 3), 0);
-        axisLeftK.setTextColor(ContextCompat.getColor(mContext, R.color.axis_text));
+        axisLeftK.setTextColor(ContextCompat.getColor(mContext, R.color.axis_y_label));
         axisLeftK.setGridColor(ContextCompat.getColor(mContext, R.color.grid_color));
         axisLeftK.setGridLineWidth(0.7f);
         axisLeftK.setXOffset(0);
@@ -211,7 +214,7 @@ public class KLineChart extends BaseChart {
         axisLeftBar.setAxisMinimum(0);
         axisLeftBar.setDrawGridLines(false);
         axisLeftBar.setDrawAxisLine(false);
-        axisLeftBar.setTextColor(ContextCompat.getColor(mContext, R.color.axis_text));
+        axisLeftBar.setTextColor(ContextCompat.getColor(mContext, R.color.axis_y_label));
         axisLeftBar.setDrawLabels(false);
         axisLeftBar.setLabelCount(3, true);
         axisLeftBar.setValueLineInside(true);
@@ -328,7 +331,7 @@ public class KLineChart extends BaseChart {
         if (data.getAssetId().endsWith(".HK") && !data.getAssetId().contains("IDX")) {
             setPrecision(3);
         } else {
-            setPrecision(2);
+            setPrecision(3);
         }
 
         CombinedData candleChartData;
@@ -422,8 +425,8 @@ public class KLineChart extends BaseChart {
             candleChart.setViewPortOffsets(0,CommonUtil.dip2px(mContext, 32),0, CommonUtil.dip2px(mContext, 22));
             barChart.setViewPortOffsets(0,CommonUtil.dip2px(mContext, 15),0, 2);
 
-            candleChart.getDescription().setPosition(-20,CommonUtil.dip2px(mContext,10));
-            barChart.getDescription().setPosition(-20,CommonUtil.dip2px(mContext,10));
+            candleChart.getDescription().setPosition(0,CommonUtil.dip2px(mContext,10));
+            barChart.getDescription().setPosition(0,CommonUtil.dip2px(mContext,10));
 
             setMarkerView(kLineData);
 //            setBottomMarkerView(kLineData);
@@ -853,19 +856,24 @@ public class KLineChart extends BaseChart {
     }
 
     //副图切换
+    // K_VOLUME: 1;
+    // case MACD : 2;
+    // case KDJ : 3;
+    // case RSI: 4;
+    int[] macdColors = {getResources().getColor(R.color.fit_black), getResources().getColor(R.color.ma10), getResources().getColor(R.color.ma30), getResources().getColor(R.color.ma20)};
     private void chartSwitch(int index) {
         switch (chartType1) {
             case 1:
-                barChart.setDescriptionCustom(ContextCompat.getColor(mContext, R.color.label_text), getResources().getString(R.string.vol_name) + NumberUtils.formatVol(mContext, kLineData.getAssetId(), kLineData.getKLineDatas().get(index).getVolume()));
+                barChart.setDescriptionCustom(new int[]{ContextCompat.getColor(mContext, R.color.fit_black),ContextCompat.getColor(mContext, R.color.theme)}, new String[]{getResources().getString(R.string.vol_name),"VOL:"+NumberUtils.formatVol(mContext, kLineData.getAssetId(), kLineData.getKLineDatas().get(index).getVolume())},2);
                 break;
             case 2:
-                barChart.setDescriptionCustom(zbColor, new String[]{"DIFF:" + (kLineData.getDifData().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getDifData().get(index).getY(), 3)), "DEA:" + (kLineData.getDeaData().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getDeaData().get(index).getY(), 3)), "MACD:" + (kLineData.getMacdData().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getMacdData().get(index).getY(), 3))});
+                barChart.setDescriptionCustom(macdColors, new String[]{"MACD(12,26,9)","DIF:" + (kLineData.getDifData().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getDifData().get(index).getY(), 3)), "DEA:" + (kLineData.getDeaData().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getDeaData().get(index).getY(), 3)), "MACD:" + (kLineData.getMacdData().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getMacdData().get(index).getY(), 3))});
                 break;
             case 3:
-                barChart.setDescriptionCustom(zbColor, new String[]{"K:" + (kLineData.getkData().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getkData().get(index).getY(), 3)), "D:" + (kLineData.getdData().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getdData().get(index).getY(), 3)), "J:" + (kLineData.getjData().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getjData().get(index).getY(), 3))});
+                barChart.setDescriptionCustom(macdColors, new String[]{"KDJ(9,3,3)","K:" + (kLineData.getkData().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getkData().get(index).getY(), 3)), "D:" + (kLineData.getdData().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getdData().get(index).getY(), 3)), "J:" + (kLineData.getjData().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getjData().get(index).getY(), 3))});
                 break;
             case 4:
-                barChart.setDescriptionCustom(zbColor, new String[]{"RSI6:" + (kLineData.getRsiData6().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getRsiData6().get(index).getY(), 3)), "RSI12:" + (kLineData.getRsiData12().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getRsiData12().get(index).getY(), 3)), "RSI24:" + (kLineData.getRsiData24().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getRsiData24().get(index).getY(), 3))});
+                barChart.setDescriptionCustom(macdColors, new String[]{"RSI(9,3,3)","RSI1:" + (kLineData.getRsiData6().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getRsiData6().get(index).getY(), 3)), "RSI12:" + (kLineData.getRsiData12().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getRsiData12().get(index).getY(), 3)), "RSI3:" + (kLineData.getRsiData24().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getRsiData24().get(index).getY(), 3))});
 //                barChart.setDescriptionCustom(zbColor, new String[]{"UPPER:" + (kLineData.getBollDataUP().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getBollDataUP().get(index).getY(), 3)), "MID:" + (kLineData.getBollDataMB().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getBollDataMB().get(index).getY(), 3)), "LOWER:" + (kLineData.getBollDataDN().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getBollDataDN().get(index).getY(), 3))});
                 break;
             case 5:
@@ -877,4 +885,10 @@ public class KLineChart extends BaseChart {
         }
     }
 
+    public void setFqLableText(String str) {
+        if (fqLable != null) {
+            fqLable.setText(str);
+            fqLable.getParent().requestLayout();
+        }
+    }
 }

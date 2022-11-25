@@ -1,6 +1,8 @@
 package com.github.mikephil.charting.components;
 
 import android.graphics.Paint;
+import android.view.View;
+import android.widget.RelativeLayout;
 
 import com.github.mikephil.charting.GlobaleConfig;
 import com.github.mikephil.charting.utils.MPPointF;
@@ -92,5 +94,19 @@ public class Description extends ComponentBase {
      */
     public Paint.Align getTextAlign() {
         return mTextAlign;
+    }
+
+    View mLabelView;
+    public View getLabelView() {
+        return mLabelView;
+    }
+
+    public void setLabelView(View labelView) {
+        this.mLabelView = labelView;
+        if(mLabelView!=null){
+            mLabelView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT));
+            mLabelView.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+            mLabelView.layout(0, 0, mLabelView.getMeasuredWidth(), mLabelView.getMeasuredHeight());
+        }
     }
 }

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+    <FrameLayout
+        android:layout_marginRight="5dp"
+        android:layout_marginLeft="0.5dp"
+        android:background="@drawable/gray_r_border"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <TextView
+            android:paddingVertical="2dp"
+            android:id="@+id/tvLabel"
+            android:paddingHorizontal="4dp"
+            android:text="@string/bfq"
+            android:textSize="10sp"
+            android:textColor="@color/equal_color"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </FrameLayout>
+
+
+</FrameLayout>

@@ -9,5 +9,7 @@
     <string name="billions_gu">亿股</string>
     <string name="millions_gu">万股</string>
     <string name="gu">股</string>
+    <string name="bfq">不复权</string>
+    <string name="hfq">后复权</string>
 
 </resources>

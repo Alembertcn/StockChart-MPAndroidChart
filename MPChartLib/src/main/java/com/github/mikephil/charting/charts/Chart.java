@@ -13,7 +13,6 @@ import android.graphics.Paint.Align;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore.Images;
 import androidx.annotation.RequiresApi;
@@ -25,7 +24,6 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 
 import com.github.mikephil.charting.animation.ChartAnimator;
-import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.animation.Easing.EasingFunction;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.IMarker;
@@ -442,17 +440,30 @@ public abstract class Chart<T extends ChartData<? extends IDataSet<? extends Ent
                 float xpos = mViewPortHandler.contentLeft();
                 if (position == null) {
                     for (int i = 0; i < mDescriptionLabels.length; i++) {
-                        xpos = xpos + Utils.calcTextWidth(mDescPaint, mDescriptionLabels[i]) + (i==0?0: 20);
+                        xpos = xpos + Utils.calcTextWidth(mDescPaint, mDescriptionLabels[i]) + (i==0?0: mDescriptionSpace);
                         mDescPaint.setColor(mDescriptionColors[i]);
                         c.drawText(mDescriptionLabels[i], xpos,
                                 mViewPortHandler.contentTop() + 5 - Utils.calcTextHeight(mDescPaint, mDescription.toString()) / 2, mDescPaint);
                     }
 
                 } else {
+                    View labelView = mDescription.getLabelView();
+                    // 文字和控件居中
+                    float textOffsetY =0;
+                    if(labelView !=null){
+                        labelView.draw(c);
+                        xpos += labelView.getMeasuredWidth();
+                        int height = labelView.getMeasuredHeight();
+                        int textHeight = Utils.calcTextHeight(mDescPaint, "A");
+                        if(height>textHeight){
+                            textOffsetY = (height - textHeight) * 1.0f / 2-5;
+                        }
+                    }
+
                     for (int i = 0; i < mDescriptionLabels.length; i++) {
                         mDescPaint.setColor(mDescriptionColors[i]);
-                        xpos = xpos + Utils.calcTextWidth(mDescPaint, mDescriptionLabels[i]) + 20;
-                        c.drawText(mDescriptionLabels[i], xpos + position.x, position.y, mDescPaint);
+                        xpos = xpos + Utils.calcTextWidth(mDescPaint, mDescriptionLabels[i]) + (i == 0?0:mDescriptionSpace);
+                        c.drawText(mDescriptionLabels[i], xpos + position.x, position.y+textOffsetY, mDescPaint);
                     }
                 }
             } else if (!"".equals(mDescription.getText())) {
@@ -1274,8 +1285,12 @@ public abstract class Chart<T extends ChartData<? extends IDataSet<? extends Ent
         mIsDescriptionCustom = true;
     }
 
+    float mDescriptionSpace = Utils.convertDpToPixel(13.0f);
     public void setDescriptionCustom(int[] colors, String[] labels) {
-
+        setDescriptionCustom(colors, labels,13);
+    }
+    public void setDescriptionCustom(int[] colors, String[] labels,int spance) {
+        this.mDescriptionSpace =  Utils.convertDpToPixel(spance);
         if (colors.length != labels.length) {
             throw new IllegalArgumentException(
                     "colors array and labels array need to be of same size");
