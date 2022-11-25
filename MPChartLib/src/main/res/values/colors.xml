@@ -15,7 +15,7 @@
 
     <!-- chart -->
     <color name="chart_bg">#ffffff</color>
-    <color name="marker_bg">#406ebc</color>
+    <color name="marker_bg">#8c9fad</color>
     <color name="marker_text_color">#FFFFFF</color>
     <color name="border_color">#e8e8e8</color>
     <color name="grid_color">#e8e8e8</color>

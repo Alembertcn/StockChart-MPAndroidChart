@@ -49,7 +49,7 @@ public class MyCombinedChart extends CombinedChart {
     @Override
     protected void drawMarkers(Canvas canvas) {
         // if there is no marker view or drawing marker is disabled
-        if (!isDrawMarkersEnabled() || !valuesToHighlight()) {
+        if (!isDrawMarkersEnabled() || !valuesToHighlight() || markerBottom==null) {
             return;
         }
 

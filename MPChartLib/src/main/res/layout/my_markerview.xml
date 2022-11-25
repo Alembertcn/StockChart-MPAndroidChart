@@ -9,8 +9,9 @@
     android:layout_height="wrap_content"
     android:textColor="@color/marker_text_color"
     android:text=""
-    android:paddingLeft="2dp"
-    android:paddingRight="2dp"
+    android:textSize="7sp"
+    android:paddingVertical="2dp"
+    android:paddingHorizontal="4dp"
     android:background="@color/marker_bg"/>
 
 </LinearLayout>

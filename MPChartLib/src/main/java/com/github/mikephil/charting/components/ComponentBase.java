@@ -37,7 +37,7 @@ public abstract class ComponentBase {
     /**
      * the text size of the labels
      */
-    protected float mTextSize = Utils.convertDpToPixel(GlobaleConfig.COMMON_TEXT_SIZE);
+    protected float mTextSize = Utils.convertSpToPixel(GlobaleConfig.COMMON_TEXT_SIZE);
 
     /**
      * the text color to use for the labels

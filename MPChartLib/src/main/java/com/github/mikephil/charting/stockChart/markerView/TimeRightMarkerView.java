@@ -27,8 +27,6 @@ public class TimeRightMarkerView extends MarkerView {
         super(context, layoutResource);
         mFormat = new DecimalFormat("#0.00");
         markerTv = (TextView) findViewById(R.id.marker_tv);
-        markerTv.setTextSize(10);
-
     }
 
     public void setData(float num) {

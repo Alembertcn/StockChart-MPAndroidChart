@@ -116,7 +116,7 @@ public class OneDayChart extends BaseChart {
         lineChart.setDrawBorders(true);//是否画外框线
         lineChart.setBorderColor(ContextCompat.getColor(mContext, R.color.border_color));
         lineChart.setBorderWidth(0.7f);
-        lineChart.setNoDataText(getResources().getString(R.string.loading));
+        lineChart.setNoDataText(getResources().getString(R.string.no_data));
         Legend lineChartLegend = lineChart.getLegend();
         lineChartLegend.setEnabled(false);
         lineChart.setDescription(null);
@@ -125,7 +125,7 @@ public class OneDayChart extends BaseChart {
         barChart.setDrawBorders(true);
         barChart.setBorderColor(ContextCompat.getColor(mContext, R.color.border_color));
         barChart.setBorderWidth(0.7f);
-        barChart.setNoDataText(getResources().getString(R.string.loading));
+        barChart.setNoDataText(getResources().getString(R.string.no_data));
         Legend barChartLegend = barChart.getLegend();
         barChartLegend.setEnabled(false);
         barChart.setDescription(null);

@@ -2,6 +2,7 @@ package com.github.mikephil.charting.components;
 
 import android.graphics.Paint;
 
+import com.github.mikephil.charting.GlobaleConfig;
 import com.github.mikephil.charting.utils.MPPointF;
 import com.github.mikephil.charting.utils.Utils;
 
@@ -29,7 +30,7 @@ public class Description extends ComponentBase {
         super();
 
         // default size
-        mTextSize = Utils.convertDpToPixel(10f);
+        mTextSize = Utils.convertDpToPixel(GlobaleConfig.COMMON_TEXT_SIZE);
     }
 
     /**

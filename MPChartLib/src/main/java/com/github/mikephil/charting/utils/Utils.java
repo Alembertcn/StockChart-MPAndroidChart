@@ -113,6 +113,19 @@ public abstract class Utils {
 
         return dp * mMetrics.density;
     }
+    public static float convertSpToPixel(float dp) {
+
+        if (mMetrics == null) {
+
+            Log.e("MPChartLib-Utils",
+                    "Utils NOT INITIALIZED. You need to call Utils.init(...) at least once before" +
+                            " calling Utils.convertDpToPixel(...). Otherwise conversion does not " +
+                            "take place.");
+            return dp;
+        }
+
+        return dp * mMetrics.scaledDensity;
+    }
 
     /**
      * This method converts device specific pixels to density independent

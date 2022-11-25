@@ -67,7 +67,7 @@ public class KLineChart extends BaseChart {
     private XAxis xAxisBar, xAxisK;
     private YAxis axisLeftBar, axisLeftK;
     private YAxis axisRightBar, axisRightK;
-    private boolean defaultDrawMaket = false;
+    private boolean defaultDrawMaket = true;
 
     private KLineDataManage kLineData;
 
@@ -121,7 +121,7 @@ public class KLineChart extends BaseChart {
         candleChart.setDragDecelerationEnabled(true);
         candleChart.setDragDecelerationFrictionCoef(0.6f);//0.92持续滚动时的速度快慢，[0,1) 0代表立即停止。
         candleChart.setDoubleTapToZoomEnabled(false);
-        candleChart.setNoDataText(getResources().getString(R.string.loading));
+        candleChart.setNoDataText(getResources().getString(R.string.no_data));
 
         // draw bars behind lines
         candleChart.setDrawOrder(new CombinedChart.DrawOrder[]{
@@ -145,7 +145,7 @@ public class KLineChart extends BaseChart {
         barChart.setDragDecelerationEnabled(true);
         barChart.setDragDecelerationFrictionCoef(0.6f);//设置太快，切换滑动源滑动不同步
         barChart.setDoubleTapToZoomEnabled(false);
-        barChart.setNoDataText(getResources().getString(R.string.loading));
+        barChart.setNoDataText(getResources().getString(R.string.no_data));
 
         //蜡烛图X轴
         xAxisK = candleChart.getXAxis();
@@ -160,7 +160,7 @@ public class KLineChart extends BaseChart {
         xAxisK.setGridLineWidth(0.7f);
         xAxisK.setAvoidFirstLastClipping(true);
         xAxisK.setDrawLimitLinesBehindData(true);
-        xAxisK.setYOffset(12F);
+        xAxisK.setYOffset(2F);
 
 
         //蜡烛图左Y轴
@@ -173,6 +173,7 @@ public class KLineChart extends BaseChart {
         axisLeftK.setTextColor(ContextCompat.getColor(mContext, R.color.axis_text));
         axisLeftK.setGridColor(ContextCompat.getColor(mContext, R.color.grid_color));
         axisLeftK.setGridLineWidth(0.7f);
+        axisLeftK.setXOffset(0);
         axisLeftK.setValueLineInside(true);
         axisLeftK.setDrawTopBottomGridLine(false);
 //        axisLeftK.setPosition(landscape ? YAxis.YAxisLabelPosition.OUTSIDE_CHART : YAxis.YAxisLabelPosition.INSIDE_CHART);
@@ -378,8 +379,11 @@ public class KLineChart extends BaseChart {
                         float[] mEntries = axis.mEntries;
                         int lastIndex = -1;
                         for (int i = 0; i < mEntries.length; i++) {
-                            if(mEntries[i] == value && i>0){
-                                lastIndex = Math.round(mEntries[i - 1]);
+                            //只取第一个防止缓存影响
+                            if(mEntries[i] == value){
+                                if(i!=0){
+                                    lastIndex = Math.round(mEntries[i - 1]);
+                                }
                                 //数组是增量的只需要绘制和获取最前面的 后面的是缓存其他的数据
                                 break;
                             }
@@ -415,14 +419,14 @@ public class KLineChart extends BaseChart {
                 barChart.setViewPortOffsets(left_right, CommonUtil.dip2px(mContext, 15), CommonUtil.dip2px(mContext, 5), CommonUtil.dip2px(mContext, 16));
             }
 
-            candleChart.setViewPortOffsets(0,CommonUtil.dip2px(mContext, 32),0, CommonUtil.dip2px(mContext, 28));
+            candleChart.setViewPortOffsets(0,CommonUtil.dip2px(mContext, 32),0, CommonUtil.dip2px(mContext, 22));
             barChart.setViewPortOffsets(0,CommonUtil.dip2px(mContext, 15),0, 2);
 
             candleChart.getDescription().setPosition(-20,CommonUtil.dip2px(mContext,10));
             barChart.getDescription().setPosition(-20,CommonUtil.dip2px(mContext,10));
 
             setMarkerView(kLineData);
-            setBottomMarkerView(kLineData);
+//            setBottomMarkerView(kLineData);
 
             updateText(kLineData.getKLineDatas().size() - 1, false);
 
@@ -454,7 +458,17 @@ public class KLineChart extends BaseChart {
     protected int chartType1 = 1;
     protected int chartTypes1 = 4;
 
+    /**
+     *  K_VOLUME: 1;
+     *  case MACD : 2;
+     *  case KDJ : 3;
+     *  case RSI: 4;
+     *  case MA: 5;
+     *  case BOLL: 6;
+     */
     public void doMainChartSwitch(int chartType) {
+        if(chartTypeMain ==chartType)return;
+
         chartTypeMain = chartType;
         if (chartTypeMain > 2) {
             chartTypeMain = 1;
@@ -475,7 +489,17 @@ public class KLineChart extends BaseChart {
         updateText(index,false);
     }
 
+    /**
+     *  K_VOLUME: 1;
+     *  case MACD : 2;
+     *  case KDJ : 3;
+     *  case RSI: 4;
+     *  case MA: 5;
+     *  case BOLL: 6;
+     */
     public void doBarChartSwitch(int chartType) {
+        if(chartType1 == chartType)return;
+
         chartType1 = chartType;
         if (chartType1 > chartTypes1) {
             chartType1 = 1;
@@ -629,12 +653,6 @@ public class KLineChart extends BaseChart {
         if (candleChart != null) {
             CombinedData combinedData = candleChart.getData();
             List<ILineDataSet> lineDataMA = kLineData.getLineDataMA();
-            boolean horizontalHighlightIndicatorEnabled = defaultDrawMaket;
-            if(lineDataMA!=null && !lineDataMA.isEmpty()){
-                horizontalHighlightIndicatorEnabled = lineDataMA.get(0).isHorizontalHighlightIndicatorEnabled();
-            }
-            setDrawMarketEnable(horizontalHighlightIndicatorEnabled);
-
             combinedData.setData(new LineData(kLineData.getLineDataMA()));
             candleChart.notifyDataSetChanged();
             candleChart.invalidate();
@@ -755,7 +773,8 @@ public class KLineChart extends BaseChart {
     public void setMarkerView(KLineDataManage kLineData) {
         LeftMarkerView leftMarkerView = new LeftMarkerView(mContext, R.layout.my_markerview, precision);
         KRightMarkerView rightMarkerView = new KRightMarkerView(mContext, R.layout.my_markerview, precision);
-        candleChart.setMarker(leftMarkerView, rightMarkerView, kLineData);
+        BarBottomMarkerView bottomMarkerView = new BarBottomMarkerView(mContext, R.layout.my_markerview);
+        candleChart.setMarker(null, null, kLineData,bottomMarkerView,TimeType.TIME_DATE);
     }
 
     public void setBottomMarkerView(KLineDataManage kLineData) {

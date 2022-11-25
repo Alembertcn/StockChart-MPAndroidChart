@@ -128,9 +128,10 @@ public class YAxisRenderer extends AxisRenderer {
 
                 String text = mYAxis.getFormattedLabel(i);
                 if (i == 0) {
-                    c.drawText(text, fixedPosition, mViewPortHandler.contentBottom() - Utils.convertDpToPixel(1), mAxisLabelPaint);
+                    c.drawText(text, fixedPosition, mViewPortHandler.contentBottom() - Utils.convertDpToPixel(2), mAxisLabelPaint);
                 } else if (i == to - 1) {
-                    c.drawText(text, fixedPosition, mViewPortHandler.contentTop() + Utils.convertDpToPixel(8), mAxisLabelPaint);
+                    float topOffset = Utils.calcTextHeight(mAxisLabelPaint, "A") + mYAxis.getYOffset();
+                    c.drawText(text, fixedPosition, mViewPortHandler.contentTop() +topOffset, mAxisLabelPaint);
                 } else {
                     c.drawText(text, fixedPosition, positions[i * 2 + 1] + offset, mAxisLabelPaint);
                 }

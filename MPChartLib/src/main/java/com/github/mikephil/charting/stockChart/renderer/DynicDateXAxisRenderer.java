@@ -38,7 +38,8 @@ public class DynicDateXAxisRenderer extends XAxisRenderer {
         }
 
         int labelCount = mAxis.getLabelCount();
-        int interval = count >= labelCount ? count / labelCount : 0;
+        boolean isZ = (count % labelCount == 0);
+        int interval = count >= labelCount ? (count / labelCount + (isZ?0:1)) : 0;
 
         int n = interval > 1.0 ? labelCount : Math.max(count, 0);
 
@@ -64,7 +65,7 @@ public class DynicDateXAxisRenderer extends XAxisRenderer {
                 mAxis.mEntries = new float[n];
             }
             int j = 0;
-            for (int i = startIndex; i <= lastIndex ; i += interval, j++) {
+            for (int i = startIndex; i <= lastIndex; i += interval, j++) {
                 mAxis.mEntries[j] = suggesLabelIndxs[i];
             }
         }

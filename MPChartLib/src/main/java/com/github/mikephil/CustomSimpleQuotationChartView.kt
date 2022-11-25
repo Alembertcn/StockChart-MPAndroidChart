@@ -103,10 +103,6 @@ class CustomSimpleQuotationChartView @JvmOverloads constructor (context: Context
                 index: Int,
                 isSelect: Boolean
             ) {
-                data?.let {
-                    tvContent.text =DataTimeUtil.secToDate((it.kLineDatas[index].dateMills))
-                }
-                tvContent.visibility = if(isSelect) View.VISIBLE else View.GONE
 
                 if(isSelect){
                     mOnCrossLineMoveListener?.onCrossLineMove(index,-1)

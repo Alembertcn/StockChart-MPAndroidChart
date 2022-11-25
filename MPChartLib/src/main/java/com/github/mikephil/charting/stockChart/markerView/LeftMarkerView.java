@@ -27,7 +27,6 @@ public class LeftMarkerView extends MarkerView {
         super(context, layoutResource);
         this.precision = precision;
         markerTv = (TextView) findViewById(R.id.marker_tv);
-        markerTv.setTextSize(10);
     }
 
     public void setData(float num) {
