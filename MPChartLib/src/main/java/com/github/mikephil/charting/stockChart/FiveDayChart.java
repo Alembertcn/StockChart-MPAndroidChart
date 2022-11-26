@@ -324,7 +324,6 @@ public class FiveDayChart extends BaseChart {
             setXLabels(mData.getFiveDayXLabels());
             setShowLabels(true);
             setMarkerView(mData);
-            setBottomMarkerView(mData);
 
             //Y轴label渲染颜色
             Transformer leftYTransformer = lineChart.getRendererLeftYAxis().getTransformer();
@@ -501,12 +500,9 @@ public class FiveDayChart extends BaseChart {
     private void setMarkerView(TimeDataManage mData) {
         LeftMarkerView leftMarkerView = new LeftMarkerView(mContext, R.layout.my_markerview, precision);
         TimeRightMarkerView rightMarkerView = new TimeRightMarkerView(mContext, R.layout.my_markerview);
-        lineChart.setMarker(leftMarkerView, rightMarkerView, mData);
-    }
-
-    private void setBottomMarkerView(TimeDataManage kDatas) {
         BarBottomMarkerView bottomMarkerView = new BarBottomMarkerView(mContext, R.layout.my_markerview,mData);
-        barChart.setMarker(bottomMarkerView, kDatas);
+
+        lineChart.setMarker(leftMarkerView, rightMarkerView, mData,bottomMarkerView);
     }
 
     @Override

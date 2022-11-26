@@ -75,18 +75,22 @@ public class MyCombinedChart extends CombinedChart {
             if (!mViewPortHandler.isInBounds(pos[0], pos[1])) {
                 continue;
             }
-            markerBottom.refreshContent(e, highlight);
-            markerBottom.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
-            markerBottom.layout(0, 0, markerBottom.getMeasuredWidth(), markerBottom.getMeasuredHeight());
+            drawBottomMask(canvas, highlight, e, pos);
+        }
+    }
 
-            int width = markerBottom.getWidth() / 2;
-            if (mViewPortHandler.contentRight() - pos[0] <= width) {
-                markerBottom.draw(canvas, mViewPortHandler.contentRight() - markerBottom.getWidth() / 2, mViewPortHandler.contentBottom() + markerBottom.getHeight());//-markerBottom.getHeight()   CommonUtil.dip2px(getContext(),65.8f)
-            } else if (pos[0] - mViewPortHandler.contentLeft() <= width) {
-                markerBottom.draw(canvas, mViewPortHandler.contentLeft() + markerBottom.getWidth() / 2, mViewPortHandler.contentBottom() + markerBottom.getHeight());
-            } else {
-                markerBottom.draw(canvas, pos[0], mViewPortHandler.contentBottom() + markerBottom.getHeight());
-            }
+    private void drawBottomMask(Canvas canvas, Highlight highlight, Entry e, float[] pos) {
+        markerBottom.refreshContent(e, highlight);
+        markerBottom.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+        markerBottom.layout(0, 0, markerBottom.getMeasuredWidth(), markerBottom.getMeasuredHeight());
+
+        int width = markerBottom.getWidth() / 2;
+        if (mViewPortHandler.contentRight() - pos[0] <= width) {
+            markerBottom.draw(canvas, mViewPortHandler.contentRight() - markerBottom.getWidth() / 2, mViewPortHandler.contentBottom() + markerBottom.getHeight());//-markerBottom.getHeight()   CommonUtil.dip2px(getContext(),65.8f)
+        } else if (pos[0] - mViewPortHandler.contentLeft() <= width) {
+            markerBottom.draw(canvas, mViewPortHandler.contentLeft() + markerBottom.getWidth() / 2, mViewPortHandler.contentBottom() + markerBottom.getHeight());
+        } else {
+            markerBottom.draw(canvas, pos[0], mViewPortHandler.contentBottom() + markerBottom.getHeight());
         }
     }
 

@@ -7,7 +7,7 @@ public class GlobaleConfig {
     public static int COMMON_TEXT_SIZE=9;
     public static int VALUE_COLOR= Color.BLACK;
     public static int UP_COLOR= Color.RED;
-    public static int DOWN_COLOR= Color.GREEN;
+    public static int DOWN_COLOR= Color.parseColor("#06B098");
     public static int EQ_COLOR= Color.GRAY;
     public static int MARKET_BG= Color.rgb(0x8c,0x9f,0xad);
     public static int getColorByCompare(double pre){

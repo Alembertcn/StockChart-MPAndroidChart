@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- chart -->
-    <color name="chart_bg">#ffffff</color>
+    <color name="chart_bg">#000</color>
     <color name="border_color">#323232</color>
     <color name="grid_color">#323232</color>
     <color name="label_text">#A7ADBC</color>

@@ -5,11 +5,13 @@ import android.graphics.Canvas;
 import android.util.AttributeSet;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.MarkerView;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.IDataSet;
 import com.github.mikephil.charting.stockChart.dataManage.TimeDataManage;
+import com.github.mikephil.charting.stockChart.markerView.BarBottomMarkerView;
 import com.github.mikephil.charting.stockChart.markerView.LeftMarkerView;
 import com.github.mikephil.charting.stockChart.markerView.TimeRightMarkerView;
 import com.github.mikephil.charting.stockChart.renderer.TimeLineChartRenderer;
@@ -17,8 +19,9 @@ import com.github.mikephil.charting.stockChart.renderer.TimeXAxisRenderer;
 
 
 public class TimeLineChart extends LineChart {
-    private LeftMarkerView myMarkerViewLeft;
-    private TimeRightMarkerView myMarkerViewRight;
+    private MarkerView myMarkerViewLeft;
+    private MarkerView myMarkerViewRight;
+    private MarkerView myMarkerViewBottom;
     private TimeDataManage kTimeData;
     private VolSelected volSelected;
 
@@ -60,10 +63,11 @@ public class TimeLineChart extends LineChart {
     }
 
     /*返回转型后的左右轴*/
-    public void setMarker(LeftMarkerView markerLeft, TimeRightMarkerView markerRight, TimeDataManage kTimeData) {
+    public void setMarker(LeftMarkerView markerLeft, TimeRightMarkerView markerRight, TimeDataManage kLineData, BarBottomMarkerView markerBottom) {
         this.myMarkerViewLeft = markerLeft;
         this.myMarkerViewRight = markerRight;
-        this.kTimeData = kTimeData;
+        this.myMarkerViewBottom =markerBottom;
+        this.kTimeData = kLineData;
     }
 
     @Override
@@ -93,9 +97,9 @@ public class TimeLineChart extends LineChart {
             if (!mViewPortHandler.isInBounds(pos[0], pos[1])) {
                 continue;
             }
-
-            float yValForXIndex1 = (float) kTimeData.getDatas().get((int) mIndicesToHighlight[i].getX()).getNowPrice();
-            float yValForXIndex2 = (float) kTimeData.getDatas().get((int) mIndicesToHighlight[i].getX()).getPer();
+//
+//            float yValForXIndex1 = (float) kTimeData.getDatas().get((int) mIndicesToHighlight[i].getX()).getNowPrice();
+//            float yValForXIndex2 = (float) kTimeData.getDatas().get((int) mIndicesToHighlight[i].getX()).getPer();
 
             if (volSelected != null) {
                 volSelected.onVolSelected(kTimeData.getDatas().get((int) mIndicesToHighlight[i].getX()).getVolume());
@@ -105,37 +109,41 @@ public class TimeLineChart extends LineChart {
                         kTimeData.getDatas().get((int) mIndicesToHighlight[i].getX()).getAveragePrice());
             }
 
-            myMarkerViewLeft.setData(yValForXIndex1);
-            myMarkerViewRight.setData(yValForXIndex2);
+//            myMarkerViewLeft.setData(yValForXIndex1);
+//            myMarkerViewRight.setData(yValForXIndex2);
 
-            myMarkerViewLeft.refreshContent(e, mIndicesToHighlight[i]);
-            myMarkerViewRight.refreshContent(e, mIndicesToHighlight[i]);
-            /*修复bug*/
-            // invalidate();
-            /*重新计算大小*/
-            myMarkerViewLeft.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
-            myMarkerViewLeft.layout(0, 0, myMarkerViewLeft.getMeasuredWidth(), myMarkerViewLeft.getMeasuredHeight());
-            myMarkerViewRight.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
-            myMarkerViewRight.layout(0, 0, myMarkerViewRight.getMeasuredWidth(), myMarkerViewRight.getMeasuredHeight());
-
-            if (getAxisLeft().getLabelPosition() == YAxis.YAxisLabelPosition.OUTSIDE_CHART) {
-                myMarkerViewLeft.draw(canvas, mViewPortHandler.contentLeft() - myMarkerViewLeft.getWidth() / 2, pos[1] + myMarkerViewLeft.getHeight() / 2);
-            } else {
-                myMarkerViewLeft.draw(canvas, mViewPortHandler.contentLeft() + myMarkerViewLeft.getWidth() / 2, pos[1] + myMarkerViewLeft.getHeight() / 2);
-            }
-            if (getAxisRight().getLabelPosition() == YAxis.YAxisLabelPosition.OUTSIDE_CHART) {
-                myMarkerViewRight.draw(canvas, mViewPortHandler.contentRight() + myMarkerViewRight.getWidth() / 2, pos[1] + myMarkerViewRight.getHeight() / 2);//- myMarkerViewRight.getWidth()
-            } else {
-                myMarkerViewRight.draw(canvas, mViewPortHandler.contentRight() - myMarkerViewRight.getWidth() / 2, pos[1] + myMarkerViewRight.getHeight() / 2);//- myMarkerViewRight.getWidth()
-            }
-            // callbacks to update the content
-//            mMarker.refreshContent(e, highlight);
-
-            // draw the marker
-//            mMarker.draw(canvas, pos[0], pos[1]);
+            drawSingleMask(canvas, i, e, pos, myMarkerViewLeft,false);
+            drawSingleMask(canvas, i, e, pos, myMarkerViewRight,false);
+            drawSingleMask(canvas, i, e, pos, myMarkerViewBottom,true);
         }
     }
 
+    private void drawSingleMask(Canvas canvas, int i, Entry e, float[] pos, MarkerView markerView,boolean isBottom) {
+        if(markerView !=null){
+            markerView.refreshContent(e, mIndicesToHighlight[i]);
+            /*重新计算大小*/
+            markerView.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+            markerView.layout(0, 0, markerView.getMeasuredWidth(), markerView.getMeasuredHeight());
+
+            if(isBottom){
+                int width = markerView.getWidth() / 2;
+                if (mViewPortHandler.contentRight() - pos[0] <= width) {
+                    markerView.draw(canvas, mViewPortHandler.contentRight() - markerView.getWidth() / 2, mViewPortHandler.contentBottom() + markerView.getHeight());//-markerBottom.getHeight()   CommonUtil.dip2px(getContext(),65.8f)
+                } else if (pos[0] - mViewPortHandler.contentLeft() <= width) {
+                    markerView.draw(canvas, mViewPortHandler.contentLeft() + markerView.getWidth() / 2, mViewPortHandler.contentBottom() + markerView.getHeight());
+                } else {
+                    markerView.draw(canvas, pos[0], mViewPortHandler.contentBottom() + markerView.getHeight());
+                }
+            }else{
+                if (getAxisLeft().getLabelPosition() == YAxis.YAxisLabelPosition.OUTSIDE_CHART) {
+                    markerView.draw(canvas, mViewPortHandler.contentLeft() - markerView.getWidth() / 2, pos[1] + markerView.getHeight() / 2);
+                } else {
+                    markerView.draw(canvas, mViewPortHandler.contentLeft() + markerView.getWidth() / 2, pos[1] + markerView.getHeight() / 2);
+                }
+            }
+
+        }
+    }
 
     //    public void setHighlightValue(Highlight h) {
 //        if (mData == null)

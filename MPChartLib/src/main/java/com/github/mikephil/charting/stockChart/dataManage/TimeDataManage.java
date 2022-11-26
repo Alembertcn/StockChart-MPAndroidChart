@@ -3,6 +3,7 @@ package com.github.mikephil.charting.stockChart.dataManage;
 import android.util.SparseArray;
 
 import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.stockChart.enums.ChartType;
 import com.github.mikephil.charting.stockChart.model.TimeDataModel;
 import com.github.mikephil.charting.utils.DataTimeUtil;
 
@@ -195,11 +196,9 @@ public class TimeDataManage implements IDataManager {
             //港股横坐标刻度
             if (landscape) {
                 xLabels.put(0, "09:30");
-                xLabels.put(60, "10:30");
-                xLabels.put(120, "11:30");
-                xLabels.put(180, "13:30");
-                xLabels.put(240, "14:30");
-                xLabels.put(300, "15:30");
+                xLabels.put(75, "");
+                xLabels.put(150, "12:00/13:00");
+                xLabels.put(240, "");
                 xLabels.put(330, "16:00");
             } else {
                 xLabels.put(0, "09:30");
@@ -251,4 +250,14 @@ public class TimeDataManage implements IDataManager {
         return fiveDayXLabelKey;
     }
 
+    public int getDataTypeMaxCount() {
+        if(assetId.endsWith("HK")){
+            return ChartType.HK_ONE_DAY.getPointNum();
+        }else if(assetId.endsWith("US")){
+            return ChartType.US_ONE_DAY.getPointNum();
+        }else {
+            return ChartType.ONE_DAY.getPointNum();
+        }
+       
+    }
 }

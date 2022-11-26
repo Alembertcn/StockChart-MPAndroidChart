@@ -3,6 +3,7 @@
     <string name="loading">加载中...</string>
     <string name="no_data">暂无数据</string>
     <string name="vol_name">成交量</string>
+    <string name="age_price">均价</string>
     <string name="billions_shou">亿手</string>
     <string name="millions_shou">万手</string>
     <string name="shou">手</string>
