@@ -21,7 +21,6 @@ class CustomSimpleQuotationChartView @JvmOverloads constructor (context: Context
     var mOnChartClickListener:OnClickListener? =null;
     private val kTimeData = TimeDataManage()// 分时图数据
     private val kLineData = KLineDataManage(getContext())// k线图数据
-    private var mMainChartType = 0//0:分时图 1：日K  2：周K：3：月  4：1分钟  5：5分钟 6：15分钟 7：30分钟
     /**
      *  K_VOLUME: 1;
      *  case MACD : 2;
@@ -113,14 +112,19 @@ class CustomSimpleQuotationChartView @JvmOverloads constructor (context: Context
     }
 
 
-
+//    ONE_DAY(0,""),FIVE_DAY(1,""),
+//    K_DAY(2,""),K_WEEK(3,"W"),
+//    K_MONTH(4,"M"),
+//    K_MINUTE_1(5,"M1"),K_MINUTE_3(6,"M3"),
+//    K_MINUTE_5(7,"M5"),K_MINUTE_15(8,"M15"),
+//    K_MINUTE_30(9,"M30"),K_MINUTE_60(10,"M60");
     /**
      * 设置K线数据
+     *
      */
     fun setKData(srcDate: JSONObject,assetId:String, preClosePrice:Double=0.0,kType:Int) {
-        mMainChartType = kType
-        when (mMainChartType) {
-            0 -> {
+        when (kType) {
+            0,1 -> {
                 flOneDayChart.visibility = View.VISIBLE
                 flKChart.visibility = View.GONE
 
@@ -164,6 +168,10 @@ class CustomSimpleQuotationChartView @JvmOverloads constructor (context: Context
     }
 
     override fun setMoveable(b: Boolean) {
+    }
+
+    fun zoom(){
+
     }
 
     override fun setZoomable(b: Boolean) {

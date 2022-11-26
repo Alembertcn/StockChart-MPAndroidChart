@@ -61,7 +61,7 @@ public class KLineChart extends BaseChart {
     private Context mContext;
     private CandleCombinedChart candleChart;
     private MyCombinedChart barChart;
-    private  TextView fqLable;
+    private TextView fqLable;
     DynicDateXAxisRenderer xAxisRenderer;
 
     private XAxis xAxisBar, xAxisK;
@@ -78,13 +78,11 @@ public class KLineChart extends BaseChart {
     public Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-
-            candleChart.setAutoScaleMinMaxEnabled(true);
-            barChart.setAutoScaleMinMaxEnabled(true);
-            candleChart.notifyDataSetChanged();
-            barChart.notifyDataSetChanged();
-            candleChart.invalidate();
-            barChart.animateY(1000);
+//            candleChart.notifyDataSetChanged();
+//            barChart.notifyDataSetChanged();
+//            candleChart.invalidate();
+//            barChart.invalidate();
+//            barChart.animateY(1000);
         }
     };
 
@@ -128,11 +126,8 @@ public class KLineChart extends BaseChart {
         candleChart.getDescription().setLabelView(desCripeView);
         // draw bars behind lines
         candleChart.setDrawOrder(new CombinedChart.DrawOrder[]{
-                 CombinedChart.DrawOrder.BAR, CombinedChart.DrawOrder.BUBBLE, CombinedChart.DrawOrder.CANDLE,  CombinedChart.DrawOrder.SCATTER,CombinedChart.DrawOrder.LINE
+                CombinedChart.DrawOrder.BAR, CombinedChart.DrawOrder.BUBBLE, CombinedChart.DrawOrder.CANDLE, CombinedChart.DrawOrder.SCATTER, CombinedChart.DrawOrder.LINE
         });
-
-        xAxisRenderer = new DynicDateXAxisRenderer(candleChart.getViewPortHandler(), candleChart.getXAxis(), candleChart.getTransformer(YAxis.AxisDependency.LEFT));
-        candleChart.setXAxisRenderer(xAxisRenderer);
 
         //副图
         barChart.setKeepPositionOnRotation(true);
@@ -239,29 +234,29 @@ public class KLineChart extends BaseChart {
 //        axisRightBar.enableGridDashedLine(CommonUtil.dip2px(mContext, 4), CommonUtil.dip2px(mContext, 3), 0);
 
         //手势联动监听
-        gestureListenerCandle = new CoupleChartGestureListener(candleChart, new Chart[]{barChart}){
+        gestureListenerCandle = new CoupleChartGestureListener(candleChart, new Chart[]{barChart}) {
             @Override
             public void onChartScale(MotionEvent me, float scaleX, float scaleY) {
                 super.onChartScale(me, scaleX, scaleY);
-                if(chartType1 == 2){
-                    barChart.getBarData().setBarWidth(macdBarWith/barChart.getScaleX());
+                if (chartType1 == 2) {
+                    barChart.getBarData().setBarWidth(macdBarWith / barChart.getScaleX());
                     barChart.notifyDataSetChanged();
                     barChart.postInvalidate();
-                }else{
+                } else {
 
                 }
             }
         };
-        gestureListenerBar = new CoupleChartGestureListener(barChart, new Chart[]{candleChart}){
+        gestureListenerBar = new CoupleChartGestureListener(barChart, new Chart[]{candleChart}) {
             @Override
             public void onChartScale(MotionEvent me, float scaleX, float scaleY) {
                 super.onChartScale(me, scaleX, scaleY);
-                if(chartType1 == 2){
-                    barChart.getBarData().setBarWidth(macdBarWith/barChart.getScaleX());
+                if (chartType1 == 2) {
+                    barChart.getBarData().setBarWidth(macdBarWith / barChart.getScaleX());
                     barChart.notifyDataSetChanged();
                     barChart.postInvalidate();
-                }else{
-                    
+                } else {
+
                 }
             }
         };
@@ -317,7 +312,7 @@ public class KLineChart extends BaseChart {
     /**
      * 设置K线数据
      */
-    public void setDataToChart(KLineDataManage data) {
+    public void setDataToChart(final KLineDataManage data) {
         kLineData = data;
         if (kLineData.getKLineDatas().size() == 0) {
             candleChart.setNoDataText(getResources().getString(R.string.no_data));
@@ -326,6 +321,7 @@ public class KLineChart extends BaseChart {
             barChart.invalidate();
             return;
         }
+
         axisLeftBar.setValueFormatter(new VolFormatter(mContext, data.getAssetId()));
 
         if (data.getAssetId().endsWith(".HK") && !data.getAssetId().contains("IDX")) {
@@ -344,11 +340,10 @@ public class KLineChart extends BaseChart {
         candleChartData.setData(new CandleData(candleDataSet));
         candleChartData.setData(new LineData(kLineData.getLineDataMA()));
         candleChart.setData(candleChartData);
-        xAxisRenderer.setSuggessLabelIndex(kLineData.getxCanUseIndexes());
         /*************************************成交量数据*****************************************************/
         barChartData = new CombinedData();
         BarData barData = new BarData(kLineData.getVolumeDataSet());
-        float barWidth =1.0f-kLineData.getCandleDataSet().getBarSpace()*2;
+        float barWidth = 1.0f - kLineData.getCandleDataSet().getBarSpace() * 2;
         barData.setBarWidth(barWidth);
 
         barChartData.setData(barData);
@@ -360,51 +355,10 @@ public class KLineChart extends BaseChart {
         }
 
         if (isFirst) {
-            barChart.getXAxis().setValueFormatter(new ValueFormatter() {
-                @Override
-                public String getAxisLabel(float value, AxisBase axis) {
-                    int index = (int) (value - kLineData.getOffSet());
-                    if (index < 0 || index >= kLineData.getxVals().size()) {
-                        return "";
-                    } else {
-                        return kLineData.getxVals().get(index);
-                    }
-                }
-            });
-//            candleChart.getXAxis().setGranularity(30);
-            candleChart.getXAxis().setValueFormatter(new ValueFormatter() {
-                @Override
-                public String getAxisLabel(float value, AxisBase axis) {
-                    int index = (int) (value - kLineData.getOffSet());
-                    if (index < 0 || index >= kLineData.getxVals().size()) {
-                        return "";
-                    } else {
-                        float[] mEntries = axis.mEntries;
-                        int lastIndex = -1;
-                        for (int i = 0; i < mEntries.length; i++) {
-                            //只取第一个防止缓存影响
-                            if(mEntries[i] == value){
-                                if(i!=0){
-                                    lastIndex = Math.round(mEntries[i - 1]);
-                                }
-                                //数组是增量的只需要绘制和获取最前面的 后面的是缓存其他的数据
-                                break;
-                            }
-                        }
-                        String currentStr = kLineData.getxVals().get(index);
-                        if(lastIndex == -1 || kLineData.getxVals().size()> lastIndex && !currentStr.startsWith(kLineData.getxVals().get(lastIndex).substring(0,4))){
-                            return  currentStr;
-                        }else {
-                            String preStr = kLineData.getxVals().get(lastIndex);
-                            if(preStr.equals(currentStr)){
-                                return "";
-                            }
-                            return currentStr.substring(5);
-                        }
-//                        return kLineData.getxVals().get(index);
-                    }
-                }
-            });
+            xAxisRenderer = new DynicDateXAxisRenderer(candleChart.getViewPortHandler(), candleChart.getXAxis(), candleChart.getTransformer(YAxis.AxisDependency.LEFT), kLineData);
+            candleChart.setXAxisRenderer(xAxisRenderer);
+
+            candleChart.getXAxis().setValueFormatter(kLineData.getXValueFormatter());
 
             //请注意，修改视口的所有方法需要在为Chart设置数据之后调用。
             //设置当前视图四周的偏移量。 设置这个，将阻止图表自动计算它的偏移量。使用 resetViewPortOffsets()撤消此设置。
@@ -422,55 +376,62 @@ public class KLineChart extends BaseChart {
                 barChart.setViewPortOffsets(left_right, CommonUtil.dip2px(mContext, 15), CommonUtil.dip2px(mContext, 5), CommonUtil.dip2px(mContext, 16));
             }
 
-            candleChart.setViewPortOffsets(0,CommonUtil.dip2px(mContext, 32),0, CommonUtil.dip2px(mContext, 22));
-            barChart.setViewPortOffsets(0,CommonUtil.dip2px(mContext, 15),0, 2);
+            candleChart.setViewPortOffsets(0, CommonUtil.dip2px(mContext, 32), 0, CommonUtil.dip2px(mContext, 22));
+            barChart.setViewPortOffsets(0, CommonUtil.dip2px(mContext, 15), 0, 2);
 
-            candleChart.getDescription().setPosition(0,CommonUtil.dip2px(mContext,10));
-            barChart.getDescription().setPosition(0,CommonUtil.dip2px(mContext,10));
+            candleChart.getDescription().setPosition(0, CommonUtil.dip2px(mContext, 10));
+            barChart.getDescription().setPosition(0, CommonUtil.dip2px(mContext, 10));
 
             setMarkerView(kLineData);
+
+            candleChart.setAutoScaleMinMaxEnabled(true);
+            barChart.setAutoScaleMinMaxEnabled(true);
+            candleChart.setVisibleXRangeMinimum(10);
+            barChart.setVisibleXRangeMinimum(10);
+            barChart.setVisibleXRangeMaximum(300);
+            candleChart.setVisibleXRangeMaximum(300);
+
 //            setBottomMarkerView(kLineData);
-
-            updateText(kLineData.getKLineDatas().size() - 1, false);
-
-            float xScale = calMaxScale(kLineData.getxVals().size());
-            ViewPortHandler viewPortHandlerCombin = candleChart.getViewPortHandler();
-            viewPortHandlerCombin.setMaximumScaleX(50);
-            //根据所给的参数进行放大或缩小。 参数 x 和 y 是变焦中心的坐标（单位：像素）。 记住，1f = 无放缩 。
-            candleChart.zoom(xScale, 0, 0, 0);
-
-            ViewPortHandler viewPortHandlerBar = barChart.getViewPortHandler();
-            viewPortHandlerBar.setMaximumScaleX(50);
-            barChart.zoom(xScale, 0, 0, 0);
-
-            candleChart.getXAxis().setAxisMinimum(candleChartData.getXMin() - 0.5f);
-            barChart.getXAxis().setAxisMinimum(barChartData.getXMin() - 0.5f);
-            candleChart.getXAxis().setAxisMaximum(kLineData.getKLineDatas().size() < 70 ? 70 : candleChartData.getXMax() + 0.5f);
-            barChart.getXAxis().setAxisMaximum(kLineData.getKLineDatas().size() < 70 ? 70 : barChartData.getXMax() + +0.5f);
-            if (kLineData.getKLineDatas().size() > 70) {
-                //moveViewTo(...) 方法会自动调用 invalidate()
-                candleChart.moveViewToX(kLineData.getKLineDatas().size() - 1);
-                barChart.moveViewToX(kLineData.getKLineDatas().size() - 1);
-            }
             isFirst = false;
         }
+
+        updateText(kLineData.getKLineDatas().size() - 1, false);
+
+        float xScale = calMaxScale(kLineData.getKLineDatas().size());
+        //根据所给的参数进行放大或缩小。 参数 x 和 y 是变焦中心的坐标（单位：像素）。 记住，1f = 无放缩 。
+        barChart.resetZoom();
+        candleChart.resetZoom();
+        candleChart.zoom(xScale, 1, 0, 0);
+        barChart.zoom(xScale, 1, 0, 0);
+
+        candleChart.getXAxis().setAxisMinimum(candleChartData.getXMin() - 0.5f);
+        barChart.getXAxis().setAxisMinimum(barChartData.getXMin() - 0.5f);
+        candleChart.getXAxis().setAxisMaximum(kLineData.getKLineDatas().size() < 70 ? 70 : candleChartData.getXMax() + 0.5f);
+        barChart.getXAxis().setAxisMaximum(kLineData.getKLineDatas().size() < 70 ? 70 : barChartData.getXMax() + +0.5f);
+        if (kLineData.getKLineDatas().size() > 70) {
+            //moveViewTo(...) 方法会自动调用 invalidate()
+            candleChart.moveViewToX(kLineData.getKLineDatas().size() - 1);
+            barChart.moveViewToX(kLineData.getKLineDatas().size() - 1);
+        }
+
         handler.sendEmptyMessageDelayed(0, 100);
     }
+
 
     protected int chartTypeMain = 1;//主图指标 ma:0 boll:1
     protected int chartType1 = 1;
     protected int chartTypes1 = 4;
 
     /**
-     *  K_VOLUME: 1;
-     *  case MACD : 2;
-     *  case KDJ : 3;
-     *  case RSI: 4;
-     *  case MA: 5;
-     *  case BOLL: 6;
+     * K_VOLUME: 1;
+     * case MACD : 2;
+     * case KDJ : 3;
+     * case RSI: 4;
+     * case MA: 5;
+     * case BOLL: 6;
      */
     public void doMainChartSwitch(int chartType) {
-        if(chartTypeMain ==chartType)return;
+        if (chartTypeMain == chartType) return;
 
         chartTypeMain = chartType;
         if (chartTypeMain > 2) {
@@ -489,19 +450,19 @@ public class KLineChart extends BaseChart {
 
     //副图切换
     private void chartSwitchMain(int index) {
-        updateText(index,false);
+        updateText(index, false);
     }
 
     /**
-     *  K_VOLUME: 1;
-     *  case MACD : 2;
-     *  case KDJ : 3;
-     *  case RSI: 4;
-     *  case MA: 5;
-     *  case BOLL: 6;
+     * K_VOLUME: 1;
+     * case MACD : 2;
+     * case KDJ : 3;
+     * case RSI: 4;
+     * case MA: 5;
+     * case BOLL: 6;
      */
     public void doBarChartSwitch(int chartType) {
-        if(chartType1 == chartType)return;
+        if (chartType1 == chartType) return;
 
         chartType1 = chartType;
         if (chartType1 > chartTypes1) {
@@ -518,7 +479,7 @@ public class KLineChart extends BaseChart {
             case 2:
                 kLineData.initMACD();
                 setMACDToChart();
-                barChart.getBarData().setBarWidth(macdBarWith/barChart.getScaleX());
+                barChart.getBarData().setBarWidth(macdBarWith / barChart.getScaleX());
                 barChart.notifyDataSetChanged();
                 barChart.postInvalidate();
                 break;
@@ -557,7 +518,7 @@ public class KLineChart extends BaseChart {
 
             CombinedData combinedData = barChart.getData();
             BarData data = new BarData(kLineData.getVolumeDataSet());
-            float barWidth =1.0f-kLineData.getCandleDataSet().getBarSpace()*2;
+            float barWidth = 1.0f - kLineData.getCandleDataSet().getBarSpace() * 2;
             data.setBarWidth(barWidth);
             combinedData.setData(data);
             combinedData.setData(new LineData());
@@ -706,7 +667,6 @@ public class KLineChart extends BaseChart {
         ICandleDataSet candleDataSet = candleData.getDataSetByIndex(0);
         int i = size - 1;
         candleDataSet.addEntry(new CandleEntry(i + kLineData.getOffSet(), (float) kLineData.getKLineDatas().get(i).getHigh(), (float) kLineData.getKLineDatas().get(i).getLow(), (float) kLineData.getKLineDatas().get(i).getOpen(), (float) kLineData.getKLineDatas().get(i).getClose()));
-        kLineData.getxVals().add(DataTimeUtil.secToDate(kLineData.getKLineDatas().get(i).getDateMills()));
         candleChart.getXAxis().setAxisMaximum(kLineData.getKLineDatas().size() < 70 ? 70 : candleChartData.getXMax() + kLineData.getOffSet());
 
         if (chartType1 == 1) {//副图是成交量
@@ -767,7 +727,7 @@ public class KLineChart extends BaseChart {
         barChart.invalidate();
     }
 
-    public void setDrawMarketEnable(boolean isEnable){
+    public void setDrawMarketEnable(boolean isEnable) {
         candleChart.setDrawMarkers(isEnable);
         barChart.setDrawMarkers(isEnable);
     }
@@ -776,12 +736,11 @@ public class KLineChart extends BaseChart {
     public void setMarkerView(KLineDataManage kLineData) {
         LeftMarkerView leftMarkerView = new LeftMarkerView(mContext, R.layout.my_markerview, precision);
         KRightMarkerView rightMarkerView = new KRightMarkerView(mContext, R.layout.my_markerview, precision);
-        BarBottomMarkerView bottomMarkerView = new BarBottomMarkerView(mContext, R.layout.my_markerview,kLineData);
-        candleChart.setMarker(null, null, kLineData,bottomMarkerView,TimeType.TIME_DATE);
+        BarBottomMarkerView bottomMarkerView = new BarBottomMarkerView(mContext, R.layout.my_markerview, kLineData);
+        candleChart.setMarker(null, null, kLineData, bottomMarkerView, TimeType.TIME_DATE);
 //        BarBottomMarkerView bottomMarkerView = new BarBottomMarkerView(mContext, R.layout.my_markerview);
 //        barChart.setMarker(bottomMarkerView, kLineData, TimeType.TIME_DATE);
     }
-
 
 
     public float calMaxScale(float count) {
@@ -816,16 +775,16 @@ public class KLineChart extends BaseChart {
             ILineDataSet ma20 = lineData.getDataSetByIndex(2);
 
             Entry ma5Entry = null;
-            if(ma5!=null && !ma5.getEntriesForXValue(index*1.0f).isEmpty()){
-                ma5Entry = ma5.getEntriesForXValue(index*1.0f).get(0);
+            if (ma5 != null && !ma5.getEntriesForXValue(index * 1.0f).isEmpty()) {
+                ma5Entry = ma5.getEntriesForXValue(index * 1.0f).get(0);
             }
             Entry ma10Entry = null;
-            if(ma5!=null && !ma10.getEntriesForXValue(index*1.0f).isEmpty()){
-                ma10Entry = ma10.getEntriesForXValue(index*1.0f).get(0);
+            if (ma5 != null && !ma10.getEntriesForXValue(index * 1.0f).isEmpty()) {
+                ma10Entry = ma10.getEntriesForXValue(index * 1.0f).get(0);
             }
             Entry ma20Entry = null;
-            if(ma5!=null && !ma20.getEntriesForXValue(index*1.0f).isEmpty()){
-                ma20Entry = ma20.getEntriesForXValue(index*1.0f).get(0);
+            if (ma5 != null && !ma20.getEntriesForXValue(index * 1.0f).isEmpty()) {
+                ma20Entry = ma20.getEntriesForXValue(index * 1.0f).get(0);
             }
 
             candleChart.setDescriptionCustom(zbColor, new String[]{"MA5:" + (ma5Entry == null ? "--" : NumberUtils.keepPrecision(ma5Entry.getY(), 3)), "MA10:" + (ma10Entry == null ? "--" : NumberUtils.keepPrecision(ma10Entry.getY(), 3)), "MA20:" + (ma20Entry == null ? "--" : NumberUtils.keepPrecision(ma20Entry.getY(), 3))});
@@ -838,18 +797,18 @@ public class KLineChart extends BaseChart {
             Entry midEntry = null;
             Entry lowEntry = null;
 
-            if(up!=null && !up.getEntriesForXValue(index*1.0f).isEmpty()){
-                upEntry = up.getEntriesForXValue(index*1.0f).get(0);
+            if (up != null && !up.getEntriesForXValue(index * 1.0f).isEmpty()) {
+                upEntry = up.getEntriesForXValue(index * 1.0f).get(0);
             }
-            if(mid!=null && !mid.getEntriesForXValue(index*1.0f).isEmpty()){
-                midEntry = mid.getEntriesForXValue(index*1.0f).get(0);
+            if (mid != null && !mid.getEntriesForXValue(index * 1.0f).isEmpty()) {
+                midEntry = mid.getEntriesForXValue(index * 1.0f).get(0);
             }
-            if(low!=null && !low.getEntriesForXValue(index*1.0f).isEmpty()){
-                lowEntry = low.getEntriesForXValue(index*1.0f).get(0);
+            if (low != null && !low.getEntriesForXValue(index * 1.0f).isEmpty()) {
+                lowEntry = low.getEntriesForXValue(index * 1.0f).get(0);
             }
 
-            candleChart.setDescriptionCustom(new int[]{Color.BLACK,ContextCompat.getColor(getContext(), R.color.ma5), ContextCompat.getColor(getContext(), R.color.ma10), ContextCompat.getColor(getContext(), R.color.ma20)},
-                    new String[]{"BOLL(20,2)","MID:" + (midEntry == null ? "--" : NumberUtils.keepPrecision(midEntry.getY(), 3)),"UPPER:" + (upEntry == null ? "--" : NumberUtils.keepPrecision(upEntry.getY(), 3)),  "LOWER:" + (lowEntry == null ? "--" : NumberUtils.keepPrecision(lowEntry.getY(), 3))});
+            candleChart.setDescriptionCustom(new int[]{Color.BLACK, ContextCompat.getColor(getContext(), R.color.ma5), ContextCompat.getColor(getContext(), R.color.ma10), ContextCompat.getColor(getContext(), R.color.ma20)},
+                    new String[]{"BOLL(20,2)", "MID:" + (midEntry == null ? "--" : NumberUtils.keepPrecision(midEntry.getY(), 3)), "UPPER:" + (upEntry == null ? "--" : NumberUtils.keepPrecision(upEntry.getY(), 3)), "LOWER:" + (lowEntry == null ? "--" : NumberUtils.keepPrecision(lowEntry.getY(), 3))});
         }
         chartSwitch(index);
     }
@@ -860,19 +819,20 @@ public class KLineChart extends BaseChart {
     // case KDJ : 3;
     // case RSI: 4;
     int[] macdColors = {getResources().getColor(R.color.fit_black), getResources().getColor(R.color.ma10), getResources().getColor(R.color.ma30), getResources().getColor(R.color.ma20)};
+
     private void chartSwitch(int index) {
         switch (chartType1) {
             case 1:
-                barChart.setDescriptionCustom(new int[]{ContextCompat.getColor(mContext, R.color.fit_black),ContextCompat.getColor(mContext, R.color.theme)}, new String[]{getResources().getString(R.string.vol_name),"VOL:"+NumberUtils.formatVol(mContext, kLineData.getAssetId(), kLineData.getKLineDatas().get(index).getVolume())},2);
+                barChart.setDescriptionCustom(new int[]{ContextCompat.getColor(mContext, R.color.fit_black), ContextCompat.getColor(mContext, R.color.theme)}, new String[]{getResources().getString(R.string.vol_name), "VOL:" + NumberUtils.formatVol(mContext, kLineData.getAssetId(), kLineData.getKLineDatas().get(index).getVolume())}, 2);
                 break;
             case 2:
-                barChart.setDescriptionCustom(macdColors, new String[]{"MACD(12,26,9)","DIF:" + (kLineData.getDifData().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getDifData().get(index).getY(), 3)), "DEA:" + (kLineData.getDeaData().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getDeaData().get(index).getY(), 3)), "MACD:" + (kLineData.getMacdData().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getMacdData().get(index).getY(), 3))});
+                barChart.setDescriptionCustom(macdColors, new String[]{"MACD(12,26,9)", "DIF:" + (kLineData.getDifData().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getDifData().get(index).getY(), 3)), "DEA:" + (kLineData.getDeaData().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getDeaData().get(index).getY(), 3)), "MACD:" + (kLineData.getMacdData().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getMacdData().get(index).getY(), 3))});
                 break;
             case 3:
-                barChart.setDescriptionCustom(macdColors, new String[]{"KDJ(9,3,3)","K:" + (kLineData.getkData().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getkData().get(index).getY(), 3)), "D:" + (kLineData.getdData().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getdData().get(index).getY(), 3)), "J:" + (kLineData.getjData().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getjData().get(index).getY(), 3))});
+                barChart.setDescriptionCustom(macdColors, new String[]{"KDJ(9,3,3)", "K:" + (kLineData.getkData().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getkData().get(index).getY(), 3)), "D:" + (kLineData.getdData().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getdData().get(index).getY(), 3)), "J:" + (kLineData.getjData().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getjData().get(index).getY(), 3))});
                 break;
             case 4:
-                barChart.setDescriptionCustom(macdColors, new String[]{"RSI(9,3,3)","RSI1:" + (kLineData.getRsiData6().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getRsiData6().get(index).getY(), 3)), "RSI12:" + (kLineData.getRsiData12().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getRsiData12().get(index).getY(), 3)), "RSI3:" + (kLineData.getRsiData24().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getRsiData24().get(index).getY(), 3))});
+                barChart.setDescriptionCustom(macdColors, new String[]{"RSI(9,3,3)", "RSI1:" + (kLineData.getRsiData6().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getRsiData6().get(index).getY(), 3)), "RSI12:" + (kLineData.getRsiData12().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getRsiData12().get(index).getY(), 3)), "RSI3:" + (kLineData.getRsiData24().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getRsiData24().get(index).getY(), 3))});
 //                barChart.setDescriptionCustom(zbColor, new String[]{"UPPER:" + (kLineData.getBollDataUP().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getBollDataUP().get(index).getY(), 3)), "MID:" + (kLineData.getBollDataMB().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getBollDataMB().get(index).getY(), 3)), "LOWER:" + (kLineData.getBollDataDN().size() <= index ? "--" : NumberUtils.keepPrecision(kLineData.getBollDataDN().get(index).getY(), 3))});
                 break;
             case 5:

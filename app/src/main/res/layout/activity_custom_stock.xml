@@ -25,6 +25,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
 
+
             <RadioButton
                 android:id="@+id/rb02"
                 android:text="日K"
@@ -34,9 +35,16 @@
 
             <RadioButton
                 android:id="@+id/rb03"
-                android:text="周K"
+                android:text="月K"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
+
+            <RadioButton
+                android:id="@+id/rb04"
+                android:text="分K"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
 
         </RadioGroup>
 

@@ -2,6 +2,7 @@ package com.github.mikephil.charting.stockChart.dataManage;
 
 import android.util.SparseArray;
 
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.stockChart.model.TimeDataModel;
 import com.github.mikephil.charting.utils.DataTimeUtil;
 
@@ -114,6 +115,17 @@ public class TimeDataManage implements IDataManager {
             timeFormat = DataTimeUtil.secToTime(dateMills, "HH:mm");
         }
         return timeFormat;
+    }
+
+    @Override
+    public Integer[] getXCanUseIndexes() {
+        // 分时图使用固定的坐标 所以这里可以先不用实现
+        return new Integer[0];
+    }
+
+    @Override
+    public ValueFormatter getXValueFormatter() {
+        return null;
     }
 
     public void removeLastData() {

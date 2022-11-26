@@ -395,7 +395,26 @@ public class DataTimeUtil {
     }
 
     public static boolean isSameMoth(long time1, long time2) {
-        return secToDateMonth(time1).equals(secToDateMonth(time2));
+        return secToTime(time1,"yyyy/MM").equals(secToTime(time2,"yyyy/MM"));
+    }
+    public static boolean isSameYear(long time1, long time2) {
+        return secToTime(time1,"yyyy").equals(secToTime(time2,"yyyy"));
+    }
+    public static boolean isSameDay(long time1, long time2) {
+        return secToTime(time1,"yyyy/MM/dd").equals(secToTime(time2,"yyyy/MM/dd"));
     }
 
+    public static boolean isSameMini(long time1, long time2) {
+        return secToTime(time1,"m").equals(secToTime(time2,"m"));
+    }
+
+    /**
+     * 是否是整半点
+     * @param dateMills
+     * @return
+     */
+    public static boolean isHalfHourTimePoint(Long dateMills) {
+        String s = secToTime(dateMills, "yyyy/MM/dd HH:mm");
+        return s.endsWith("00") || s.endsWith("30");
+    }
 }

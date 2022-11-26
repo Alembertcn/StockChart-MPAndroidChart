@@ -4,26 +4,24 @@ import android.graphics.Canvas;
 
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.renderer.XAxisRenderer;
+import com.github.mikephil.charting.stockChart.dataManage.IDataManager;
 import com.github.mikephil.charting.utils.MPPointF;
 import com.github.mikephil.charting.utils.Transformer;
 import com.github.mikephil.charting.utils.Utils;
 import com.github.mikephil.charting.utils.ViewPortHandler;
 
 public class DynicDateXAxisRenderer extends XAxisRenderer {
-    public void setSuggessLabelIndex(Integer[] all) {
-        this.suggesLabelIndxs = all;
-    }
+    private IDataManager dataManager;
 
-    private Integer[] suggesLabelIndxs = new Integer[]{};
-
-    public DynicDateXAxisRenderer(ViewPortHandler viewPortHandler, XAxis xAxis, Transformer trans) {
+    public DynicDateXAxisRenderer(ViewPortHandler viewPortHandler, XAxis xAxis, Transformer trans,IDataManager dataManager) {
         super(viewPortHandler, xAxis, trans);
-        mXAxis = xAxis;
+        this.dataManager = dataManager;
     }
 
     protected void computeAxisValues(float min, float max) {
 
         int startIndex = -1, count = -1, lastIndex = -1;
+        Integer[] suggesLabelIndxs = dataManager.getXCanUseIndexes();
         for (int i = 0; i < suggesLabelIndxs.length; i++) {
             int i1 = suggesLabelIndxs[i];
             if (i1 >= min && i1 <= max) {

@@ -227,7 +227,6 @@ public class ViewPortHandler {
      */
     public void resetZoom(Matrix outputMatrix) {
         outputMatrix.reset();
-        outputMatrix.set(mMatrixTouch);
         outputMatrix.postScale(1.0f, 1.0f, 0.0f, 0.0f);
     }
 

@@ -6,6 +6,7 @@ import android.graphics.Paint;
 import androidx.core.content.ContextCompat;
 
 import com.github.mikephil.charting.R;
+import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
@@ -15,6 +16,7 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.GlobaleConfig;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.stockChart.model.KLineDataModel;
 import com.github.mikephil.charting.stockChart.model.bean.BOLLEntity;
@@ -88,12 +90,7 @@ public class KLineDataManage implements IDataManager {
     private int currentKType = K_1DAY;
 
 
-    //X轴数据
-    private ArrayList<String> xVal = new ArrayList<>();
 
-    public Integer[] getxCanUseIndexes() {
-        return xCanUseIndexes.toArray(new Integer[]{});
-    }
 
     private ArrayList<Integer> xCanUseIndexes = new ArrayList<>();
 
@@ -139,7 +136,6 @@ public class KLineDataManage implements IDataManager {
             lineDataMA.clear();
             JSONArray data = object.optJSONArray("data");
             if (data != null) {
-                xVal.clear();
                 xCanUseIndexes.clear();
                 ArrayList<CandleEntry> candleEntries = new ArrayList<>();
                 ArrayList<BarEntry> barEntries = new ArrayList<>();
@@ -179,10 +175,16 @@ public class KLineDataManage implements IDataManager {
                     preClosePrice = klineDatamodel.getPreClose();
                     kDatas.add(klineDatamodel);
 
-                    xVal.add(DataTimeUtil.secToDateMonth(getKLineDatas().get(i).getDateMills()));
-                    if (i > 0 && !DataTimeUtil.isSameMoth(getKLineDatas().get(i).getDateMills(), getKLineDatas().get(i - 1).getDateMills())) {
-                        xCanUseIndexes.add(i);
+                    if(isMinKType()){
+                        if (DataTimeUtil.isHalfHourTimePoint(getKLineDatas().get(i).getDateMills()) && i > 0 && !DataTimeUtil.isSameMini(getKLineDatas().get(i).getDateMills(), getKLineDatas().get(i - 1).getDateMills())) {
+                            xCanUseIndexes.add(i);
+                        }
+                    }else{
+                        if (i > 0 && !DataTimeUtil.isSameMoth(getKLineDatas().get(i).getDateMills(), getKLineDatas().get(i - 1).getDateMills())) {
+                            xCanUseIndexes.add(i);
+                        }
                     }
+                    
                     candleEntries.add(new CandleEntry(i + offSet, (float) getKLineDatas().get(i).getHigh(), (float) getKLineDatas().get(i).getLow(), (float) getKLineDatas().get(i).getOpen(), (float) getKLineDatas().get(i).getClose()));
 
                     float color = getKLineDatas().get(i).getOpen() == getKLineDatas().get(i).getClose() ? 0f : getKLineDatas().get(i).getOpen() > getKLineDatas().get(i).getClose() ? -1f : 1f;
@@ -412,10 +414,6 @@ public class KLineDataManage implements IDataManager {
         kDatas.addAll(datas);
     }
 
-    public ArrayList<String> getxVals() {
-        return xVal;
-    }
-
     public List<ILineDataSet> getLineDataMA() {
         return lineDataMA;
     }
@@ -558,6 +556,72 @@ public class KLineDataManage implements IDataManager {
         }
         return timeFormat;
     }
+
+    @Override
+    public Integer[] getXCanUseIndexes() {
+        return xCanUseIndexes.toArray(new Integer[]{});
+    }
+
+    @Override
+    public ValueFormatter getXValueFormatter() {
+        return mGlobalXFormatter;
+    }
+
+    private boolean isMinKType(){
+        return currentKType == K_1MIN
+                ||currentKType == K_5MIN
+                ||currentKType == K_15MIN
+                ||currentKType == K_30MIN
+                ||currentKType == K_60MIN;
+    }
+
+    ValueFormatter mGlobalXFormatter = new ValueFormatter() {
+        @Override
+        public String getAxisLabel(float value, AxisBase axis) {
+            int index = (int) (value - getOffSet());
+            if (index < 0 || index >= kDatas.size()) {
+                return "";
+            } else {
+                float[] mEntries = axis.mEntries;
+                int lastIndex = -1;
+                for (int i = 0; i < mEntries.length; i++) {
+                    //只取第一个防止缓存影响
+                    if (mEntries[i] == value) {
+                        if (i != 0) {
+                            lastIndex = Math.round(mEntries[i - 1]);
+                        }
+                        //数组是增量的只需要绘制和获取最前面的 后面的是缓存其他的数据
+                        break;
+                    }
+                }
+
+                String currentStr = getIndexTime(index);
+                Long timeSrc = kDatas.get(index).getDateMills();
+
+                if (lastIndex == -1 || kDatas.size() <= lastIndex) {
+                    currentStr = DataTimeUtil.secToTime(timeSrc, isMinKType()?"MM/dd HH:mm":"yyyy/MM/dd");
+                } else {
+                    Long timeLast = kDatas.get(lastIndex).getDateMills();
+                    if(isMinKType()){
+                        if (DataTimeUtil.isSameDay(timeLast, timeSrc)) {
+                            currentStr = DataTimeUtil.secToTime(timeSrc, "HH:mm");
+                        } else {
+                            currentStr = DataTimeUtil.secToTime(timeSrc, "MM/dd HH:mm");
+                        }
+                    }else{
+                        if (DataTimeUtil.isSameYear(timeLast, timeSrc)) {
+                            currentStr = DataTimeUtil.secToTime(timeSrc, "MM/dd");
+                        } else {
+                            currentStr = DataTimeUtil.secToTime(timeSrc, "yyyy/MM/dd");
+                        }
+                    }
+
+                }
+                return currentStr;
+            }
+        }
+    };
+
 
     enum ColorType {
         blue,

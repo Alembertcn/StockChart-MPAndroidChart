@@ -10,17 +10,33 @@ import kotlinx.android.synthetic.main.custom_simple_quotation_chart_view.view.*
 import org.json.JSONObject
 
 class CustomStockActivity: AppCompatActivity() {
+    fun calMaxScale(count: Float): Float {
+        var xScale = 1f
+        xScale = if (count >= 800) {
+            12f
+        } else if (count >= 500) {
+            8f
+        } else if (count >= 300) {
+            5.5f
+        } else if (count >= 150) {
+            2f
+        } else if (count >= 100) {
+            1.5f
+        } else {
+            0.1f
+        }
+        return xScale
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_custom_stock)
         test.setOnClickListener {
 
-            val layoutParams = flChart.layoutParams
-            layoutParams.width = layoutParams.width+10
-            flChart.layoutParams = layoutParams
-            flChart.requestLayout()
-            chartView.combinedchart.setFqLableText("0")
-
+//            val layoutParams = flChart.layoutParams
+//            layoutParams.width = layoutParams.width+10
+//            flChart.layoutParams = layoutParams
+//            flChart.requestLayout()
+//            chartView.combinedchart.setFqLableText("0")
 
 //            chartView.oneDayChart.stopHeaderAnimation()
         }
@@ -34,6 +50,9 @@ class CustomStockActivity: AppCompatActivity() {
                 }
                 R.id.rb03 -> {
                     chartView.setKData(JSONObject(Constains.oneDK),"601818.SH",2.82,KLineDataManage.K_1MONTH)
+                }
+                R.id.rb04 -> {
+                    chartView.setKData(JSONObject(Constains.oneMinKData),"601818.SH",2.82,KLineDataManage.K_1MIN)
                 }
                 else -> {
                 }
