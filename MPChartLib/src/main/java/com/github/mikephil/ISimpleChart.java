@@ -32,7 +32,7 @@ public interface ISimpleChart {
 //    public void setKData(List<CandleLine.CandleLineBean> kList, List<String> ma5List, List<String> ma10List, List<String> ma20List,
 //                         List<Histogram.HistogramBean> turnoverList, float maxPrice, float minPrice);
 
-    void setLastPointData(String data, double changePercent);
+    void setLastPointData(double newPrice, double avgPrice,int volume);
 
     //     void onPositionUpdate(int amount, double price);//分时图才显示 可能是持仓变化
 //    public void onPendingOrderUpdate(List<PendingOrderElement> pendingOrderList);//分时图才显示 可能是持仓变化

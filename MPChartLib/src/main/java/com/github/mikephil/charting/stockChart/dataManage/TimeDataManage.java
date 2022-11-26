@@ -258,4 +258,11 @@ public class TimeDataManage implements IDataManager {
         }
        
     }
+
+    public TimeDataModel getLastData() {
+        if(realTimeDatas!=null && !realTimeDatas.isEmpty()){
+            return realTimeDatas.get(realTimeDatas.size() - 1);
+        }
+        return null;
+    }
 }

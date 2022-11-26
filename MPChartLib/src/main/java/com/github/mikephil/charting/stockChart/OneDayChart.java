@@ -408,8 +408,10 @@ public class OneDayChart extends BaseChart {
                 barChart.setViewPortOffsets(CommonUtil.dip2px(mContext, 5), 0, CommonUtil.dip2px(mContext, 5), CommonUtil.dip2px(mContext, 15));
             }
 
-            lineChart.setViewPortOffsets(0, CommonUtil.dip2px(mContext, 0), 0, CommonUtil.dip2px(mContext, 22));
-            barChart.setViewPortOffsets(0, CommonUtil.dip2px(mContext, 15), 0, 2);
+
+            //右边3是为了适配小圆点遮挡问题
+            lineChart.setViewPortOffsets(0, CommonUtil.dip2px(mContext, 0), 3, CommonUtil.dip2px(mContext, 22));
+            barChart.setViewPortOffsets(0, CommonUtil.dip2px(mContext, 15), 3, 2);
 
             axisLeftLine.setAxisMinimum(mData.getMin());
             axisLeftLine.setAxisMaximum(mData.getMax());
