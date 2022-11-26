@@ -194,24 +194,22 @@ public class TimeDataManage implements IDataManager {
         SparseArray<String> xLabels = new SparseArray<String>();
         if (assetId.endsWith(".HK")) {
             //港股横坐标刻度
-            if (landscape) {
-                xLabels.put(0, "09:30");
-                xLabels.put(75, "");
-                xLabels.put(150, "12:00/13:00");
-                xLabels.put(240, "");
-                xLabels.put(330, "16:00");
-            } else {
-                xLabels.put(0, "09:30");
-                xLabels.put(75, "");
-                xLabels.put(150, "12:00/13:00");
-                xLabels.put(240, "");
-                xLabels.put(330, "16:00");
-            }
-        } else {
             xLabels.put(0, "09:30");
-            xLabels.put(60, "10:30");
+            xLabels.put(75, "");
+            xLabels.put(150, "12:00/13:00");
+            xLabels.put(240, "");
+            xLabels.put(330, "16:00");
+        } else if(assetId.endsWith(".US")){
+            xLabels.put(0, "09:30");
+            xLabels.put(60, "");
+            xLabels.put(120, "12:00/13:00");
+            xLabels.put(180, "");
+            xLabels.put(240, "16:00");
+        }else{
+            xLabels.put(0, "09:30");
+            xLabels.put(60, "");
             xLabels.put(120, "11:30/13:00");
-            xLabels.put(180, "14:00");
+            xLabels.put(180, "");
             xLabels.put(240, "15:00");
         }
         return xLabels;

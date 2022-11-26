@@ -414,10 +414,10 @@ public class OneDayChart extends BaseChart {
             axisLeftLine.setAxisMinimum(mData.getMin());
             axisLeftLine.setAxisMaximum(mData.getMax());
             //下面方法需在填充数据后调用
-            xAxisLine.setXLabels(getXLabels());
-            xAxisLine.setLabelCount(getXLabels().size(), true);
-            xAxisBar.setXLabels(getXLabels());
-            xAxisBar.setLabelCount(getXLabels().size(), true);
+            xAxisLine.setXLabels(mData.getOneDayXLabels(landscape));
+            xAxisLine.setLabelCount(mData.getOneDayXLabels(landscape).size(), true);
+            xAxisBar.setXLabels(mData.getOneDayXLabels(landscape));
+            xAxisBar.setLabelCount(mData.getOneDayXLabels(landscape).size(), true);
             lineChart.setVisibleXRange(maxCount, maxCount);
             barChart.setVisibleXRange(maxCount, maxCount);
             //moveViewTo(...) 方法会自动调用 invalidate()
