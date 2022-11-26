@@ -112,6 +112,7 @@ public class KLineChart extends BaseChart {
         candleChart.setScaleYEnabled(false);//Y轴方向是否可放大缩小
         candleChart.setKeepPositionOnRotation(true);
         candleChart.setHardwareAccelerationEnabled(true);
+        candleChart.setTouchEnabled(false);
         Legend mChartKlineLegend = candleChart.getLegend();
         mChartKlineLegend.setEnabled(false);
         //k线滚动系数设置，控制滚动惯性
@@ -842,6 +843,23 @@ public class KLineChart extends BaseChart {
                 barChart.setDescriptionCustom(new int[]{ContextCompat.getColor(mContext, R.color.fit_black), ContextCompat.getColor(mContext, R.color.theme)}, new String[]{getResources().getString(R.string.vol_name), "VOL:" + NumberUtils.formatVol(mContext, mData.getAssetId(), mData.getKLineDatas().get(index).getVolume())}, 2);
                 break;
         }
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        float chartHeight = candleChart.getViewPortHandler().getChartHeight();
+        if(event.getY()<=chartHeight){
+            //防止点击主图触发幅图的点击事件 幅图点击一般是切换幅图类型
+            int action = event.getAction();
+            if (action == MotionEvent.ACTION_UP) {
+                event.setAction( MotionEvent.ACTION_CANCEL);
+            }
+//            不能直接替换只能偏移源event 替换后缩放会发生 point outof range异常
+//            event=MotionEvent.obtain(event.getDownTime(), event.getEventTime(), event.getAction(), event.getX(), event.getY(),event.getMetaState());
+
+            event.setLocation(event.getX(),chartHeight+10);
+        }
+        return super.dispatchTouchEvent(event);
     }
 
     public void setFqLableText(String str) {
