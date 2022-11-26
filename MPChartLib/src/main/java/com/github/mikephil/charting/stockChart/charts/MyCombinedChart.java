@@ -75,16 +75,6 @@ public class MyCombinedChart extends CombinedChart {
             if (!mViewPortHandler.isInBounds(pos[0], pos[1])) {
                 continue;
             }
-
-            String date = null;
-
-            if (this.timeType == TimeType.TIME_HOUR) {
-                date = DataTimeUtil.secToTime(kLineData.getKLineDatas().get((int) e.getX()).getDateMills());
-            } else {
-                date = DataTimeUtil.secToDate(kLineData.getKLineDatas().get((int) e.getX()).getDateMills());
-            }
-
-            markerBottom.setData(date);
             markerBottom.refreshContent(e, highlight);
             markerBottom.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
             markerBottom.layout(0, 0, markerBottom.getMeasuredWidth(), markerBottom.getMeasuredHeight());

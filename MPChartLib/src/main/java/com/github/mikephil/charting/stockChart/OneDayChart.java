@@ -512,7 +512,7 @@ public class OneDayChart extends BaseChart {
     }
 
     private void setBottomMarkerView(TimeDataManage kDatas) {
-        BarBottomMarkerView bottomMarkerView = new BarBottomMarkerView(mContext, R.layout.my_markerview);
+        BarBottomMarkerView bottomMarkerView = new BarBottomMarkerView(mContext, R.layout.my_markerview,mData);
         barChart.setMarker(bottomMarkerView, kDatas);
     }
 

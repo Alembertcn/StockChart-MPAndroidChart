@@ -62,7 +62,7 @@ public class ChartFiveDayFragment extends BaseFragment {
         }
 
         //上证指数代码000001.IDX.SH
-        kTimeData.parseTimeData(object,"000001.IDX.SH",0);
+        kTimeData.parseData(object,"000001.IDX.SH",0, TimeDataManage.FIVE_DAY);
         chart.setDataToChart(kTimeData);
 
         //非横屏页单击转横屏页

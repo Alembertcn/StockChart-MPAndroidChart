@@ -13,7 +13,6 @@ import com.github.mikephil.charting.stockChart.dataManage.KLineDataManage
 import com.github.mikephil.charting.stockChart.dataManage.TimeDataManage
 import com.github.mikephil.charting.stockChart.enums.ChartType
 import com.github.mikephil.charting.stockChart.model.TimeDataModel
-import com.github.mikephil.charting.utils.DataTimeUtil
 import kotlinx.android.synthetic.main.custom_simple_quotation_chart_view.view.*
 import org.json.JSONObject
 
@@ -125,7 +124,7 @@ class CustomSimpleQuotationChartView @JvmOverloads constructor (context: Context
                 flOneDayChart.visibility = View.VISIBLE
                 flKChart.visibility = View.GONE
 
-                kTimeData.parseTimeData(srcDate, assetId, preClosePrice)
+                kTimeData.parseData(srcDate, assetId, preClosePrice,kType)
                 oneDayChart.setDataToChart(kTimeData)
 
             }
@@ -134,7 +133,7 @@ class CustomSimpleQuotationChartView @JvmOverloads constructor (context: Context
                 flKChart.visibility = View.VISIBLE
 
                 //上证指数代码000001.IDX.SH
-                kLineData.parseKlineData(srcDate, assetId, land)
+                kLineData.parseData(srcDate, assetId, preClosePrice,kType)
                 kLineData.candleDataSet.apply {
 //                    decreasingColor = GlobaleConfig.getFallColor()
 //                    increasingColor = GlobaleConfig.getRiseColor()

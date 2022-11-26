@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.android.stockapp.R
 import com.android.stockapp.application.MyApplication
+import com.github.mikephil.charting.stockChart.dataManage.KLineDataManage
 import kotlinx.android.synthetic.main.activity_custom_stock.*
 import kotlinx.android.synthetic.main.custom_simple_quotation_chart_view.view.*
 import org.json.JSONObject
@@ -29,9 +30,10 @@ class CustomStockActivity: AppCompatActivity() {
                     chartView.setKData(JSONObject(Constains.oneDayData),"601818.SH",2.82,0)
                 }
                 R.id.rb02 -> {
-                    chartView.setKData(JSONObject(Constains.oneDK),"601818.SH",2.82,1)
+                    chartView.setKData(JSONObject(Constains.oneDK),"601818.SH",2.82,KLineDataManage.K_1WEEK)
                 }
                 R.id.rb03 -> {
+                    chartView.setKData(JSONObject(Constains.oneDK),"601818.SH",2.82,KLineDataManage.K_1MONTH)
                 }
                 else -> {
                 }

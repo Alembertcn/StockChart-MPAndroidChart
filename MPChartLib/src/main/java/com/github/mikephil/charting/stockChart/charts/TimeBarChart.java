@@ -83,11 +83,6 @@ public class TimeBarChart extends BarChart {
                 continue;
             }
 
-            String date = "";
-
-            date = DataTimeUtil.secToTime(kTimeData.getDatas().get((int) e.getX()).getTimeMills());//分时图显示的数据
-
-            markerBottom.setData(date);
             markerBottom.refreshContent(e, highlight);
             markerBottom.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
             markerBottom.layout(0, 0, markerBottom.getMeasuredWidth(), markerBottom.getMeasuredHeight());

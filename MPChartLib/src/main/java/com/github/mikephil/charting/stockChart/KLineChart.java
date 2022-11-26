@@ -776,14 +776,13 @@ public class KLineChart extends BaseChart {
     public void setMarkerView(KLineDataManage kLineData) {
         LeftMarkerView leftMarkerView = new LeftMarkerView(mContext, R.layout.my_markerview, precision);
         KRightMarkerView rightMarkerView = new KRightMarkerView(mContext, R.layout.my_markerview, precision);
-        BarBottomMarkerView bottomMarkerView = new BarBottomMarkerView(mContext, R.layout.my_markerview);
+        BarBottomMarkerView bottomMarkerView = new BarBottomMarkerView(mContext, R.layout.my_markerview,kLineData);
         candleChart.setMarker(null, null, kLineData,bottomMarkerView,TimeType.TIME_DATE);
+//        BarBottomMarkerView bottomMarkerView = new BarBottomMarkerView(mContext, R.layout.my_markerview);
+//        barChart.setMarker(bottomMarkerView, kLineData, TimeType.TIME_DATE);
     }
 
-    public void setBottomMarkerView(KLineDataManage kLineData) {
-        BarBottomMarkerView bottomMarkerView = new BarBottomMarkerView(mContext, R.layout.my_markerview);
-        barChart.setMarker(bottomMarkerView, kLineData, TimeType.TIME_DATE);
-    }
+
 
     public float calMaxScale(float count) {
         float xScale = 1;

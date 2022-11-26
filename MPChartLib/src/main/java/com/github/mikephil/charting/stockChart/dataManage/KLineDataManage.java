@@ -34,12 +34,11 @@ import java.util.List;
 /**
  * K线数据解析
  */
-public class KLineDataManage {
+public class KLineDataManage implements IDataManager {
     private Context mContext;
     private ArrayList<KLineDataModel> kDatas = new ArrayList<>();
     private float offSet = 0f;//K线图最右边偏移量
     private String assetId;//股票代号
-    private boolean landscape = false;//横屏还是竖屏
 
     //MA参数
     public int N1 = 5;
@@ -70,11 +69,30 @@ public class KLineDataManage {
     public int RSIN2 = 12;
     public int RSIN3 = 24;
 
+//    ONE_DAY(0,""),FIVE_DAY(1,""),
+//    K_DAY(2,""),K_WEEK(3,"W"),
+//    K_MONTH(4,"M"),
+//    K_MINUTE_1(5,"M1"),K_MINUTE_3(6,"M3"),
+//    K_MINUTE_5(7,"M5"),K_MINUTE_15(8,"M15"),
+//    K_MINUTE_30(9,"M30"),K_MINUTE_60(10,"M60");
+
+    // k线类型
+    public static final int K_1MIN = 5;
+    public static final int K_5MIN = 7;
+    public static final int K_15MIN = 8;
+    public static final int K_30MIN = 9;
+    public static final int K_60MIN = 10;
+    public static final int K_1DAY = 2;
+    public static final int K_1WEEK = 3;
+    public static final int K_1MONTH = 4;
+    private int currentKType = K_1DAY;
+
+
     //X轴数据
     private ArrayList<String> xVal = new ArrayList<>();
 
     public Integer[] getxCanUseIndexes() {
-        return  xCanUseIndexes.toArray(new Integer[]{});
+        return xCanUseIndexes.toArray(new Integer[]{});
     }
 
     private ArrayList<Integer> xCanUseIndexes = new ArrayList<>();
@@ -111,12 +129,11 @@ public class KLineDataManage {
         mContext = context;
     }
 
-    /**
-     * 解析K线数据
-     */
-    public void parseKlineData(JSONObject object, String assetId,boolean landscape) {
+
+    @Override
+    public void parseData(JSONObject object, String assetId, double preClosePrice, int type) {
+        this.currentKType = type;
         this.assetId = assetId;
-        this.landscape = landscape;
         if (object != null) {
             kDatas.clear();
             lineDataMA.clear();
@@ -163,7 +180,7 @@ public class KLineDataManage {
                     kDatas.add(klineDatamodel);
 
                     xVal.add(DataTimeUtil.secToDateMonth(getKLineDatas().get(i).getDateMills()));
-                    if(i>0 && !DataTimeUtil.isSameMoth(getKLineDatas().get(i).getDateMills(),getKLineDatas().get(i-1).getDateMills())){
+                    if (i > 0 && !DataTimeUtil.isSameMoth(getKLineDatas().get(i).getDateMills(), getKLineDatas().get(i - 1).getDateMills())) {
                         xCanUseIndexes.add(i);
                     }
                     candleEntries.add(new CandleEntry(i + offSet, (float) getKLineDatas().get(i).getHigh(), (float) getKLineDatas().get(i).getLow(), (float) getKLineDatas().get(i).getOpen(), (float) getKLineDatas().get(i).getClose()));
@@ -172,12 +189,12 @@ public class KLineDataManage {
                     barEntries.add(new BarEntry(i + offSet, (float) getKLineDatas().get(i).getVolume(), color));
 
                     line5Entries.add(new Entry(i + offSet, (float) getKLineDatas().get(i).getMa5()));
-                    line10Entries.add(new Entry( i + offSet, (float) getKLineDatas().get(i).getMa10()));
+                    line10Entries.add(new Entry(i + offSet, (float) getKLineDatas().get(i).getMa10()));
                     line20Entries.add(new Entry(i + offSet, (float) getKLineDatas().get(i).getMa20()));
                 }
-                line5Entries =line5Entries.size()>N1 ? line5Entries.subList(N1-1, line5Entries.size()):line5Entries;
-                line10Entries =line10Entries.size()>N2 ? line10Entries.subList(N2-1, line10Entries.size()):line10Entries;
-                line20Entries = line20Entries.size()>N3 ?line20Entries.subList(N3-1, line20Entries.size()):line20Entries;
+                line5Entries = line5Entries.size() > N1 ? line5Entries.subList(N1 - 1, line5Entries.size()) : line5Entries;
+                line10Entries = line10Entries.size() > N2 ? line10Entries.subList(N2 - 1, line10Entries.size()) : line10Entries;
+                line20Entries = line20Entries.size() > N3 ? line20Entries.subList(N3 - 1, line20Entries.size()) : line20Entries;
                 candleDataSet = setACandle(candleEntries);
                 bollCandleDataSet = setBOLLCandle(candleEntries);
                 volumeDataSet = setABar(barEntries, "成交量");
@@ -187,7 +204,6 @@ public class KLineDataManage {
             }
         }
     }
-
 
     /**
      * 初始化自己计算MACD
@@ -237,7 +253,7 @@ public class KLineDataManage {
         bollDataMB = new ArrayList<>();
         bollDataDN = new ArrayList<>();
         for (int i = 0; i < bollEntity.getUPs().size(); i++) {
-            if (i<=BOLLN-1)continue;
+            if (i <= BOLLN - 1) continue;
             bollDataUP.add(new Entry(i + offSet, bollEntity.getUPs().get(i)));
             bollDataMB.add(new Entry(i + offSet, bollEntity.getMBs().get(i)));
             bollDataDN.add(new Entry(i + offSet, bollEntity.getDNs().get(i)));
@@ -246,6 +262,7 @@ public class KLineDataManage {
         lineDataBOLL.add(setALine(ColorType.yellow, bollDataMB, false));
         lineDataBOLL.add(setALine(ColorType.purple, bollDataDN, false));
     }
+
     /**
      * 初始化自己计算RSI
      */
@@ -318,6 +335,7 @@ public class KLineDataManage {
         boolean highlightEnable = false;
         return setALine(ma, lineEntries, label, highlightEnable);
     }
+
     //行情走势线属性设置
     private LineDataSet setALine(ColorType colorType, List<Entry> lineEntries, String label, boolean highlightEnable) {
         LineDataSet lineDataSetMa = new LineDataSet(lineEntries, label);
@@ -510,6 +528,35 @@ public class KLineDataManage {
                 }
             }
         }
+    }
+
+    public int getCurrentKType() {
+        return currentKType;
+    }
+
+
+    @Override
+    public String getIndexTime(int index) {
+        String timeFormat = "";
+        if (index < kDatas.size()) {
+            Long dateMills = kDatas.get(index).getDateMills();
+            switch (currentKType) {
+                case K_1MIN:
+                case K_5MIN:
+                case K_15MIN:
+                case K_30MIN:
+                case K_60MIN:
+                    timeFormat = DataTimeUtil.secToTime(dateMills, "yy/MM/dd hh:mm");
+                    break;
+                case K_1MONTH:
+                    timeFormat = DataTimeUtil.secToTime(dateMills, "yy/MM");
+                    break;
+                default:
+                    timeFormat = DataTimeUtil.secToTime(dateMills, "yy/MM/dd");
+                    break;
+            }
+        }
+        return timeFormat;
     }
 
     enum ColorType {

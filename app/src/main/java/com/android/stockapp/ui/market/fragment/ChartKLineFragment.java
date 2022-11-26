@@ -69,7 +69,7 @@ public class ChartKLineFragment extends BaseFragment {
             e.printStackTrace();
         }
         //上证指数代码000001.IDX.SH
-        kLineData.parseKlineData(object,"000001.IDX.SH",land);
+        kLineData.parseData(object,"000001.IDX.SH",0.0,KLineDataManage.K_1DAY);
         combinedchart.setDataToChart(kLineData);
 
         combinedchart.getGestureListenerCandle().setCoupleClick(new CoupleChartGestureListener.CoupleClick() {

@@ -3,11 +3,11 @@ package com.github.mikephil.charting.stockChart.dataManage;
 import android.util.SparseArray;
 
 import com.github.mikephil.charting.stockChart.model.TimeDataModel;
+import com.github.mikephil.charting.utils.DataTimeUtil;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +17,20 @@ import static com.github.mikephil.charting.utils.DataTimeUtil.secToDateForFiveDa
  * 分时数据解析
  */
 
-public class TimeDataManage {
+public class TimeDataManage implements IDataManager {
+//    ONE_DAY(0,""),FIVE_DAY(1,""),
+//    K_DAY(2,""),K_WEEK(3,"W"),
+//    K_MONTH(4,"M"),
+//    K_MINUTE_1(5,"M1"),K_MINUTE_3(6,"M3"),
+//    K_MINUTE_5(7,"M5"),K_MINUTE_15(8,"M15"),
+//    K_MINUTE_30(9,"M30"),K_MINUTE_60(10,"M60");
+
+    // 分时线类型 暂时没有需求需要实现
+    public static final int ONE_DAY = 0;
+    public static final int FIVE_DAY = 1;
+    private int currentType = ONE_DAY;
+
+
     private ArrayList<TimeDataModel> realTimeDatas = new ArrayList<>();//分时数据
     private double baseValue = 0;//分时图基准值
     private double permaxmin = 0;//分时图价格最大区间值
@@ -31,10 +44,13 @@ public class TimeDataManage {
     private String assetId;//股票代号
     private double preClose;//昨收价
 
+
     /**
      * 外部传JSONObject解析获得分时数据集
      */
-    public void parseTimeData(JSONObject object, String assetId, double preClosePrice) {
+    @Override
+    public void parseData(JSONObject object, String assetId, double preClosePrice, int type) {
+        this.currentType = type;
         this.assetId = assetId;
         if (object != null) {
             realTimeDatas.clear();
@@ -88,6 +104,16 @@ public class TimeDataManage {
                 permaxmin = (max - min) / 2;
             }
         }
+    }
+
+    @Override
+    public String getIndexTime(int index) {
+        String timeFormat = "";
+        if (index < realTimeDatas.size()) {
+            Long dateMills = realTimeDatas.get(index).getTimeMills();
+            timeFormat = DataTimeUtil.secToTime(dateMills, "HH:mm");
+        }
+        return timeFormat;
     }
 
     public void removeLastData() {
