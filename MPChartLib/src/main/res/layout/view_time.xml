@@ -24,19 +24,21 @@
 
     <FrameLayout
         android:id="@+id/circle_frame_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/circle_size"
+        android:layout_height="@dimen/circle_size"
         android:visibility="invisible">
 
         <ImageView
+            android:visibility="invisible"
             android:id="@+id/anim_view"
-            android:layout_width="15dp"
-            android:layout_height="15dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:src="@mipmap/ring" />
 
         <ImageView
-            android:layout_width="15dp"
-            android:layout_height="15dp"
+            android:visibility="invisible"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:src="@mipmap/dot" />
     </FrameLayout>
 

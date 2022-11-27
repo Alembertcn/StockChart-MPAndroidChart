@@ -1,6 +1,7 @@
 package com.github.mikephil.charting.stockChart;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Paint;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -33,6 +34,7 @@ import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.github.mikephil.charting.stockChart.customView.TwinklePoint;
 import com.github.mikephil.charting.stockChart.markerView.BarBottomMarkerView;
 import com.github.mikephil.charting.stockChart.renderer.ColorContentYAxisRenderer;
 import com.github.mikephil.charting.stockChart.charts.CoupleChartGestureListener;
@@ -53,7 +55,6 @@ import com.github.mikephil.charting.utils.Utils;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 /**
@@ -83,6 +84,7 @@ public class OneDayChart extends BaseChart {
     private SparseArray<String> xLabels = new SparseArray<>();//X轴刻度label
     private TimeDataManage mData;
     private int[] colorArray;
+    private float defaultCircleWith=getResources().getDimension(R.dimen.circle_size);
 
     public OneDayChart(Context context) {
         this(context, null);
@@ -101,6 +103,7 @@ public class OneDayChart extends BaseChart {
         EventBus.getDefault().register(this);
 
         colorArray = new int[]{ ContextCompat.getColor(mContext, R.color.up_color), ContextCompat.getColor(mContext, R.color.equal_color),ContextCompat.getColor(mContext, R.color.down_color)};
+        initTwinklePoint();
     }
 
 
@@ -410,11 +413,10 @@ public class OneDayChart extends BaseChart {
 
 
             //右边3是为了适配小圆点遮挡问题
-            lineChart.setViewPortOffsets(0, CommonUtil.dip2px(mContext, 0), 3, CommonUtil.dip2px(mContext, 22));
-            barChart.setViewPortOffsets(0, CommonUtil.dip2px(mContext, 15), 3, 2);
+            lineChart.setViewPortOffsets(defaultCircleWith/2, CommonUtil.dip2px(mContext, 0), defaultCircleWith/2, CommonUtil.dip2px(mContext, 22));
+            barChart.setViewPortOffsets(defaultCircleWith/2, CommonUtil.dip2px(mContext, 15), defaultCircleWith/2, 2);
 
-            axisLeftLine.setAxisMinimum(mData.getMin());
-            axisLeftLine.setAxisMaximum(mData.getMax());
+
             //下面方法需在填充数据后调用
             xAxisLine.setXLabels(mData.getOneDayXLabels(landscape));
             xAxisLine.setLabelCount(mData.getOneDayXLabels(landscape).size(), true);
@@ -422,11 +424,13 @@ public class OneDayChart extends BaseChart {
             xAxisBar.setLabelCount(mData.getOneDayXLabels(landscape).size(), true);
             lineChart.setVisibleXRange(maxCount, maxCount);
             barChart.setVisibleXRange(maxCount, maxCount);
-            //moveViewTo(...) 方法会自动调用 invalidate()
-            lineChart.moveViewToX(mData.getDatas().size() - 1);
-            barChart.moveViewToX(mData.getDatas().size() - 1);
-
         }
+        //moveViewTo(...) 方法会自动调用 invalidate()
+//        axisLeftLine.setAxisMinimum(mData.getMin());
+//        axisLeftLine.setAxisMaximum(mData.getMax());
+        lineChart.moveViewToX(mData.getDatas().size() - 1);
+        barChart.moveViewToX(mData.getDatas().size() - 1);
+
         updateText(mData.getDatas().size() - 1, false);
 
     }
@@ -437,6 +441,8 @@ public class OneDayChart extends BaseChart {
      * @param length
      */
     public void dynamicsAddOne(TimeDataModel timeDatamodel, int length) {
+        mData.addLastData(timeDatamodel);
+
         int index = length - 1;
         LineData lineData = lineChart.getData();
         ILineDataSet d1 = lineData.getDataSetByIndex(0);
@@ -448,16 +454,17 @@ public class OneDayChart extends BaseChart {
         IBarDataSet barDataSet = barData.getDataSetByIndex(0);
         float color = timeDatamodel.getNowPrice() == d1.getEntryForIndex(index - 1).getY() ? 0f : timeDatamodel.getNowPrice() > d1.getEntryForIndex(index - 1).getY() ? 1f : -1f;
         barDataSet.addEntry(new BarEntry(index, timeDatamodel.getVolume(),color));
+        //动态添加或移除数据后， 调用invalidate()刷新图表之前 必须调用 notifyDataSetChanged() .
         lineData.notifyDataChanged();
         lineChart.notifyDataSetChanged();
         barData.notifyDataChanged();
         barChart.notifyDataSetChanged();
-        lineChart.setVisibleXRange(maxCount, maxCount);
-        barChart.setVisibleXRange(maxCount, maxCount);
-        //动态添加或移除数据后， 调用invalidate()刷新图表之前 必须调用 notifyDataSetChanged() .
+//        lineChart.setVisibleXRange(maxCount, maxCount);
+//        barChart.setVisibleXRange(maxCount, maxCount);
+
         lineChart.moveViewToX(index);
         barChart.moveViewToX(index);
-        playHeaderAnimation(1);
+        playHeaderAnimation(4);
     }
 
     /**
@@ -466,6 +473,7 @@ public class OneDayChart extends BaseChart {
      * @param length
      */
     public void dynamicsUpdateOne(TimeDataModel timeDatamodel, int length) {
+        mData.updateLastData(timeDatamodel);
         int index = length - 1;
         LineData lineData = lineChart.getData();
         ILineDataSet d1 = lineData.getDataSetByIndex(0);
@@ -491,7 +499,10 @@ public class OneDayChart extends BaseChart {
         barData.notifyDataChanged();
         barChart.notifyDataSetChanged();
         barChart.moveViewToX(index);
-        playHeaderAnimation(1);
+//        playHeaderAnimation(4);
+        twinklePoint.setCenterColor(GlobaleConfig.getColorByCompare(color));
+        twinklePoint.setTwinkleColor(GlobaleConfig.getColorByCompare(color));
+        twinklePoint.startTwinkle(2);
     }
 
     public void cleanData() {
@@ -543,4 +554,20 @@ public class OneDayChart extends BaseChart {
     public void doBarChartSwitch(int indexTypeOnyDay) {
 
     }
+
+
+
+    TwinklePoint twinklePoint;
+    private void initTwinklePoint() {
+        twinklePoint = new TwinklePoint.Builder(getContext())
+                .setTwinkleColor(getResources().getColor(R.color.fit_black))
+                .setCenterColor(getResources().getColor(R.color.up_color))
+                .setDuration(1000)
+                .build();
+        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+        twinklePoint.setLayoutParams(layoutParams);
+        ((ViewGroup)findViewById(R.id.circle_frame_time)).addView(twinklePoint);
+    }
+
+
 }

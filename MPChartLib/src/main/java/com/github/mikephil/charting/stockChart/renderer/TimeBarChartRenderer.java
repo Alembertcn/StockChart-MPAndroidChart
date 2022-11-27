@@ -30,7 +30,6 @@ public class TimeBarChartRenderer extends BarChartRenderer {
     @Override
     protected void drawDataSet(Canvas c, IBarDataSet dataSet, int index) {
         Transformer trans = mChart.getTransformer(dataSet.getAxisDependency());
-
         mBarBorderPaint.setColor(dataSet.getBarBorderColor());
         mBarBorderPaint.setStrokeWidth(Utils.convertDpToPixel(dataSet.getBarBorderWidth()));
 

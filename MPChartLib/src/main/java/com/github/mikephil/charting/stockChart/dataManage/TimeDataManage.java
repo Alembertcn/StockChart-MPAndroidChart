@@ -129,11 +129,18 @@ public class TimeDataManage implements IDataManager {
         return null;
     }
 
-    public void removeLastData() {
+    public synchronized void removeLastData() {
         TimeDataModel realTimeData = getRealTimeData().get(getRealTimeData().size() - 1);
         mAllVolume -= realTimeData.getVolume();
         volMaxTimeLine = perVolMaxTimeLine;
         getRealTimeData().remove(getRealTimeData().size() - 1);
+    }
+    public synchronized void updateLastData(TimeDataModel last) {
+        removeLastData();
+        getRealTimeData().add(last);
+    }
+    public synchronized void addLastData(TimeDataModel last) {
+        getRealTimeData().add(last);
     }
 
     public synchronized ArrayList<TimeDataModel> getRealTimeData() {

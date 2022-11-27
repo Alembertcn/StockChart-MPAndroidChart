@@ -31,7 +31,7 @@ class CustomStockActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_custom_stock)
         test.setOnClickListener {
-
+            chartView.setLastPointData(5.0,2.0,1000)
 //            val layoutParams = flChart.layoutParams
 //            layoutParams.width = layoutParams.width+10
 //            flChart.layoutParams = layoutParams
