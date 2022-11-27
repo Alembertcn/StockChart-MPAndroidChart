@@ -203,6 +203,8 @@ public class KLineDataManage implements IDataManager {
                 lineDataMA.add(setALine(ColorType.blue, line5Entries, false));
                 lineDataMA.add(setALine(ColorType.yellow, line10Entries, false));
                 lineDataMA.add(setALine(ColorType.purple, line20Entries, false));
+                //主图boll线直接初始化
+                initBOLL();
             }
         }
     }
@@ -211,6 +213,7 @@ public class KLineDataManage implements IDataManager {
      * 初始化自己计算MACD
      */
     public void initMACD() {
+        lineDataMACD.clear();
         MACDEntity macdEntity = new MACDEntity(getKLineDatas(), SHORT, LONG, M);
 
         macdData = new ArrayList<>();
@@ -230,6 +233,7 @@ public class KLineDataManage implements IDataManager {
      * 初始化自己计算KDJ
      */
     public void initKDJ() {
+        lineDataKDJ.clear();
         KDJEntity kdjEntity = new KDJEntity(getKLineDatas(), KDJN, KDJM1, KDJM2);
 
         kData = new ArrayList<>();
@@ -249,6 +253,7 @@ public class KLineDataManage implements IDataManager {
      * 初始化自己计算BOLL
      */
     public void initBOLL() {
+        lineDataBOLL.clear();
         BOLLEntity bollEntity = new BOLLEntity(getKLineDatas(), BOLLN);
         lineDataBOLL.clear();
         bollDataUP = new ArrayList<>();
@@ -269,6 +274,7 @@ public class KLineDataManage implements IDataManager {
      * 初始化自己计算RSI
      */
     public void initRSI() {
+        lineDataRSI.clear();
         RSIEntity rsiEntity6 = new RSIEntity(getKLineDatas(), RSIN1);
         RSIEntity rsiEntity12 = new RSIEntity(getKLineDatas(), RSIN2);
         RSIEntity rsiEntity24 = new RSIEntity(getKLineDatas(), RSIN3);

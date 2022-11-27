@@ -275,9 +275,7 @@ public class OneDayChart extends BaseChart {
      */
     public void setDataToChart(TimeDataManage mData) {
         this.mData = mData;
-        cirCleView.setVisibility(landscape ? View.VISIBLE : View.GONE);
         if (mData.getDatas().size() == 0) {
-            cirCleView.setVisibility(View.GONE);
             lineChart.setNoDataText(getResources().getString(R.string.no_data));
             barChart.setNoDataText(getResources().getString(R.string.no_data));
             lineChart.invalidate();
@@ -441,6 +439,8 @@ public class OneDayChart extends BaseChart {
      * @param timeDatamodel
      */
     public void dynamicsAddOne(TimeDataModel timeDatamodel) {
+        cirCleView.setVisibility(View.VISIBLE);
+
         mData.addLastData(timeDatamodel);
         setDataToChart(mData);
         int size = mData.getDatas().size();
@@ -461,6 +461,8 @@ public class OneDayChart extends BaseChart {
      * @param timeDatamodel
      */
     public void dynamicsUpdateOne(TimeDataModel timeDatamodel) {
+        cirCleView.setVisibility(View.VISIBLE);
+
         mData.updateLastData(timeDatamodel);
         int index = mData.getDatas().size() - 1;
         LineData lineData = lineChart.getData();

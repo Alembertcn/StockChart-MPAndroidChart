@@ -341,21 +341,41 @@ public class KLineChart extends BaseChart {
         candleDataSet.setPrecision(precision);
         candleChartData = new CombinedData();
         candleChartData.setData(new CandleData(candleDataSet));
-        candleChartData.setData(new LineData(mData.getLineDataMA()));
+        candleChartData.setData(new LineData(chartTypeMain!=2?mData.getLineDataMA():mData.getLineDataBOLL()));
         candleChart.setData(candleChartData);
         /*************************************成交量数据*****************************************************/
         barChartData = new CombinedData();
-        BarData barData = new BarData(mData.getVolumeDataSet());
-        float barWidth = 1.0f - mData.getCandleDataSet().getBarSpace() * 2;
-        barData.setBarWidth(barWidth);
-
-        barChartData.setData(barData);
+        barChartData.setData(new BarData());
         barChartData.setData(new LineData());
         barChartData.setData(new CandleData());
-        //重新请求数据时保持副图指标还是显示原来的指标
-        if (chartType1 == 1) {
-            barChart.setData(barChartData);
+
+
+        switch (chartType1) {
+            case 2:
+                mData.initMACD();
+                barChartData.setData(new LineData(mData.getLineDataMACD()));
+                break;
+            case 3:
+                mData.initKDJ();
+                barChartData.setData(new LineData(mData.getLineDataKDJ()));
+
+                break;
+            case 4:
+                mData.initRSI();
+                barChartData.setData(new LineData(mData.getLineDataRSI()));
+                break;
+            case 1:
+            default:
+                barChart.getAxisLeft().setDrawGridLines(false);
+                barChart.getAxisLeft().setDrawLabels(false);
+                BarData barData = new BarData(mData.getVolumeDataSet());
+                float barWidth = 1.0f - mData.getCandleDataSet().getBarSpace() * 2;
+                barData.setBarWidth(barWidth);
+                barChartData.setData(barData);
+
+                break;
         }
+        barChart.setData(barChartData);
 
         if (isFirst) {
             xAxisRenderer = new DynicDateXAxisRenderer(candleChart.getViewPortHandler(), candleChart.getXAxis(), candleChart.getTransformer(YAxis.AxisDependency.LEFT), mData);
@@ -419,7 +439,7 @@ public class KLineChart extends BaseChart {
     }
 
 
-    protected int chartTypeMain = 1;//主图指标 ma:0 boll:1
+    protected int chartTypeMain = 1;//主图指标 ma:1 boll:2
     protected int chartType1 = 1;
     protected int chartTypes1 = 4;
 

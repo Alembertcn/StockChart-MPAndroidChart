@@ -152,8 +152,6 @@ class CustomSimpleQuotationChartView @JvmOverloads constructor (context: Context
                 combinedchart.setDataToChart(kLineData)
             }
         }
-
-
     }
 
     override fun setMainLatitudeNum(num: Int) {
@@ -184,6 +182,15 @@ class CustomSimpleQuotationChartView @JvmOverloads constructor (context: Context
     var currentChartType: ChartType? =null;
     override fun setGlobalChartType(marketType: String?, chartType: ChartType?) {
         this.currentChartType = chartType
+    }
+
+
+    fun  setLastPointData(
+        newPrice: Double,
+        avgPrice: Double,
+        newVolume: Int,
+    ) {
+       setLastPointData(newPrice, avgPrice, newVolume,false)
     }
 
     override fun  setLastPointData(
