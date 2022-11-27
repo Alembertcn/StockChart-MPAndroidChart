@@ -441,6 +441,11 @@ public class OneDayChart extends BaseChart {
     public void dynamicsAddOne(TimeDataModel timeDatamodel) {
         cirCleView.setVisibility(View.VISIBLE);
 
+        if(timeDatamodel.getTimeMills()==0 && mData.getLastData()!=null && mData.getDatas().size()>=2){
+            long l = mData.getDatas().get(1).getTimeMills() - mData.getDatas().get(0).getTimeMills();
+            timeDatamodel.setTimeMills(mData.getLastData().getTimeMills()+l);
+        }
+
         mData.addLastData(timeDatamodel);
         setDataToChart(mData);
         int size = mData.getDatas().size();
@@ -462,6 +467,8 @@ public class OneDayChart extends BaseChart {
      */
     public void dynamicsUpdateOne(TimeDataModel timeDatamodel) {
         cirCleView.setVisibility(View.VISIBLE);
+        if(mData.getLastData()!=null)
+        timeDatamodel.setTimeMills(mData.getLastData().getTimeMills());
 
         mData.updateLastData(timeDatamodel);
         int index = mData.getDatas().size() - 1;
