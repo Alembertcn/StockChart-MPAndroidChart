@@ -79,6 +79,7 @@ public class OneDayChart extends BaseChart {
     TimeXAxis xAxisBar;
     YAxis axisLeftBar;
     YAxis axisRightBar;
+    boolean hideSub = false;
 
     private int maxCount = ChartType.HK_ONE_DAY.getPointNum();//最大可见数量，即分时一天最大数据点数
     private SparseArray<String> xLabels = new SparseArray<>();//X轴刻度label
@@ -413,7 +414,7 @@ public class OneDayChart extends BaseChart {
 
 
             //右边3是为了适配小圆点遮挡问题
-            lineChart.setViewPortOffsets(defaultCircleWith/2, CommonUtil.dip2px(mContext, 0), defaultCircleWith/2, CommonUtil.dip2px(mContext, 22));
+            lineChart.setViewPortOffsets(defaultCircleWith/2, CommonUtil.dip2px(mContext, 0), defaultCircleWith/2, CommonUtil.dip2px(mContext, hideSub?15:22));
             barChart.setViewPortOffsets(defaultCircleWith/2, CommonUtil.dip2px(mContext, 15), defaultCircleWith/2, 2);
 
 
@@ -438,43 +439,30 @@ public class OneDayChart extends BaseChart {
     /**
      * 动态增加一个点数据
      * @param timeDatamodel
-     * @param length
      */
-    public void dynamicsAddOne(TimeDataModel timeDatamodel, int length) {
+    public void dynamicsAddOne(TimeDataModel timeDatamodel) {
         mData.addLastData(timeDatamodel);
+        setDataToChart(mData);
+        int size = mData.getDatas().size();
 
-        int index = length - 1;
-        LineData lineData = lineChart.getData();
-        ILineDataSet d1 = lineData.getDataSetByIndex(0);
-        d1.addEntry(new Entry(index, (float) timeDatamodel.getNowPrice()));
-        ILineDataSet d2 = lineData.getDataSetByIndex(1);
-        d2.addEntry(new Entry(index, (float) timeDatamodel.getAveragePrice()));
+        if(size>1) {
+            int index = size;
+            float color = timeDatamodel.getNowPrice() == d1.getEntryForIndex(index - 1).getY() ? 0f : timeDatamodel.getNowPrice() > d1.getEntryForIndex(index - 1).getY() ? 1f : -1f;
+            twinklePoint.setCenterColor(GlobaleConfig.getColorByCompare(color));
+            twinklePoint.setTwinkleColor(GlobaleConfig.getColorByCompare(color));
+        }
 
-        BarData barData = barChart.getData();
-        IBarDataSet barDataSet = barData.getDataSetByIndex(0);
-        float color = timeDatamodel.getNowPrice() == d1.getEntryForIndex(index - 1).getY() ? 0f : timeDatamodel.getNowPrice() > d1.getEntryForIndex(index - 1).getY() ? 1f : -1f;
-        barDataSet.addEntry(new BarEntry(index, timeDatamodel.getVolume(),color));
-        //动态添加或移除数据后， 调用invalidate()刷新图表之前 必须调用 notifyDataSetChanged() .
-        lineData.notifyDataChanged();
-        lineChart.notifyDataSetChanged();
-        barData.notifyDataChanged();
-        barChart.notifyDataSetChanged();
-//        lineChart.setVisibleXRange(maxCount, maxCount);
-//        barChart.setVisibleXRange(maxCount, maxCount);
-
-        lineChart.moveViewToX(index);
-        barChart.moveViewToX(index);
-        playHeaderAnimation(4);
+        twinklePoint.startTwinkle(2);
+//        playHeaderAnimation(4);
     }
 
     /**
      * 动态更新最后一点数据
      * @param timeDatamodel
-     * @param length
      */
-    public void dynamicsUpdateOne(TimeDataModel timeDatamodel, int length) {
+    public void dynamicsUpdateOne(TimeDataModel timeDatamodel) {
         mData.updateLastData(timeDatamodel);
-        int index = length - 1;
+        int index = mData.getDatas().size() - 1;
         LineData lineData = lineChart.getData();
         ILineDataSet d1 = lineData.getDataSetByIndex(0);
         Entry e = d1.getEntryForIndex(index);

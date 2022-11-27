@@ -6,7 +6,6 @@ import com.android.stockapp.R
 import com.android.stockapp.application.MyApplication
 import com.github.mikephil.charting.stockChart.dataManage.KLineDataManage
 import kotlinx.android.synthetic.main.activity_custom_stock.*
-import kotlinx.android.synthetic.main.custom_simple_quotation_chart_view.view.*
 import org.json.JSONObject
 
 class CustomStockActivity: AppCompatActivity() {
@@ -31,7 +30,8 @@ class CustomStockActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_custom_stock)
         test.setOnClickListener {
-            chartView.setLastPointData(5.0,2.0,1000)
+//            chartView.setLastPointData(5.0, 2.0, 1000, true)
+            chartView.setLastPointData(3.6,2.95,1000,true)
 //            val layoutParams = flChart.layoutParams
 //            layoutParams.width = layoutParams.width+10
 //            flChart.layoutParams = layoutParams

@@ -186,7 +186,12 @@ class CustomSimpleQuotationChartView @JvmOverloads constructor (context: Context
         this.currentChartType = chartType
     }
 
-    override fun  setLastPointData(newPrice:Double, avgPrice:Double,newVolume:Int) {
+    override fun  setLastPointData(
+        newPrice: Double,
+        avgPrice: Double,
+        newVolume: Int,
+        isAdd: Boolean
+    ) {
         if ( flOneDayChart.visibility == View.VISIBLE) {
             val lastData = kTimeData.lastData
             var temAvgPrice = if(avgPrice ==0.0 && lastData!=null) lastData.averagePrice else avgPrice
@@ -199,7 +204,11 @@ class CustomSimpleQuotationChartView @JvmOverloads constructor (context: Context
            var animView:ImageView = oneDayChart.findViewById(com.github.mikephil.charting.R.id.anim_view)
             animView.setColorFilter(GlobaleConfig.getColorByCompare(data.nowPrice - kTimeData.preClose))
 
-            oneDayChart.dynamicsUpdateOne(data,kTimeData.realTimeData.size)
+            if(isAdd){
+                oneDayChart.dynamicsAddOne(data)
+            }else{
+                oneDayChart.dynamicsUpdateOne(data)
+            }
 //            oneDayChart.dynamicsAddOne(data)
         }
     }

@@ -2,8 +2,6 @@ package com.github.mikephil;
 
 import com.github.mikephil.charting.stockChart.enums.ChartType;
 
-import java.util.List;
-
 public interface ISimpleChart {
     public void setMainLatitudeNum(int num);
 
@@ -32,7 +30,7 @@ public interface ISimpleChart {
 //    public void setKData(List<CandleLine.CandleLineBean> kList, List<String> ma5List, List<String> ma10List, List<String> ma20List,
 //                         List<Histogram.HistogramBean> turnoverList, float maxPrice, float minPrice);
 
-    void setLastPointData(double newPrice, double avgPrice,int volume);
+    void setLastPointData(double newPrice, double avgPrice, int volume, boolean b);
 
     //     void onPositionUpdate(int amount, double price);//分时图才显示 可能是持仓变化
 //    public void onPendingOrderUpdate(List<PendingOrderElement> pendingOrderList);//分时图才显示 可能是持仓变化
