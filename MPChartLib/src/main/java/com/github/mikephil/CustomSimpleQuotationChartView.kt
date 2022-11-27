@@ -19,8 +19,8 @@ import org.json.JSONObject
 class CustomSimpleQuotationChartView @JvmOverloads constructor (context: Context, attrs: AttributeSet? =null) :FrameLayout(context,attrs),ISimpleChart {
     var land=true
     var mOnChartClickListener:OnClickListener? =null;
-    private val kTimeData = TimeDataManage()// 分时图数据
-    private val kLineData = KLineDataManage(getContext())// k线图数据
+    val kTimeData = TimeDataManage()// 分时图数据
+    val kLineData = KLineDataManage(getContext())// k线图数据
     /**
      *  K_VOLUME: 1;
      *  case MACD : 2;
@@ -82,16 +82,16 @@ class CustomSimpleQuotationChartView @JvmOverloads constructor (context: Context
         combinedchart.getGestureListenerCandle().setCoupleClick {
 //            combinedchart.doMainChartSwitch((mMainLineType++)%2 + 1)
         }
-        combinedchart.setHighlightValueSelectedListener(object:
+        val value = object :
             BaseChart.OnHighlightValueSelectedListener {
             override fun onDayHighlightValueListener(
                 mData: TimeDataManage?,
                 index: Int,
                 isSelect: Boolean
             ) {
-                if(isSelect){
-                    mOnCrossLineMoveListener?.onCrossLineMove(index,-1)
-                }else{
+                if (isSelect) {
+                    mOnCrossLineMoveListener?.onCrossLineMove(index, -1)
+                } else {
                     mOnCrossLineMoveListener?.onCrossLineDismiss()
                 }
             }
@@ -102,13 +102,15 @@ class CustomSimpleQuotationChartView @JvmOverloads constructor (context: Context
                 isSelect: Boolean
             ) {
 
-                if(isSelect){
-                    mOnCrossLineMoveListener?.onCrossLineMove(index,-1)
-                }else{
+                if (isSelect) {
+                    mOnCrossLineMoveListener?.onCrossLineMove(index, -1)
+                } else {
                     mOnCrossLineMoveListener?.onCrossLineDismiss()
                 }
             }
-        })
+        }
+        combinedchart.setHighlightValueSelectedListener(value)
+        oneDayChart.setHighlightValueSelectedListener(value)
     }
 
 
@@ -206,7 +208,7 @@ class CustomSimpleQuotationChartView @JvmOverloads constructor (context: Context
             var data = TimeDataModel().apply {
                 nowPrice = newPrice
                 averagePrice = temAvgPrice
-                volume = newVolume
+                volume = newVolume.toLong()
             }
            var animView:ImageView = oneDayChart.findViewById(com.github.mikephil.charting.R.id.anim_view)
             animView.setColorFilter(GlobaleConfig.getColorByCompare(data.nowPrice - kTimeData.preClose))

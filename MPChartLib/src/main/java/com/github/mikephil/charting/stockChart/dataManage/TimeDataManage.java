@@ -36,7 +36,7 @@ public class TimeDataManage implements IDataManager {
     private ArrayList<TimeDataModel> realTimeDatas = new ArrayList<>();//分时数据
     private double baseValue = 0;//分时图基准值
     private double permaxmin = 0;//分时图价格最大区间值
-    private int mAllVolume = 0;//分时图总成交量
+    private long mAllVolume = 0;//分时图总成交量
     private double volMaxTimeLine;//分时图最大成交量
     private double max = 0;//分时图最大价格
     private double min = 0;//分时图最小价格
@@ -68,7 +68,7 @@ public class TimeDataManage implements IDataManager {
                     timeDatamodel.setTimeMills(data.optJSONArray(i).optLong(0, 0L));
                     timeDatamodel.setNowPrice(Double.isNaN(data.optJSONArray(i).optDouble(1)) ? 0 : data.optJSONArray(i).optDouble(1));
                     timeDatamodel.setAveragePrice(Double.isNaN(data.optJSONArray(i).optDouble(2)) ? 0 : data.optJSONArray(i).optDouble(2));
-                    timeDatamodel.setVolume(Double.valueOf(data.optJSONArray(i).optString(3)).intValue());
+                    timeDatamodel.setVolume(Double.valueOf(data.optJSONArray(i).optString(3)).longValue());
                     timeDatamodel.setOpen(Double.isNaN(data.optJSONArray(i).optDouble(4)) ? 0 : data.optJSONArray(i).optDouble(4));
                     timeDatamodel.setPreClose(preClose == 0 ? (preClosePrice == 0 ? timeDatamodel.getOpen() : preClosePrice) : preClose);
 

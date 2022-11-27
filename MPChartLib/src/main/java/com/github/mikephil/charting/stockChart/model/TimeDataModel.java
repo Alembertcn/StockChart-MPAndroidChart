@@ -16,7 +16,7 @@ public class TimeDataModel implements Serializable {
     //均价
     private double averagePrice;
     //分钟成交量
-    private int volume;
+    private long volume;
     //今开
     private double open;
     //昨收
@@ -50,11 +50,11 @@ public class TimeDataModel implements Serializable {
         this.averagePrice = averagePrice;
     }
 
-    public int getVolume() {
+    public long getVolume() {
         return volume;
     }
 
-    public void setVolume(int volume) {
+    public void setVolume(long volume) {
         this.volume = volume;
     }
 

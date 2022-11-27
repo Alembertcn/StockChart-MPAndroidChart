@@ -102,10 +102,10 @@ public class TimeLineChart extends LineChart {
 //            float yValForXIndex2 = (float) kTimeData.getDatas().get((int) mIndicesToHighlight[i].getX()).getPer();
 
             if (volSelected != null) {
-                volSelected.onVolSelected(kTimeData.getDatas().get((int) mIndicesToHighlight[i].getX()).getVolume());
+                volSelected.onVolSelected((int) kTimeData.getDatas().get((int) mIndicesToHighlight[i].getX()).getVolume());
                 volSelected.onValuesSelected(kTimeData.getDatas().get((int) mIndicesToHighlight[i].getX()).getNowPrice(),
                         kTimeData.getDatas().get((int) mIndicesToHighlight[i].getX()).getPer(),
-                        kTimeData.getDatas().get((int) mIndicesToHighlight[i].getX()).getVolume(),
+                        (int) kTimeData.getDatas().get((int) mIndicesToHighlight[i].getX()).getVolume(),
                         kTimeData.getDatas().get((int) mIndicesToHighlight[i].getX()).getAveragePrice());
             }
 
