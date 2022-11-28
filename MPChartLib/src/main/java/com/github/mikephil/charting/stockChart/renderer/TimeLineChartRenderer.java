@@ -127,7 +127,7 @@ public class TimeLineChartRenderer extends LineChartRenderer {
 
                 // get the color that is set for this line-segment
                 mRenderPaint.setColor(dataSet.getColor(j));
-
+                
                 canvas.drawLines(mLineBuffer, 0, pointsPerEntryPair * 2, mRenderPaint);
             }
 
@@ -176,9 +176,16 @@ public class TimeLineChartRenderer extends LineChartRenderer {
                     trans.pointValuesToPixel(mLineBuffer);
 
                     final int size = Math.max((mXBounds.range + 1) * pointsPerEntryPair, pointsPerEntryPair) * 2;
-
                     mRenderPaint.setColor(dataSet.getColor());
 
+//                    float[] tem = new float[]{0,0};
+//                    trans.pointValuesToPixel(tem);
+//                    float strokeWidth = mRenderPaint.getStrokeWidth();
+//                    for (int i = 0; i < mLineBuffer.length; i+=2) {
+//                        if(mLineBuffer[i]==tem[0]){
+//                            mLineBuffer[i] = mLineBuffer[i] + strokeWidth;
+//                        }
+//                    }
                     int max = mXBounds.range + mXBounds.min;
 //                    Log.e("内容",j+" "+mLineBuffer.length+" "+max);
                     canvas.drawLines(mLineBuffer, 0, size, mRenderPaint);
