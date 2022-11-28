@@ -204,11 +204,13 @@ class CustomSimpleQuotationChartView @JvmOverloads constructor (context: Context
         if ( flOneDayChart.visibility == View.VISIBLE) {
             val lastData = kTimeData.lastData
             var temAvgPrice = if(avgPrice ==0.0 && lastData!=null) lastData.averagePrice else avgPrice
+            //小于0不更新
+            var temVolume = if(newVolume <0)  ( lastData?.volume ?:0) else newVolume
 
             var data = TimeDataModel().apply {
                 nowPrice = newPrice
                 averagePrice = temAvgPrice
-                volume = newVolume.toLong()
+                volume = temVolume as Long
             }
            var animView:ImageView = oneDayChart.findViewById(com.github.mikephil.charting.R.id.anim_view)
             animView.setColorFilter(GlobaleConfig.getColorByCompare(data.nowPrice - kTimeData.preClose))

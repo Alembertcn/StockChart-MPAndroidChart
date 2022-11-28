@@ -250,6 +250,8 @@ public class OneDayChart extends BaseChart {
     }
 
     private void updateText(int index, boolean isSelect) {
+        if(index<0||index>mData.getDatas().size()-1)return;
+
         if (mHighlightValueSelectedListener != null) {
             mHighlightValueSelectedListener.onDayHighlightValueListener(mData,index, isSelect);
         }
@@ -439,6 +441,8 @@ public class OneDayChart extends BaseChart {
      * @param timeDatamodel
      */
     public void dynamicsAddOne(TimeDataModel timeDatamodel) {
+        if(mData ==null)return;
+
         cirCleView.setVisibility(View.VISIBLE);
 
         if(timeDatamodel.getTimeMills()==0 && mData.getLastData()!=null && mData.getDatas().size()>=2){
@@ -449,15 +453,21 @@ public class OneDayChart extends BaseChart {
         mData.addLastData(timeDatamodel);
         setDataToChart(mData);
         int size = mData.getDatas().size();
-
+        float color=1;
+        //和上一个比较或者和昨收价比较
         if(size>1) {
             int index = size;
-            float color = timeDatamodel.getNowPrice() == d1.getEntryForIndex(index - 1).getY() ? 0f : timeDatamodel.getNowPrice() > d1.getEntryForIndex(index - 1).getY() ? 1f : -1f;
-            twinklePoint.setCenterColor(GlobaleConfig.getColorByCompare(color));
-            twinklePoint.setTwinkleColor(GlobaleConfig.getColorByCompare(color));
+            color = timeDatamodel.getNowPrice() == d1.getEntryForIndex(index - 1).getY() ? 0f : timeDatamodel.getNowPrice() > d1.getEntryForIndex(index - 1).getY() ? 1f : -1f;
+        }else {
+            color = timeDatamodel.getNowPrice() - mData.getPreClose()>=0 ?1f : -1f;
         }
-
+        twinklePoint.setCenterColor(GlobaleConfig.getColorByCompare(color));
+        twinklePoint.setTwinkleColor(GlobaleConfig.getColorByCompare(color));
         twinklePoint.startTwinkle(2);
+
+        if(!lineChart.valuesToHighlight()){
+            updateText(mData.getDatas().size()-1,false);
+        }
 //        playHeaderAnimation(4);
     }
 
@@ -466,9 +476,11 @@ public class OneDayChart extends BaseChart {
      * @param timeDatamodel
      */
     public void dynamicsUpdateOne(TimeDataModel timeDatamodel) {
+        TimeDataModel lastData = mData.getLastData();
+        if(mData ==null || lastData==null)return;
+
         cirCleView.setVisibility(View.VISIBLE);
-        if(mData.getLastData()!=null)
-        timeDatamodel.setTimeMills(mData.getLastData().getTimeMills());
+        timeDatamodel.setTimeMills(lastData.getTimeMills());
 
         mData.updateLastData(timeDatamodel);
         int index = mData.getDatas().size() - 1;
@@ -496,10 +508,17 @@ public class OneDayChart extends BaseChart {
         barData.notifyDataChanged();
         barChart.notifyDataSetChanged();
         barChart.moveViewToX(index);
-//        playHeaderAnimation(4);
-        twinklePoint.setCenterColor(GlobaleConfig.getColorByCompare(color));
-        twinklePoint.setTwinkleColor(GlobaleConfig.getColorByCompare(color));
-        twinklePoint.startTwinkle(2);
+        if(NumberUtils.keepPrecision(lastData.getNowPrice(),3) != NumberUtils.keepPrecision(timeDatamodel.getNowPrice(),3)){
+            twinklePoint.setCenterColor(GlobaleConfig.getColorByCompare(color));
+            twinklePoint.setTwinkleColor(GlobaleConfig.getColorByCompare(color));
+            twinklePoint.startTwinkle(2);
+            //        playHeaderAnimation(4);
+        }
+
+        if(!lineChart.valuesToHighlight()){
+            updateText(mData.getDatas().size()-1,false);
+        }
+
     }
 
     public void cleanData() {

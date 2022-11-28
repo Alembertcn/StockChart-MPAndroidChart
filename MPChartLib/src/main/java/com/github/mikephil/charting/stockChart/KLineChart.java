@@ -44,6 +44,7 @@ import com.github.mikephil.charting.stockChart.markerView.LeftMarkerView;
 import com.github.mikephil.charting.stockChart.charts.MyCombinedChart;
 import com.github.mikephil.charting.stockChart.dataManage.KLineDataManage;
 import com.github.mikephil.charting.stockChart.enums.TimeType;
+import com.github.mikephil.charting.stockChart.model.KLineDataModel;
 import com.github.mikephil.charting.stockChart.renderer.DynicDateXAxisRenderer;
 import com.github.mikephil.charting.utils.CommonUtil;
 import com.github.mikephil.charting.utils.NumberUtils;
@@ -681,14 +682,16 @@ public class KLineChart extends BaseChart {
      *
      * @param kLineData 最新数据集
      */
-    public void dynamicsAddOne(KLineDataManage kLineData) {
-        int size = kLineData.getKLineDatas().size();
+    public void dynamicsAddOne(KLineDataModel kLineData) {
+        if(mData ==null)return;
+        
+        int size = mData.getKLineDatas().size();
         CombinedData candleChartData = candleChart.getData();
         CandleData candleData = candleChartData.getCandleData();
         ICandleDataSet candleDataSet = candleData.getDataSetByIndex(0);
         int i = size - 1;
-        candleDataSet.addEntry(new CandleEntry(i + kLineData.getOffSet(), (float) kLineData.getKLineDatas().get(i).getHigh(), (float) kLineData.getKLineDatas().get(i).getLow(), (float) kLineData.getKLineDatas().get(i).getOpen(), (float) kLineData.getKLineDatas().get(i).getClose()));
-        candleChart.getXAxis().setAxisMaximum(kLineData.getKLineDatas().size() < 70 ? 70 : candleChartData.getXMax() + kLineData.getOffSet());
+        candleDataSet.addEntry(new CandleEntry(i + mData.getOffSet(), (float) mData.getKLineDatas().get(i).getHigh(), (float) mData.getKLineDatas().get(i).getLow(), (float) mData.getKLineDatas().get(i).getOpen(), (float) mData.getKLineDatas().get(i).getClose()));
+        candleChart.getXAxis().setAxisMaximum(mData.getKLineDatas().size() < 70 ? 70 : candleChartData.getXMax() + mData.getOffSet());
 
         if (chartType1 == 1) {//副图是成交量
             CombinedData barChartData = barChart.getData();
@@ -696,47 +699,53 @@ public class KLineChart extends BaseChart {
             if (barDataSet == null) {//当没有数据时
                 return;
             }
-            float color = kLineData.getKLineDatas().get(i).getOpen() == kLineData.getKLineDatas().get(i).getClose() ? 0f : kLineData.getKLineDatas().get(i).getOpen() > kLineData.getKLineDatas().get(i).getClose() ? -1f : 1f;
-            BarEntry barEntry = new BarEntry(i + kLineData.getOffSet(), (float) kLineData.getKLineDatas().get(i).getVolume(), color);
+            float color = mData.getKLineDatas().get(i).getOpen() == mData.getKLineDatas().get(i).getClose() ? 0f : mData.getKLineDatas().get(i).getOpen() > mData.getKLineDatas().get(i).getClose() ? -1f : 1f;
+            BarEntry barEntry = new BarEntry(i + mData.getOffSet(), (float) mData.getKLineDatas().get(i).getVolume(), color);
 
             barDataSet.addEntry(barEntry);
-            barChart.getXAxis().setAxisMaximum(kLineData.getKLineDatas().size() < 70 ? 70 : barChartData.getXMax() + kLineData.getOffSet());
+            barChart.getXAxis().setAxisMaximum(mData.getKLineDatas().size() < 70 ? 70 : barChartData.getXMax() + mData.getOffSet());
         } else {//副图是其他技术指标
             doBarChartSwitch(chartType1);
         }
 
         candleChart.notifyDataSetChanged();
         barChart.notifyDataSetChanged();
-        if (kLineData.getKLineDatas().size() > 70) {
+        if (mData.getKLineDatas().size() > 70) {
             //moveViewTo(...) 方法会自动调用 invalidate()
-            candleChart.moveViewToX(kLineData.getKLineDatas().size() - 1);
-            barChart.moveViewToX(kLineData.getKLineDatas().size() - 1);
+            candleChart.moveViewToX(mData.getKLineDatas().size() - 1);
+            barChart.moveViewToX(mData.getKLineDatas().size() - 1);
         } else {
             candleChart.invalidate();
             barChart.invalidate();
+        }
+
+        if(!candleChart.valuesToHighlight()){
+            updateText(mData.getKLineDatas().size()-1,false);
         }
     }
 
     /**
      * 动态更新最后一点数据 最新数据集
      *
-     * @param kLineData
+     * @param data
      */
-    public void dynamicsUpdateOne(KLineDataManage kLineData) {
-        int size = kLineData.getKLineDatas().size();
+    public void dynamicsUpdateOne(KLineDataModel data) {
+        if(mData ==null)return;
+
+        int size = mData.getKLineDatas().size();
         int i = size - 1;
         CombinedData candleChartData = candleChart.getData();
         CandleData candleData = candleChartData.getCandleData();
         ICandleDataSet candleDataSet = candleData.getDataSetByIndex(0);
         candleDataSet.removeEntry(i);
 
-        candleDataSet.addEntry(new CandleEntry(i + kLineData.getOffSet(), (float) kLineData.getKLineDatas().get(i).getHigh(), (float) kLineData.getKLineDatas().get(i).getLow(), (float) kLineData.getKLineDatas().get(i).getOpen(), (float) kLineData.getKLineDatas().get(i).getClose()));
+        candleDataSet.addEntry(new CandleEntry(i + mData.getOffSet(), (float) mData.getKLineDatas().get(i).getHigh(), (float) mData.getKLineDatas().get(i).getLow(), (float) mData.getKLineDatas().get(i).getOpen(), (float) mData.getKLineDatas().get(i).getClose()));
         if (chartType1 == 1) {//副图是成交量
             CombinedData barChartData = barChart.getData();
             IBarDataSet barDataSet = barChartData.getBarData().getDataSetByIndex(0);
             barDataSet.removeEntry(i);
-            float color = kLineData.getKLineDatas().get(i).getOpen() == kLineData.getKLineDatas().get(i).getClose() ? 0f : kLineData.getKLineDatas().get(i).getOpen() > kLineData.getKLineDatas().get(i).getClose() ? -1f : 1f;
-            BarEntry barEntry = new BarEntry(i + kLineData.getOffSet(), (float) kLineData.getKLineDatas().get(i).getVolume(), color);
+            float color = mData.getKLineDatas().get(i).getOpen() == mData.getKLineDatas().get(i).getClose() ? 0f : mData.getKLineDatas().get(i).getOpen() > mData.getKLineDatas().get(i).getClose() ? -1f : 1f;
+            BarEntry barEntry = new BarEntry(i + mData.getOffSet(), (float) mData.getKLineDatas().get(i).getVolume(), color);
             barDataSet.addEntry(barEntry);
         } else {//副图是其他技术指标
             doBarChartSwitch(chartType1);
@@ -746,6 +755,10 @@ public class KLineChart extends BaseChart {
         barChart.notifyDataSetChanged();
         candleChart.invalidate();
         barChart.invalidate();
+
+        if(!candleChart.valuesToHighlight()){
+            updateText(mData.getKLineDatas().size()-1,false);
+        }
     }
 
     public void setDrawMarketEnable(boolean isEnable) {
@@ -784,6 +797,8 @@ public class KLineChart extends BaseChart {
 
     //移动十字标更新数据
     public void updateText(int index, boolean isSelect) {
+        if(index<0||index>mData.getKLineDatas().size()-1)return;
+
         if (mHighlightValueSelectedListener != null) {
             mHighlightValueSelectedListener.onKHighlightValueListener(mData, index, isSelect);
         }
