@@ -22,7 +22,7 @@ public class BOLLEntity {
      * @param n
      */
     public BOLLEntity(ArrayList<KLineDataModel> kLineBeens, int n) {
-        this(kLineBeens, n, 0);
+        this(kLineBeens, n, 2);
     }
 
     /**
@@ -59,7 +59,8 @@ public class BOLLEntity {
                 ma = closeSum / index;
                 sum = getSum(k, i, ma, kLineBeens);
                 md = (float) Math.sqrt(sum / index);
-                mb = ((closeSum - (float) kLineBeens.get(i).getClose()) / (index - 1));
+//                mb = ((closeSum - (float) kLineBeens.get(i).getClose()) / (index - 1));
+                mb = ((closeSum) / (index));
                 up = mb + (2 * md);
                 dn = mb - (2 * md);
 
