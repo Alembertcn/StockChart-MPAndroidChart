@@ -60,7 +60,7 @@ public class TimeDataManage implements IDataManager {
             getFiveDayXLabelKey(assetId);
             String preDate = null;
             int index = 0;
-            preClose = Double.isNaN(object.optDouble("preClose")) ? 0 : object.optDouble("preClose");
+            preClose = Double.isNaN(object.optDouble("preClose")) ? preClosePrice : object.optDouble("preClose");
             JSONArray data = object.optJSONArray("data");
             if (data != null) {
                 for (int i = 0; i < data.length(); i++) {
@@ -138,9 +138,13 @@ public class TimeDataManage implements IDataManager {
     public synchronized void updateLastData(TimeDataModel last) {
         removeLastData();
         getRealTimeData().add(last);
+        max = Math.max(last.getNowPrice(), max);
+        min = Math.min(last.getNowPrice(), min);
     }
     public synchronized void addLastData(TimeDataModel last) {
         getRealTimeData().add(last);
+        max = Math.max(last.getNowPrice(), max);
+        min = Math.min(last.getNowPrice(), min);
     }
 
     public synchronized ArrayList<TimeDataModel> getRealTimeData() {

@@ -104,8 +104,10 @@ public class TimeBarChartRenderer extends BarChartRenderer {
 
 
             int i = j / 4;
-
-            Object openClose = dataSet.getEntryForIndex(i).getData();
+            Object openClose = null;
+            if(dataSet.getEntryForIndex(i) !=null){
+                openClose = dataSet.getEntryForIndex(i).getData();
+            }
             if (openClose != null) {//根据开平判断柱状图的颜色填充
                 float value = (Float) openClose;
                 if (value > 0) {//表示增加
@@ -126,9 +128,8 @@ public class TimeBarChartRenderer extends BarChartRenderer {
                 }
             }
 
-            // 防止细到看不到线
-            float top = Math.abs(buffer.buffer[j + 1] - buffer.buffer[j + 3]) <2.0f ? (buffer.buffer[j + 3] - 2.0f) : buffer.buffer[j + 1];
-            c.drawRect(buffer.buffer[j], top, buffer.buffer[j + 2],
+
+            c.drawRect(buffer.buffer[j], buffer.buffer[j + 1], buffer.buffer[j + 2],
                     buffer.buffer[j + 3], mRenderPaint);
 
             if (drawBorder) {

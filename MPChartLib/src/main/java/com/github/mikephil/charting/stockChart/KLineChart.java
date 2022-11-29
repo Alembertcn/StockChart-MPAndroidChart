@@ -2,6 +2,7 @@ package com.github.mikephil.charting.stockChart;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Handler;
 import android.os.Message;
 
@@ -36,6 +37,9 @@ import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ICandleDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.github.mikephil.charting.renderer.BarChartRenderer;
+import com.github.mikephil.charting.renderer.CandleStickChartRenderer;
+import com.github.mikephil.charting.renderer.DataRenderer;
 import com.github.mikephil.charting.stockChart.markerView.BarBottomMarkerView;
 import com.github.mikephil.charting.stockChart.charts.CandleCombinedChart;
 import com.github.mikephil.charting.stockChart.charts.CoupleChartGestureListener;
@@ -46,6 +50,7 @@ import com.github.mikephil.charting.stockChart.dataManage.KLineDataManage;
 import com.github.mikephil.charting.stockChart.enums.TimeType;
 import com.github.mikephil.charting.stockChart.model.KLineDataModel;
 import com.github.mikephil.charting.stockChart.renderer.DynicDateXAxisRenderer;
+import com.github.mikephil.charting.stockChart.renderer.MyCombinedChartRenderer;
 import com.github.mikephil.charting.utils.CommonUtil;
 import com.github.mikephil.charting.utils.NumberUtils;
 import com.github.mikephil.charting.utils.Utils;
@@ -70,8 +75,8 @@ public class KLineChart extends BaseChart {
 
     private KLineDataManage mData;
 
-    private int maxVisibleXCount = 300;
-    private int minVisibleXCount = 10;
+    private int maxVisibleXCount = 150;
+    private int minVisibleXCount = 30;
     private boolean isFirst = true;//是否是第一次加载数据
     private int zbColor[];
     private float macdBarWith = 0.95f;//默认是缩放是5
@@ -127,7 +132,7 @@ public class KLineChart extends BaseChart {
         candleChart.getDescription().setLabelView(desCripeView);
         candleChart.getDescription().setPosition(0, CommonUtil.dip2px(mContext, 10));
         barChart.getDescription().setPosition(0, CommonUtil.dip2px(mContext, 10));
-        
+
         // draw bars behind lines
         candleChart.setDrawOrder(new CombinedChart.DrawOrder[]{
                 CombinedChart.DrawOrder.BAR, CombinedChart.DrawOrder.BUBBLE, CombinedChart.DrawOrder.CANDLE, CombinedChart.DrawOrder.SCATTER, CombinedChart.DrawOrder.LINE
@@ -379,6 +384,26 @@ public class KLineChart extends BaseChart {
         barChart.setData(barChartData);
 
         if (isFirst) {
+            //组合视图需要在setData后设置sub renderer 因为setData中会重新初始化sub renderer  (((CombinedChartRenderer)mRenderer).createRenderers();)
+            MyCombinedChartRenderer renderer = (MyCombinedChartRenderer) candleChart.getRenderer();
+            for (DataRenderer subRenderer : renderer.getSubRenderers()) {
+                if(subRenderer instanceof CandleStickChartRenderer){
+                    //设置默认样式 因为有空心描边的蜡烛图为了间隙和宽度一致设置蜡烛图和柱壮填充和描边
+                    subRenderer.getPaintRender().setStyle(Paint.Style.FILL_AND_STROKE);
+                    //防止为0的时候太细看不到
+                    subRenderer.getPaintRender().setStrokeWidth(2);
+                }
+            }
+            MyCombinedChartRenderer renderer2 = (MyCombinedChartRenderer) barChart.getRenderer();
+            for (DataRenderer subRenderer : renderer2.getSubRenderers()) {
+                if(subRenderer instanceof BarChartRenderer){
+                    //设置默认样式 因为有空心描边的蜡烛图为了间隙和宽度一致设置蜡烛图和柱壮填充和描边
+                    subRenderer.getPaintRender().setStyle(Paint.Style.FILL_AND_STROKE);
+                    //防止为0的时候太细看不到
+                    subRenderer.getPaintRender().setStrokeWidth(2);
+                }
+            }
+
             xAxisRenderer = new DynicDateXAxisRenderer(candleChart.getViewPortHandler(), candleChart.getXAxis(), candleChart.getTransformer(YAxis.AxisDependency.LEFT), mData);
             candleChart.setXAxisRenderer(xAxisRenderer);
 
@@ -566,6 +591,8 @@ public class KLineChart extends BaseChart {
 
             axisLeftBar.resetAxisMaximum();
             axisLeftBar.resetAxisMinimum();
+            axisLeftBar.setSpaceTop(1);
+            axisLeftBar.setSpaceBottom(1);
             axisLeftBar.setValueFormatter(new ValueFormatter() {
                 @Override
                 public String getAxisLabel(float value, AxisBase axis) {
@@ -778,11 +805,15 @@ public class KLineChart extends BaseChart {
 
 
     public float calMaxScale(float count) {
-        float xScale = 1;
+
+        float xScale = count/120;
+        if(true){
+            return xScale;
+        }
         if (count >= 800) {
-            xScale = 12f;
+            xScale = 10f;
         } else if (count >= 500) {
-            xScale = 8f;
+            xScale = 6f;
         } else if (count >= 300) {
             xScale = 5.5f;
         } else if (count >= 150) {

@@ -56,7 +56,7 @@ public class CandleStickChartRenderer extends LineScatterCandleRadarRenderer {
 
     @SuppressWarnings("ResourceAsColor")
     protected void drawDataSet(Canvas c, ICandleDataSet dataSet) {
-
+        Paint.Style saveStyle = mRenderPaint.getStyle();
         Transformer trans = mChart.getTransformer(dataSet.getAxisDependency());
 
         float phaseY = mAnimator.getPhaseY();
@@ -148,7 +148,6 @@ public class CandleStickChartRenderer extends LineScatterCandleRadarRenderer {
                     );
                 }
 
-                mRenderPaint.setStyle(Paint.Style.STROKE);
 
                 c.drawLines(mShadowBuffers, mRenderPaint);
 
@@ -257,6 +256,7 @@ public class CandleStickChartRenderer extends LineScatterCandleRadarRenderer {
                         mRenderPaint);
             }
         }
+        mRenderPaint.setStyle(saveStyle);
     }
 
 

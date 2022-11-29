@@ -396,6 +396,7 @@ public class OneDayChart extends BaseChart {
             barDataSet.setIncreasingPaintStyle(Paint.Style.FILL);
             barDataSet.setDecreasingPaintStyle(Paint.Style.FILL);
             BarData barData = new BarData(barDataSet);
+            barData.setBarWidth(.5f);
             barChart.setData(barData);
 
             //请注意，修改视口的所有方法需要在为Chart设置数据之后调用。
@@ -427,8 +428,7 @@ public class OneDayChart extends BaseChart {
             barChart.setVisibleXRange(maxCount, maxCount);
         }
         //moveViewTo(...) 方法会自动调用 invalidate()
-//        axisLeftLine.setAxisMinimum(mData.getMin());
-//        axisLeftLine.setAxisMaximum(mData.getMax());
+        updateAxisLeft();
         lineChart.moveViewToX(mData.getDatas().size() - 1);
         barChart.moveViewToX(mData.getDatas().size() - 1);
 
@@ -501,6 +501,9 @@ public class OneDayChart extends BaseChart {
         float color = timeDatamodel.getNowPrice() == d1.getEntryForIndex(index - 1).getY() ? 0f : timeDatamodel.getNowPrice() > d1.getEntryForIndex(index - 1).getY() ? 1f : -1f;
         barDataSet.addEntry(new BarEntry(index, timeDatamodel.getVolume(),color));
 
+        updateAxisLeft();
+
+
         lineData.notifyDataChanged();
         lineChart.notifyDataSetChanged();
         lineChart.moveViewToX(index);
@@ -509,8 +512,10 @@ public class OneDayChart extends BaseChart {
         barChart.notifyDataSetChanged();
         barChart.moveViewToX(index);
         if(NumberUtils.keepPrecision(lastData.getNowPrice(),3) != NumberUtils.keepPrecision(timeDatamodel.getNowPrice(),3)){
-            twinklePoint.setCenterColor(GlobaleConfig.getColorByCompare(color));
-            twinklePoint.setTwinkleColor(GlobaleConfig.getColorByCompare(color));
+
+            double compare = timeDatamodel.getNowPrice() == mData.getPreClose() ? 1 : (timeDatamodel.getNowPrice() - mData.getPreClose());
+            twinklePoint.setCenterColor(GlobaleConfig.getColorByCompare(compare));
+            twinklePoint.setTwinkleColor(GlobaleConfig.getColorByCompare(compare));
             twinklePoint.startTwinkle(2);
             //        playHeaderAnimation(4);
         }
@@ -519,6 +524,17 @@ public class OneDayChart extends BaseChart {
             updateText(mData.getDatas().size()-1,false);
         }
 
+    }
+
+    public void updateAxisLeft() {
+        float axisMinimum = axisLeftLine.getAxisMinimum();
+        float axisMaximum = axisLeftLine.getAxisMaximum();
+        if(axisMaximum<mData.getMax()){
+            axisLeftLine.setAxisMaximum(mData.getMax());
+        }
+        if(axisMinimum>mData.getMin()){
+            axisLeftLine.setAxisMinimum(mData.getMin());
+        }
     }
 
     public void cleanData() {

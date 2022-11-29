@@ -139,6 +139,7 @@ public class KLineDataManage implements IDataManager {
                 xCanUseIndexes.clear();
                 ArrayList<CandleEntry> candleEntries = new ArrayList<>();
                 ArrayList<BarEntry> barEntries = new ArrayList<>();
+                ArrayList<Integer> colors = new ArrayList<>();
                 List<Entry> line5Entries = new ArrayList<>();
                 List<Entry> line10Entries = new ArrayList<>();
                 List<Entry> line20Entries = new ArrayList<>();
@@ -157,7 +158,6 @@ public class KLineDataManage implements IDataManager {
                     klineDatamodel.setMa30(0.0);
                     klineDatamodel.setMa60(0.0);
                     klineDatamodel.setPreClose(data.optJSONArray(i).optDouble(10));
-
 //                    klineDatamodel.setDateMills(data.optJSONArray(i).optLong(0, 0L));
 //                    klineDatamodel.setOpen(data.optJSONArray(i).optDouble(1));
 //                    klineDatamodel.setHigh(data.optJSONArray(i).optDouble(2));
@@ -189,7 +189,7 @@ public class KLineDataManage implements IDataManager {
 
                     float color = getKLineDatas().get(i).getOpen() == getKLineDatas().get(i).getClose() ? 0f : getKLineDatas().get(i).getOpen() > getKLineDatas().get(i).getClose() ? -1f : 1f;
                     barEntries.add(new BarEntry(i + offSet, (float) getKLineDatas().get(i).getVolume(), color));
-
+                    colors.add(GlobaleConfig.getColorByCompare(getKLineDatas().get(i).getClose()-getKLineDatas().get(i).getOpen()));
                     line5Entries.add(new Entry(i + offSet, (float) getKLineDatas().get(i).getMa5()));
                     line10Entries.add(new Entry(i + offSet, (float) getKLineDatas().get(i).getMa10()));
                     line20Entries.add(new Entry(i + offSet, (float) getKLineDatas().get(i).getMa20()));
@@ -199,7 +199,7 @@ public class KLineDataManage implements IDataManager {
                 line20Entries = line20Entries.size() > N3 ? line20Entries.subList(N3 - 1, line20Entries.size()) : line20Entries;
                 candleDataSet = setACandle(candleEntries);
                 bollCandleDataSet = setBOLLCandle(candleEntries);
-                volumeDataSet = setABar(barEntries, "成交量");
+                volumeDataSet = setABar(barEntries, "成交量",colors);
                 lineDataMA.add(setALine(ColorType.blue, line5Entries, false));
                 lineDataMA.add(setALine(ColorType.yellow, line10Entries, false));
                 lineDataMA.add(setALine(ColorType.purple, line20Entries, false));
@@ -302,7 +302,7 @@ public class KLineDataManage implements IDataManager {
         candleDataSet.setDecreasingPaintStyle(Paint.Style.STROKE);
         candleDataSet.setBarSpace(0.25f);
         candleDataSet.setIncreasingColor(ContextCompat.getColor(mContext, R.color.up_color));
-        candleDataSet.setIncreasingPaintStyle(Paint.Style.FILL);
+        candleDataSet.setIncreasingPaintStyle(Paint.Style.FILL_AND_STROKE);
         candleDataSet.setNeutralColor(ContextCompat.getColor(mContext, R.color.equal_color));
         candleDataSet.setShadowColorSameAsCandle(true);
         candleDataSet.setValueTextSize(GlobaleConfig.COMMON_TEXT_SIZE);
@@ -319,10 +319,11 @@ public class KLineDataManage implements IDataManager {
         candleDataSet.setHighLightColor(ContextCompat.getColor(mContext, R.color.highLight_Color));
         candleDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
         candleDataSet.setDecreasingColor(ContextCompat.getColor(mContext, R.color.down_color));
-        candleDataSet.setDecreasingPaintStyle(Paint.Style.FILL);
+        candleDataSet.setDecreasingPaintStyle(Paint.Style.FILL_AND_STROKE);
         candleDataSet.setIncreasingColor(ContextCompat.getColor(mContext, R.color.up_color));
-        candleDataSet.setIncreasingPaintStyle(Paint.Style.FILL);
+        candleDataSet.setIncreasingPaintStyle(Paint.Style.FILL_AND_STROKE);
         candleDataSet.setNeutralColor(ContextCompat.getColor(mContext, R.color.equal_color));
+
         candleDataSet.setDrawValues(false);
         candleDataSet.setDrawIcons(false);
         candleDataSet.setShowCandleBar(false);
@@ -366,11 +367,11 @@ public class KLineDataManage implements IDataManager {
 
     private BarDataSet setABar(ArrayList<BarEntry> barEntries) {
         String label = "BarDataSet";
-        return setABar(barEntries, label);
+        return setABar(barEntries, label,null);
     }
 
     //成交量柱状图属性设置
-    private BarDataSet setABar(ArrayList<BarEntry> barEntries, String label) {
+    private BarDataSet setABar(ArrayList<BarEntry> barEntries, String label,List<Integer> colors) {
         BarDataSet barDataSet = new BarDataSet(barEntries, label);
         barDataSet.setHighlightEnabled(true);//是否画高亮十字线
         barDataSet.setHighLightColor(ContextCompat.getColor(mContext, R.color.highLight_Color));//高亮十字线颜色
@@ -379,9 +380,12 @@ public class KLineDataManage implements IDataManager {
         barDataSet.setNeutralColor(ContextCompat.getColor(mContext, R.color.equal_color));//行情平势时蜡烛的标识颜色
         barDataSet.setIncreasingColor(ContextCompat.getColor(mContext, R.color.up_color));//行情涨势时蜡烛的标识颜色
         barDataSet.setDecreasingColor(ContextCompat.getColor(mContext, R.color.down_color));//行情跌势时蜡烛的标识颜色
+        barDataSet.setIncreasingPaintStyle(Paint.Style.FILL_AND_STROKE);
+        barDataSet.setDecreasingPaintStyle(Paint.Style.FILL_AND_STROKE);
 
-        barDataSet.setIncreasingPaintStyle(Paint.Style.FILL);
-        barDataSet.setDecreasingPaintStyle(Paint.Style.FILL);
+        if(colors!=null){
+            barDataSet.setColors(colors);
+        }
         return barDataSet;
     }
 
