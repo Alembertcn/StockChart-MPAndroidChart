@@ -2,12 +2,14 @@ package com.github.mikephil.charting.stockChart.renderer;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 
 import com.github.mikephil.charting.animation.ChartAnimator;
 import com.github.mikephil.charting.data.CandleEntry;
 import com.github.mikephil.charting.interfaces.dataprovider.CandleDataProvider;
 import com.github.mikephil.charting.interfaces.datasets.ICandleDataSet;
 import com.github.mikephil.charting.renderer.CandleStickChartRenderer;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.mikephil.charting.utils.NumberUtils;
 import com.github.mikephil.charting.utils.Transformer;
 import com.github.mikephil.charting.utils.Utils;
@@ -165,4 +167,213 @@ public class MyCandleStickChartRenderer extends CandleStickChartRenderer {
             }
         }
     }
+
+
+
+    @SuppressWarnings("ResourceAsColor")
+    protected void drawDataSet(Canvas c, ICandleDataSet dataSet) {
+        Paint.Style saveStyle = mRenderPaint.getStyle();
+        Transformer trans = mChart.getTransformer(dataSet.getAxisDependency());
+
+        float phaseY = mAnimator.getPhaseY();
+        float barSpace = dataSet.getBarSpace();
+        boolean showCandleBar = dataSet.getShowCandleBar();
+
+        mXBounds.set(mChart, dataSet);
+
+        float shadowWidth = dataSet.getShadowWidth();
+        mRenderPaint.setStrokeWidth(shadowWidth);
+
+        // draw the body
+        for (int j = mXBounds.min; j <= mXBounds.range + mXBounds.min; j++) {
+
+            // get the entry
+            CandleEntry e = null;
+            try {
+                e = dataSet.getEntryForIndex(j);
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+
+            if (e == null) {
+                continue;
+            }
+
+            final float xPos = e.getX();
+
+            final float open = e.getOpen();
+            final float close = e.getClose();
+            final float high = e.getHigh();
+            final float low = e.getLow();
+
+            if (showCandleBar) {
+                // calculate the shadow
+
+                mShadowBuffers[0] = xPos;
+                mShadowBuffers[2] = xPos;
+                mShadowBuffers[4] = xPos;
+                mShadowBuffers[6] = xPos;
+
+                if (open > close) {
+                    mShadowBuffers[1] = high * phaseY;
+                    mShadowBuffers[3] = open * phaseY;
+                    mShadowBuffers[5] = low * phaseY;
+                    mShadowBuffers[7] = close * phaseY;
+                } else if (open < close) {
+                    mShadowBuffers[1] = high * phaseY;
+                    mShadowBuffers[3] = close * phaseY;
+                    mShadowBuffers[5] = low * phaseY;
+                    mShadowBuffers[7] = open * phaseY;
+                } else {
+                    mShadowBuffers[1] = high * phaseY;
+                    mShadowBuffers[3] = open * phaseY;
+                    mShadowBuffers[5] = low * phaseY;
+                    mShadowBuffers[7] = mShadowBuffers[3];
+                }
+
+                trans.pointValuesToPixel(mShadowBuffers);
+
+                // draw the shadows
+
+                if (dataSet.getShadowColorSameAsCandle()) {
+
+                    if (open > close) {
+                        mRenderPaint.setColor(
+                                dataSet.getDecreasingColor() == ColorTemplate.COLOR_NONE ?
+                                        dataSet.getColor(j) :
+                                        dataSet.getDecreasingColor()
+                        );
+                    } else if (open < close) {
+                        mRenderPaint.setColor(
+                                dataSet.getIncreasingColor() == ColorTemplate.COLOR_NONE ?
+                                        dataSet.getColor(j) :
+                                        dataSet.getIncreasingColor()
+                        );
+                    } else {
+                        mRenderPaint.setColor(
+                                dataSet.getNeutralColor() == ColorTemplate.COLOR_NONE ?
+                                        dataSet.getColor(j) :
+                                        dataSet.getNeutralColor()
+                        );
+                    }
+
+                } else {
+                    mRenderPaint.setColor(
+                            dataSet.getShadowColor() == ColorTemplate.COLOR_NONE ?
+                                    dataSet.getColor(j) :
+                                    dataSet.getShadowColor()
+                    );
+                }
+
+
+                c.drawLines(mShadowBuffers, mRenderPaint);
+
+                // calculate the body
+
+                mBodyBuffers[0] = xPos - 0.5f + barSpace;
+                mBodyBuffers[1] = close * phaseY;
+                mBodyBuffers[2] = (xPos + 0.5f - barSpace);
+                mBodyBuffers[3] = open * phaseY;
+
+                trans.pointValuesToPixel(mBodyBuffers);
+
+                // draw body differently for increasing and decreasing entry
+                if (open > close) { // decreasing
+
+                    if (dataSet.getDecreasingColor() == ColorTemplate.COLOR_NONE) {
+                        mRenderPaint.setColor(dataSet.getColor(j));
+                    } else {
+                        mRenderPaint.setColor(dataSet.getDecreasingColor());
+                    }
+
+                    mRenderPaint.setStyle(dataSet.getDecreasingPaintStyle());
+
+                    c.drawRect(
+                            mBodyBuffers[0]+shadowWidth/2, mBodyBuffers[3],
+                            mBodyBuffers[2]-shadowWidth/2, mBodyBuffers[1],
+                            mRenderPaint);
+
+                } else if (open < close) {
+
+                    if (dataSet.getIncreasingColor() == ColorTemplate.COLOR_NONE) {
+                        mRenderPaint.setColor(dataSet.getColor(j));
+                    } else {
+                        mRenderPaint.setColor(dataSet.getIncreasingColor());
+                    }
+
+                    mRenderPaint.setStyle(dataSet.getIncreasingPaintStyle());
+
+                    c.drawRect(
+                            mBodyBuffers[0]+shadowWidth/2, mBodyBuffers[1],
+                            mBodyBuffers[2]-shadowWidth/2, mBodyBuffers[3],
+                            mRenderPaint);
+                } else { // equal values
+
+                    if (dataSet.getNeutralColor() == ColorTemplate.COLOR_NONE) {
+                        mRenderPaint.setColor(dataSet.getColor(j));
+                    } else {
+                        mRenderPaint.setColor(dataSet.getNeutralColor());
+                    }
+
+                    c.drawLine(
+                            mBodyBuffers[0], mBodyBuffers[1],
+                            mBodyBuffers[2], mBodyBuffers[3],
+                            mRenderPaint);
+                }
+            } else {
+
+                mRangeBuffers[0] = xPos;
+                mRangeBuffers[1] = high * phaseY;
+                mRangeBuffers[2] = xPos;
+                mRangeBuffers[3] = low * phaseY;
+
+                mOpenBuffers[0] = xPos - 0.5f + barSpace;
+                mOpenBuffers[1] = open * phaseY;
+                mOpenBuffers[2] = xPos;
+                mOpenBuffers[3] = open * phaseY;
+
+                mCloseBuffers[0] = xPos + 0.5f - barSpace;
+                mCloseBuffers[1] = close * phaseY;
+                mCloseBuffers[2] = xPos;
+                mCloseBuffers[3] = close * phaseY;
+
+                trans.pointValuesToPixel(mRangeBuffers);
+                trans.pointValuesToPixel(mOpenBuffers);
+                trans.pointValuesToPixel(mCloseBuffers);
+
+                // draw the ranges
+                int barColor;
+
+                if (open > close) {
+                    barColor = dataSet.getDecreasingColor() == ColorTemplate.COLOR_NONE
+                            ? dataSet.getColor(j)
+                            : dataSet.getDecreasingColor();
+                } else if (open < close) {
+                    barColor = dataSet.getIncreasingColor() == ColorTemplate.COLOR_NONE
+                            ? dataSet.getColor(j)
+                            : dataSet.getIncreasingColor();
+                } else {
+                    barColor = dataSet.getNeutralColor() == ColorTemplate.COLOR_NONE
+                            ? dataSet.getColor(j)
+                            : dataSet.getNeutralColor();
+                }
+
+                mRenderPaint.setColor(barColor);
+                c.drawLine(
+                        mRangeBuffers[0], mRangeBuffers[1],
+                        mRangeBuffers[2], mRangeBuffers[3],
+                        mRenderPaint);
+                c.drawLine(
+                        mOpenBuffers[0], mOpenBuffers[1],
+                        mOpenBuffers[2], mOpenBuffers[3],
+                        mRenderPaint);
+                c.drawLine(
+                        mCloseBuffers[0], mCloseBuffers[1],
+                        mCloseBuffers[2], mCloseBuffers[3],
+                        mRenderPaint);
+            }
+        }
+        mRenderPaint.setStyle(saveStyle);
+    }
+
 }

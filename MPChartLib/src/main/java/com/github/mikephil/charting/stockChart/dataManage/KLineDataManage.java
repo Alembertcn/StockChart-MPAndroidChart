@@ -1,6 +1,7 @@
 package com.github.mikephil.charting.stockChart.dataManage;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Paint;
 
 import androidx.core.content.ContextCompat;
@@ -25,6 +26,7 @@ import com.github.mikephil.charting.stockChart.model.bean.MACDEntity;
 import com.github.mikephil.charting.stockChart.model.bean.RSIEntity;
 import com.github.mikephil.charting.utils.DataTimeUtil;
 import com.github.mikephil.charting.utils.NumberUtils;
+import com.github.mikephil.charting.utils.Utils;
 
 
 import org.json.JSONArray;
@@ -36,7 +38,7 @@ import java.util.List;
 /**
  * K线数据解析
  */
-public class KLineDataManage implements IDataManager {
+public class KLineDataManage extends IDataManager {
     private Context mContext;
     private ArrayList<KLineDataModel> kDatas = new ArrayList<>();
     private float offSet = 0f;//K线图最右边偏移量
@@ -78,20 +80,6 @@ public class KLineDataManage implements IDataManager {
 //    K_MINUTE_5(7,"M5"),K_MINUTE_15(8,"M15"),
 //    K_MINUTE_30(9,"M30"),K_MINUTE_60(10,"M60");
 
-    // k线类型
-    public static final int K_1MIN = 5;
-    public static final int K_5MIN = 7;
-    public static final int K_15MIN = 8;
-    public static final int K_30MIN = 9;
-    public static final int K_60MIN = 10;
-    public static final int K_1DAY = 2;
-    public static final int K_1WEEK = 3;
-    public static final int K_1MONTH = 4;
-    private int currentKType = K_1DAY;
-
-
-
-
     private ArrayList<Integer> xCanUseIndexes = new ArrayList<>();
 
     private CandleDataSet candleDataSet;//蜡烛图集合
@@ -129,7 +117,7 @@ public class KLineDataManage implements IDataManager {
 
     @Override
     public void parseData(JSONObject object, String assetId, double preClosePrice, int type) {
-        this.currentKType = type;
+        this.currentType = type;
         this.assetId = assetId;
         if (object != null) {
             kDatas.clear();
@@ -300,7 +288,7 @@ public class KLineDataManage implements IDataManager {
         candleDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
         candleDataSet.setDecreasingColor(ContextCompat.getColor(mContext, R.color.down_color));
         candleDataSet.setDecreasingPaintStyle(Paint.Style.STROKE);
-        candleDataSet.setBarSpace(0.25f);
+        candleDataSet.setBarSpace(0.15f);
         candleDataSet.setIncreasingColor(ContextCompat.getColor(mContext, R.color.up_color));
         candleDataSet.setIncreasingPaintStyle(Paint.Style.FILL_AND_STROKE);
         candleDataSet.setNeutralColor(ContextCompat.getColor(mContext, R.color.equal_color));
@@ -308,7 +296,6 @@ public class KLineDataManage implements IDataManager {
         candleDataSet.setValueTextSize(GlobaleConfig.COMMON_TEXT_SIZE);
         candleDataSet.setValueTextColor(GlobaleConfig.VALUE_COLOR);
         candleDataSet.setDrawValues(true);
-
         return candleDataSet;
     }
 
@@ -380,9 +367,10 @@ public class KLineDataManage implements IDataManager {
         barDataSet.setNeutralColor(ContextCompat.getColor(mContext, R.color.equal_color));//行情平势时蜡烛的标识颜色
         barDataSet.setIncreasingColor(ContextCompat.getColor(mContext, R.color.up_color));//行情涨势时蜡烛的标识颜色
         barDataSet.setDecreasingColor(ContextCompat.getColor(mContext, R.color.down_color));//行情跌势时蜡烛的标识颜色
-        barDataSet.setIncreasingPaintStyle(Paint.Style.FILL_AND_STROKE);
-        barDataSet.setDecreasingPaintStyle(Paint.Style.FILL_AND_STROKE);
-
+        barDataSet.setIncreasingPaintStyle(Paint.Style.FILL);
+        barDataSet.setDecreasingPaintStyle(Paint.Style.FILL);
+        barDataSet.setBarBorderWidth(Utils.convertPixelsToDp(1.5f));
+        barDataSet.setBarBorderColor(Color.TRANSPARENT);
         if(colors!=null){
             barDataSet.setColors(colors);
         }
@@ -539,7 +527,7 @@ public class KLineDataManage implements IDataManager {
     }
 
     public int getCurrentKType() {
-        return currentKType;
+        return currentType;
     }
 
 
@@ -548,7 +536,7 @@ public class KLineDataManage implements IDataManager {
         String timeFormat = "";
         if (index < kDatas.size()) {
             Long dateMills = kDatas.get(index).getDateMills();
-            switch (currentKType) {
+            switch (currentType) {
                 case K_1MIN:
                 case K_5MIN:
                 case K_15MIN:
@@ -578,11 +566,11 @@ public class KLineDataManage implements IDataManager {
     }
 
     private boolean isMinKType(){
-        return currentKType == K_1MIN
-                ||currentKType == K_5MIN
-                ||currentKType == K_15MIN
-                ||currentKType == K_30MIN
-                ||currentKType == K_60MIN;
+        return currentType == K_1MIN
+                || currentType == K_5MIN
+                || currentType == K_15MIN
+                || currentType == K_30MIN
+                || currentType == K_60MIN;
     }
 
     ValueFormatter mGlobalXFormatter = new ValueFormatter() {

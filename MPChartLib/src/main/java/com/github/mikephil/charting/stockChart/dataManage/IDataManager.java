@@ -20,8 +20,7 @@ public abstract class IDataManager {
     public static final int ONE_DAY_AFTER = 3;//盘后
     public static final int FIVE_DAY = 1;
     int currentType = K_1DAY;
-    boolean isLateFor8 = false;
-    
+
     /**
      * 解析数据
      */
