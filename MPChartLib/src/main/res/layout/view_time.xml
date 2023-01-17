@@ -13,13 +13,13 @@
             android:id="@+id/line_chart"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="252" />
+            android:layout_weight="200" />
 
         <com.github.mikephil.charting.stockChart.charts.TimeBarChart
             android:id="@+id/bar_chart"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="65" />
+            android:layout_weight="63" />
     </LinearLayout>
 
     <FrameLayout
@@ -72,4 +72,12 @@
 
       </LinearLayout>
     </FrameLayout>
+
+    <com.github.mikephil.charting.stockChart.customView.TwinklePoint2
+        android:id="@+id/tPoint2"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+
 </FrameLayout>

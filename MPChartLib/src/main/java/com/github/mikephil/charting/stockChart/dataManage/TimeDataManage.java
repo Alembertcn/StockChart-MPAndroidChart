@@ -19,7 +19,7 @@ import static com.github.mikephil.charting.utils.DataTimeUtil.secToDateForFiveDa
  * 分时数据解析
  */
 
-public class TimeDataManage implements IDataManager {
+public class TimeDataManage extends IDataManager {
 //    ONE_DAY(0,""),FIVE_DAY(1,""),
 //    K_DAY(2,""),K_WEEK(3,"W"),
 //    K_MONTH(4,"M"),
@@ -28,9 +28,7 @@ public class TimeDataManage implements IDataManager {
 //    K_MINUTE_30(9,"M30"),K_MINUTE_60(10,"M60");
 
     // 分时线类型 暂时没有需求需要实现
-    public static final int ONE_DAY = 0;
-    public static final int FIVE_DAY = 1;
-    private int currentType = ONE_DAY;
+
 
 
     private ArrayList<TimeDataModel> realTimeDatas = new ArrayList<>();//分时数据
@@ -204,24 +202,78 @@ public class TimeDataManage implements IDataManager {
     public SparseArray<String> getOneDayXLabels(boolean landscape) {
         SparseArray<String> xLabels = new SparseArray<String>();
         if (assetId.endsWith(".HK")) {
+            ChartType hkOneDay = ChartType.HK_ONE_DAY;
+            int pointNum = hkOneDay.getPointNum();
+
             //港股横坐标刻度
             xLabels.put(0, "09:30");
             xLabels.put(75, "");
             xLabels.put(150, "12:00/13:00");
             xLabels.put(240, "");
-            xLabels.put(330, "16:00");
+//            xLabels.put(330, "16:00");
+
+//            xLabels.put(pointNum/4, "");
+//            xLabels.put(pointNum/2, "12:00/13:00");
+//            xLabels.put(3*pointNum/4, "");
+            xLabels.put(pointNum, "16:00");
         } else if(assetId.endsWith(".US")){
-            xLabels.put(0, "09:30");
-            xLabels.put(60, "");
-            xLabels.put(120, "12:00/13:00");
-            xLabels.put(180, "");
-            xLabels.put(240, "16:00");
+            if(currentType == ONE_DAY_PRE){
+                ChartType chartType = ChartType.US_ONE_DAY_PRE_MARKET;
+                int pointNum = chartType.getPointNum();
+                xLabels.put(0, "04:00");
+//                xLabels.put(60, "");
+//                xLabels.put(120, "07:00");
+//                xLabels.put(180, "");
+//                xLabels.put(330, "09:30");
+
+                xLabels.put(pointNum/4, "");
+                xLabels.put(pointNum/2, "07:00");
+                xLabels.put(pointNum*3/4, "");
+                xLabels.put(pointNum, "09:30");
+            }else if(currentType == ONE_DAY_AFTER){
+                ChartType chartType = ChartType.US_ONE_DAY_AFTER_MARKET;
+                int pointNum = chartType.getPointNum();
+                xLabels.put(0, "16:00");
+//                xLabels.put(60, "");
+//                xLabels.put(120, "18:00");
+//                xLabels.put(180, "");
+//                xLabels.put(240, "20:00");
+
+                xLabels.put(pointNum/4, "");
+                xLabels.put(pointNum/2, "18:00");
+                xLabels.put(pointNum*3/4, "");
+                xLabels.put(pointNum, "20:00");
+            }else{
+                ChartType chartType = ChartType.US_ONE_DAY;
+                int pointNum = chartType.getPointNum();
+
+                xLabels.put(0, "09:30");
+//                xLabels.put(70, "");
+//                xLabels.put(195, "12:00/13:00");
+//                xLabels.put(280, "");
+//                xLabels.put(390, "16:00");
+
+                xLabels.put(pointNum/4, "");
+//                xLabels.put(pointNum/2, "12:00/13:00");
+                xLabels.put(150, "12:00");
+                xLabels.put(pointNum*3/4, "");
+                xLabels.put(pointNum, "16:00");
+            }
+
         }else{
+            ChartType chartType = ChartType.ONE_DAY;
+            int pointNum = chartType.getPointNum();
+
             xLabels.put(0, "09:30");
-            xLabels.put(60, "");
-            xLabels.put(120, "11:30/13:00");
-            xLabels.put(180, "");
-            xLabels.put(240, "15:00");
+//            xLabels.put(60, "");
+//            xLabels.put(120, "11:30/13:00");
+//            xLabels.put(180, "");
+//            xLabels.put(240, "15:00");
+
+            xLabels.put(pointNum/4, "");
+            xLabels.put(pointNum/2, "11:30/13:00");
+            xLabels.put(pointNum*3/4, "");
+            xLabels.put(pointNum, "15:00");
         }
         return xLabels;
     }
@@ -263,7 +315,12 @@ public class TimeDataManage implements IDataManager {
         if(assetId.endsWith("HK")){
             return ChartType.HK_ONE_DAY.getPointNum();
         }else if(assetId.endsWith("US")){
-            return ChartType.US_ONE_DAY.getPointNum();
+            if(currentType == IDataManager.ONE_DAY_PRE){
+                return ChartType.US_ONE_DAY_PRE_MARKET.getPointNum();
+            }else if(currentType == IDataManager.ONE_DAY_AFTER){
+                return ChartType.US_ONE_DAY_AFTER_MARKET.getPointNum();
+            }
+            return  ChartType.US_ONE_DAY.getPointNum();
         }else {
             return ChartType.ONE_DAY.getPointNum();
         }

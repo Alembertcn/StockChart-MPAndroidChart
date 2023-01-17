@@ -24,11 +24,11 @@ public class CandleStickChartRenderer extends LineScatterCandleRadarRenderer {
 
     protected CandleDataProvider mChart;
 
-    private float[] mShadowBuffers = new float[8];
-    private float[] mBodyBuffers = new float[4];
-    private float[] mRangeBuffers = new float[4];
-    private float[] mOpenBuffers = new float[4];
-    private float[] mCloseBuffers = new float[4];
+    protected float[] mShadowBuffers = new float[8];
+    protected float[] mBodyBuffers = new float[4];
+    protected float[] mRangeBuffers = new float[4];
+    protected float[] mOpenBuffers = new float[4];
+    protected float[] mCloseBuffers = new float[4];
 
     public CandleStickChartRenderer(CandleDataProvider chart, ChartAnimator animator,
                                     ViewPortHandler viewPortHandler) {

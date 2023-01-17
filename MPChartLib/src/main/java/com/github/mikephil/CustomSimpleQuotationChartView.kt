@@ -8,7 +8,9 @@ import android.widget.ImageView
 import com.github.mikephil.charting.GlobaleConfig
 import com.github.mikephil.charting.R
 import com.github.mikephil.charting.stockChart.BaseChart
+import com.github.mikephil.charting.stockChart.OneDayChart
 import com.github.mikephil.charting.stockChart.charts.CoupleChartGestureListener.CoupleClick
+import com.github.mikephil.charting.stockChart.dataManage.IDataManager
 import com.github.mikephil.charting.stockChart.dataManage.KLineDataManage
 import com.github.mikephil.charting.stockChart.dataManage.TimeDataManage
 import com.github.mikephil.charting.stockChart.enums.ChartType
@@ -46,6 +48,8 @@ class CustomSimpleQuotationChartView @JvmOverloads constructor (context: Context
         inflate(context, R.layout.custom_simple_quotation_chart_view,this)
         //非横屏页单击转横屏页
     }
+    
+    fun getOneDayChart(): OneDayChart =oneDayChart
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
@@ -113,6 +117,10 @@ class CustomSimpleQuotationChartView @JvmOverloads constructor (context: Context
         oneDayChart.setHighlightValueSelectedListener(value)
     }
 
+    fun valuesToHighlight():Boolean{
+        return combinedchart.valuesToHighlight() || oneDayChart.valuesToHighlight()
+    }
+
 
 //    ONE_DAY(0,""),FIVE_DAY(1,""),
 //    K_DAY(2,""),K_WEEK(3,"W"),
@@ -126,7 +134,7 @@ class CustomSimpleQuotationChartView @JvmOverloads constructor (context: Context
      */
     fun setKData(srcDate: JSONObject,assetId:String, preClosePrice:Double=0.0,kType:Int) {
         when (kType) {
-            0,1 -> {
+            IDataManager.ONE_DAY,IDataManager.ONE_DAY_PRE,IDataManager.ONE_DAY_AFTER,IDataManager.FIVE_DAY -> {
                 flOneDayChart.visibility = View.VISIBLE
                 flKChart.visibility = View.GONE
 
@@ -210,7 +218,7 @@ class CustomSimpleQuotationChartView @JvmOverloads constructor (context: Context
             var data = TimeDataModel().apply {
                 nowPrice = newPrice
                 averagePrice = temAvgPrice
-                volume = temVolume as Long
+                volume = temVolume.toLong()
             }
            var animView:ImageView = oneDayChart.findViewById(com.github.mikephil.charting.R.id.anim_view)
             animView.setColorFilter(GlobaleConfig.getColorByCompare(data.nowPrice - kTimeData.preClose))

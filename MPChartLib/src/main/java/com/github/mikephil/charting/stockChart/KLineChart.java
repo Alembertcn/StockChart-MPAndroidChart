@@ -77,6 +77,7 @@ public class KLineChart extends BaseChart {
 
     private int maxVisibleXCount = 150;
     private int minVisibleXCount = 30;
+    private float visiableRadio = 0.8f;
     private boolean isFirst = true;//是否是第一次加载数据
     private int zbColor[];
     private float macdBarWith = 0.95f;//默认是缩放是5
@@ -168,7 +169,6 @@ public class KLineChart extends BaseChart {
         xAxisK.setAvoidFirstLastClipping(true);
         xAxisK.setDrawLimitLinesBehindData(true);
         xAxisK.setYOffset(2F);
-
 
         //蜡烛图左Y轴
         axisLeftK = candleChart.getAxisLeft();
@@ -433,16 +433,24 @@ public class KLineChart extends BaseChart {
 
             candleChart.setAutoScaleMinMaxEnabled(true);
             barChart.setAutoScaleMinMaxEnabled(true);
+
             candleChart.setVisibleXRangeMinimum(minVisibleXCount);
             barChart.setVisibleXRangeMinimum(minVisibleXCount);
             barChart.setVisibleXRangeMaximum(maxVisibleXCount);
             candleChart.setVisibleXRangeMaximum(maxVisibleXCount);
 
+
+//            candleChart.setVisibleXRange(minVisibleXCount,maxVisibleXCount);
+//            barChart.setVisibleXRange(minVisibleXCount,maxVisibleXCount);
+
 //            setBottomMarkerView(kLineData);
             isFirst = false;
         }
 
-        updateText(mData.getKLineDatas().size() - 1, false);
+        candleChart.getXAxis().setAxisMinimum(candleChartData.getXMin() - 0.5f);
+        barChart.getXAxis().setAxisMinimum(barChartData.getXMin() - 0.5f);
+        candleChart.getXAxis().setAxisMaximum(mData.getKLineDatas().size() < 70 ? 70 : candleChartData.getXMax() + 0.5f);
+        barChart.getXAxis().setAxisMaximum(mData.getKLineDatas().size() < 70 ? 70 : barChartData.getXMax() +0.5f);
 
         float xScale = calMaxScale(mData.getKLineDatas().size());
         //根据所给的参数进行放大或缩小。 参数 x 和 y 是变焦中心的坐标（单位：像素）。 记住，1f = 无放缩 。
@@ -451,15 +459,14 @@ public class KLineChart extends BaseChart {
         candleChart.zoom(xScale, 1, 0, 0);
         barChart.zoom(xScale, 1, 0, 0);
 
-        candleChart.getXAxis().setAxisMinimum(candleChartData.getXMin() - 0.5f);
-        barChart.getXAxis().setAxisMinimum(barChartData.getXMin() - 0.5f);
-        candleChart.getXAxis().setAxisMaximum(mData.getKLineDatas().size() < 70 ? 70 : candleChartData.getXMax() + 0.5f);
-        barChart.getXAxis().setAxisMaximum(mData.getKLineDatas().size() < 70 ? 70 : barChartData.getXMax() + +0.5f);
-        if (mData.getKLineDatas().size() > 70) {
+
+        if (mData.getKLineDatas().size() > maxVisibleXCount*visiableRadio) {
             //moveViewTo(...) 方法会自动调用 invalidate()
             candleChart.moveViewToX(mData.getKLineDatas().size() - 1);
             barChart.moveViewToX(mData.getKLineDatas().size() - 1);
         }
+
+        updateText(mData.getKLineDatas().size() - 1, false);
 
         handler.sendEmptyMessageDelayed(0, 100);
     }
@@ -808,7 +815,10 @@ public class KLineChart extends BaseChart {
 
         float xScale = count/120;
         if(true){
-            return xScale;
+            if(count<(maxVisibleXCount *visiableRadio)){
+                return 1;
+            }
+            return count/(maxVisibleXCount *visiableRadio);
         }
         if (count >= 800) {
             xScale = 10f;
@@ -933,5 +943,9 @@ public class KLineChart extends BaseChart {
             fqLable.setText(str);
             fqLable.getParent().requestLayout();
         }
+    }
+
+    public boolean valuesToHighlight(){
+        return candleChart.valuesToHighlight() || barChart.valuesToHighlight();
     }
 }

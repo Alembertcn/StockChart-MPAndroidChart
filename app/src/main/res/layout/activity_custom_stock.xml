@@ -14,6 +14,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
+        <Button
+            android:id="@+id/test2"
+            android:text="测试添加点"
+            android:padding="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <Button
+            android:id="@+id/test3"
+            android:text="测试改变尺寸"
+            android:padding="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
         <RadioGroup
             android:id="@+id/rg"
             android:orientation="horizontal"

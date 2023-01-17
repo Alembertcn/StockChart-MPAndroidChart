@@ -35,6 +35,7 @@ import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.stockChart.customView.TwinklePoint;
+import com.github.mikephil.charting.stockChart.customView.TwinklePoint2;
 import com.github.mikephil.charting.stockChart.markerView.BarBottomMarkerView;
 import com.github.mikephil.charting.stockChart.renderer.ColorContentYAxisRenderer;
 import com.github.mikephil.charting.stockChart.charts.CoupleChartGestureListener;
@@ -49,6 +50,7 @@ import com.github.mikephil.charting.stockChart.event.BaseEvent;
 import com.github.mikephil.charting.stockChart.model.CirclePositionTime;
 import com.github.mikephil.charting.stockChart.model.TimeDataModel;
 import com.github.mikephil.charting.utils.CommonUtil;
+import com.github.mikephil.charting.utils.MPPointD;
 import com.github.mikephil.charting.utils.NumberUtils;
 import com.github.mikephil.charting.utils.Transformer;
 import com.github.mikephil.charting.utils.Utils;
@@ -68,6 +70,7 @@ public class OneDayChart extends BaseChart {
     FrameLayout cirCleView;
     ViewGroup flAvPrice;
     TextView tvAgPrice;
+    TwinklePoint2 tPoint2;
 
     private LineDataSet d1, d2;
     private BarDataSet barDataSet;
@@ -80,6 +83,13 @@ public class OneDayChart extends BaseChart {
     YAxis axisLeftBar;
     YAxis axisRightBar;
     boolean hideSub = false;
+
+    public void setHideAvgIcon(boolean hideAvgIcon) {
+        this.hideAvgIcon = hideAvgIcon;
+        flAvPrice.setVisibility(hideAvgIcon?View.GONE:View.VISIBLE);
+    }
+
+    boolean hideAvgIcon = false;
 
     private int maxCount = ChartType.HK_ONE_DAY.getPointNum();//最大可见数量，即分时一天最大数据点数
     private SparseArray<String> xLabels = new SparseArray<>();//X轴刻度label
@@ -100,6 +110,7 @@ public class OneDayChart extends BaseChart {
         cirCleView = (FrameLayout) findViewById(R.id.circle_frame_time);
         flAvPrice = (ViewGroup) findViewById(R.id.flAvPrice);
         tvAgPrice = (TextView) findViewById(R.id.tvAgPrice);
+        tPoint2 = (TwinklePoint2) findViewById(R.id.tPoint2);
 
         EventBus.getDefault().register(this);
 
@@ -121,6 +132,8 @@ public class OneDayChart extends BaseChart {
      * 初始化图表属性
      */
     public void initChart(boolean landscape) {
+        tPoint2.setLineColor(ContextCompat.getColor(mContext, R.color.minute_blue));
+        tPoint2.setLineWidth(Utils.convertDpToPixel(.8f));
         this.landscape = landscape;
         //主图
         lineChart.setScaleEnabled(false);//是否可以缩放
@@ -249,6 +262,7 @@ public class OneDayChart extends BaseChart {
 
     }
 
+
     private void updateText(int index, boolean isSelect) {
         if(index<0||index>mData.getDatas().size()-1)return;
 
@@ -264,10 +278,19 @@ public class OneDayChart extends BaseChart {
     }
 
     @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
+    protected void onSizeChanged(int w, int h, int oldW, int oldH) {
+        super.onSizeChanged(w, h, oldW, oldH);
         lineChart.getDescription().setEnabled(false);
         barChart.getDescription().setPosition(0, CommonUtil.dip2px(mContext, 10));
+        if(tPoint2.getVisibility() == View.VISIBLE && mData!=null && mData.getLastData()!=null){
+            TimeDataModel lastData = mData.getLastData();
+            Transformer transformer = lineChart.getTransformer(YAxis.AxisDependency.LEFT);
+            MPPointD startPointion = transformer.getPixelForValues(mData.getDatas().size()-1, (float) lastData.getNowPrice());
+            MPPointD updatePointion = transformer.getPixelForValues(tPoint2.getSrcX(), tPoint2.getSrcY());
+            tPoint2.setLineStartPoint((float)startPointion.x,(float) startPointion.y);
+            tPoint2.setCoordinateX((float) updatePointion.x,tPoint2.getSrcX());
+            tPoint2.setCoordinateY((float) updatePointion.y,tPoint2.getSrcY());
+        }
     }
 
     /**
@@ -324,7 +347,7 @@ public class OneDayChart extends BaseChart {
             barChart.getData().notifyDataChanged();
             barChart.notifyDataSetChanged();
         }else {
-            flAvPrice.setVisibility(View.VISIBLE);
+            flAvPrice.setVisibility(hideAvgIcon?View.GONE:View.VISIBLE);
             setPrecision(mData.getAssetId().contains("IDX") ? 2 : 3);
             setMaxCount(mData.getDataTypeMaxCount());
 
@@ -396,7 +419,7 @@ public class OneDayChart extends BaseChart {
             barDataSet.setIncreasingPaintStyle(Paint.Style.FILL);
             barDataSet.setDecreasingPaintStyle(Paint.Style.FILL);
             BarData barData = new BarData(barDataSet);
-            barData.setBarWidth(.5f);
+            barData.setBarWidth(.7f);
             barChart.setData(barData);
 
             //请注意，修改视口的所有方法需要在为Chart设置数据之后调用。
@@ -443,7 +466,7 @@ public class OneDayChart extends BaseChart {
     public void dynamicsAddOne(TimeDataModel timeDatamodel) {
         if(mData ==null)return;
 
-        cirCleView.setVisibility(View.VISIBLE);
+        cirCleView.setVisibility(View.GONE);
 
         if(timeDatamodel.getTimeMills()==0 && mData.getLastData()!=null && mData.getDatas().size()>=2){
             long l = mData.getDatas().get(1).getTimeMills() - mData.getDatas().get(0).getTimeMills();
@@ -461,70 +484,100 @@ public class OneDayChart extends BaseChart {
         }else {
             color = timeDatamodel.getNowPrice() - mData.getPreClose()>=0 ?1f : -1f;
         }
-        twinklePoint.setCenterColor(GlobaleConfig.getColorByCompare(color));
-        twinklePoint.setTwinkleColor(GlobaleConfig.getColorByCompare(color));
-        twinklePoint.startTwinkle(2);
+//        twinklePoint.setCenterColor(GlobaleConfig.getColorByCompare(color));
+//        twinklePoint.setTwinkleColor(GlobaleConfig.getColorByCompare(color));
+//        twinklePoint.startTwinkle(2);
+
+        TimeDataModel lastData = mData.getLastData();
+        int endX = mData.getDatas().size() - 1;
+        float endY = (float) timeDatamodel.getNowPrice();
+        MPPointD startPointion = lineChart.getTransformer(YAxis.AxisDependency.LEFT).getPixelForValues(endX, (float) lastData.getNowPrice());
+        MPPointD updatePointion = lineChart.getTransformer(YAxis.AxisDependency.LEFT).getPixelForValues(endX, endY);
+            tPoint2.setLineStartPoint((float)startPointion.x,(float) startPointion.y);
+            tPoint2.setCoordinateX((float) updatePointion.x, endX);
+            tPoint2.setCoordinateY((float) updatePointion.y, endY);
+            tPoint2.setCenterColor(GlobaleConfig.getColorByCompare(color));
+            tPoint2.setTwinkleColor(GlobaleConfig.getColorByCompare(color));
+            tPoint2.startTwinkle(2);
 
         if(!lineChart.valuesToHighlight()){
-            updateText(mData.getDatas().size()-1,false);
+            updateText(endX,false);
         }
 //        playHeaderAnimation(4);
     }
-
+    public void dynamicsUpdateOne(TimeDataModel timeDatamodel) {
+        dynamicsUpdateOne(timeDatamodel, true);
+    }
     /**
      * 动态更新最后一点数据
      * @param timeDatamodel
      */
-    public void dynamicsUpdateOne(TimeDataModel timeDatamodel) {
+    public void dynamicsUpdateOne(TimeDataModel timeDatamodel,boolean playAnim) {
         TimeDataModel lastData = mData.getLastData();
-        if(mData ==null || lastData==null)return;
+        if(mData ==null || lastData==null || NumberUtils.keepPrecision(lastData.getNowPrice(),3) == NumberUtils.keepPrecision(timeDatamodel.getNowPrice(),3))return;
 
-        cirCleView.setVisibility(View.VISIBLE);
+        cirCleView.setVisibility(View.GONE);
+        tPoint2.setVisibility(View.VISIBLE);
         timeDatamodel.setTimeMills(lastData.getTimeMills());
 
-        mData.updateLastData(timeDatamodel);
-        int index = mData.getDatas().size() - 1;
-        LineData lineData = lineChart.getData();
-        ILineDataSet d1 = lineData.getDataSetByIndex(0);
-        Entry e = d1.getEntryForIndex(index);
-        d1.removeEntry(e);
-        d1.addEntry(new Entry(index, (float) timeDatamodel.getNowPrice()));
-
-        ILineDataSet d2 = lineData.getDataSetByIndex(1);
-        Entry e2 = d2.getEntryForIndex(index);
-        d2.removeEntry(e2);
-        d2.addEntry(new Entry(index, (float) timeDatamodel.getAveragePrice()));
-
-        BarData barData = barChart.getData();
-        IBarDataSet barDataSet = barData.getDataSetByIndex(0);
-        barDataSet.removeEntry(index);
-        float color = timeDatamodel.getNowPrice() == d1.getEntryForIndex(index - 1).getY() ? 0f : timeDatamodel.getNowPrice() > d1.getEntryForIndex(index - 1).getY() ? 1f : -1f;
-        barDataSet.addEntry(new BarEntry(index, timeDatamodel.getVolume(),color));
+//        mData.updateLastData(timeDatamodel);
+//        int index = mData.getDatas().size() - 1;
+//        LineData lineData = lineChart.getData();
+//        ILineDataSet d1 = lineData.getDataSetByIndex(0);
+//        Entry e = d1.getEntryForIndex(index);
+//        d1.removeEntry(e);
+//        d1.addEntry(new Entry(index, (float) timeDatamodel.getNowPrice()));
+//
+//        ILineDataSet d2 = lineData.getDataSetByIndex(1);
+//        Entry e2 = d2.getEntryForIndex(index);
+//        d2.removeEntry(e2);
+//        d2.addEntry(new Entry(index, (float) timeDatamodel.getAveragePrice()));
+//
+//        BarData barData = barChart.getData();
+//        IBarDataSet barDataSet = barData.getDataSetByIndex(0);
+//        barDataSet.removeEntry(index);
+//        float color = timeDatamodel.getNowPrice() == d1.getEntryForIndex(index - 1).getY() ? 0f : timeDatamodel.getNowPrice() > d1.getEntryForIndex(index - 1).getY() ? 1f : -1f;
+//        barDataSet.addEntry(new BarEntry(index, timeDatamodel.getVolume(),color));
 
         updateAxisLeft();
 
 
-        lineData.notifyDataChanged();
-        lineChart.notifyDataSetChanged();
-        lineChart.moveViewToX(index);
+//        lineData.notifyDataChanged();
+//        lineChart.notifyDataSetChanged();
+//        lineChart.moveViewToX(index);
+//
+//        barData.notifyDataChanged();
+//        barChart.notifyDataSetChanged();
+//        barChart.moveViewToX(index);
+        double compare = timeDatamodel.getNowPrice()>=lastData.getNowPrice()?1:-1;
+        MPPointD startPosition = lineChart.getTransformer(YAxis.AxisDependency.LEFT).getPixelForValues(mData.getDatas().size()-1, (float) lastData.getNowPrice());
+        int endX = mData.getDatas().size();
+        float endY = (float) timeDatamodel.getNowPrice();
+        MPPointD updatePointion = lineChart.getTransformer(YAxis.AxisDependency.LEFT).getPixelForValues(endX, endY);
+            tPoint2.setLineStartPoint((float)startPosition.x,(float) startPosition.y);
+            tPoint2.setCoordinateX((float) updatePointion.x,endX);
+            tPoint2.setCoordinateY((float) updatePointion.y,endY);
+            if(playAnim){
+                tPoint2.setCenterColor(GlobaleConfig.getColorByCompare(compare));
+                tPoint2.setTwinkleColor(GlobaleConfig.getColorByCompare(compare));
+                tPoint2.startTwinkle(2);
+            }else{
+                tPoint2.invalidate();
+            }
 
-        barData.notifyDataChanged();
-        barChart.notifyDataSetChanged();
-        barChart.moveViewToX(index);
-        if(NumberUtils.keepPrecision(lastData.getNowPrice(),3) != NumberUtils.keepPrecision(timeDatamodel.getNowPrice(),3)){
 
-            double compare = timeDatamodel.getNowPrice() == mData.getPreClose() ? 1 : (timeDatamodel.getNowPrice() - mData.getPreClose());
-            twinklePoint.setCenterColor(GlobaleConfig.getColorByCompare(compare));
-            twinklePoint.setTwinkleColor(GlobaleConfig.getColorByCompare(compare));
-            twinklePoint.startTwinkle(2);
+//            double compare = timeDatamodel.getNowPrice() == mData.getPreClose() ? 1 : (timeDatamodel.getNowPrice() - mData.getPreClose());
+//            twinklePoint.setCenterColor(GlobaleConfig.getColorByCompare(compare));
+//            twinklePoint.setTwinkleColor(GlobaleConfig.getColorByCompare(compare));
+//            twinklePoint.startTwinkle(2);
             //        playHeaderAnimation(4);
-        }
 
         if(!lineChart.valuesToHighlight()){
             updateText(mData.getDatas().size()-1,false);
         }
 
     }
+
 
     public void updateAxisLeft() {
         float axisMinimum = axisLeftLine.getAxisMinimum();
@@ -600,6 +653,12 @@ public class OneDayChart extends BaseChart {
         twinklePoint.setLayoutParams(layoutParams);
         ((ViewGroup)findViewById(R.id.circle_frame_time)).addView(twinklePoint);
     }
+
+
+    public boolean valuesToHighlight(){
+        return lineChart.valuesToHighlight() || barChart.valuesToHighlight();
+    }
+
 
 
 }

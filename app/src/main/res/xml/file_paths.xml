@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <external-path name="external_storage_root" path="."/>
+    <cache-path name="app_cache_path" path="." />
+    <files-path name="app_files_path"  path="."/>
+
+    <!--配置root-path。这样子可以读取到sd卡和一些应用分身的目录，否则微信分身保存的图片，就会导致 java.lang.IllegalArgumentException: Failed to find configured root that contains /storage/emulated/999/tencent/MicroMsg/WeiXin/export1544062754693.jpg-->
+    <root-path
+        name="app_root_path"
+        path="." />
+</paths>

@@ -1,12 +1,18 @@
 package com.android.stockapp.ui.main
 
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.os.Handler
+import android.os.Message
 import androidx.appcompat.app.AppCompatActivity
 import com.android.stockapp.R
 import com.android.stockapp.application.MyApplication
 import com.github.mikephil.charting.stockChart.dataManage.KLineDataManage
 import kotlinx.android.synthetic.main.activity_custom_stock.*
 import org.json.JSONObject
+import java.util.*
+import kotlin.math.roundToInt
+import kotlin.random.Random
 
 class CustomStockActivity: AppCompatActivity() {
     fun calMaxScale(count: Float): Float {
@@ -26,12 +32,28 @@ class CustomStockActivity: AppCompatActivity() {
         }
         return xScale
     }
+
+    var  mHandler= @SuppressLint("HandlerLeak")
+    object :Handler(){
+        override fun handleMessage(msg: Message?) {
+            super.handleMessage(msg)
+            chartView.setLastPointData(2.0 + Random.nextDouble(2.0),2.0,2000,false)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_custom_stock)
         test.setOnClickListener {
+            Timer().schedule(object : TimerTask() {
+                override fun run() {
+                    mHandler.sendMessageDelayed(android.os.Message.obtain(), 2000)
+                }
+            }, 2000, 2000)
+
+
 //            chartView.setLastPointData(5.0, 2.0, 1000, true)
-            chartView.setLastPointData(3.6,2.95,1000,true)
+//            chartView.setLastPointData(3.6,2.95,1000,true)
 //            val layoutParams = flChart.layoutParams
 //            layoutParams.width = layoutParams.width+10
 //            flChart.layoutParams = layoutParams
@@ -39,6 +61,16 @@ class CustomStockActivity: AppCompatActivity() {
 //            chartView.combinedchart.setFqLableText("0")
 
 //            chartView.oneDayChart.stopHeaderAnimation()
+        }
+
+        test2.setOnClickListener {
+            chartView.setLastPointData(2.0 + Random.nextDouble(2.0),2.0,2000,true)
+        }
+        test3.setOnClickListener {
+            val layoutParams = flChart.layoutParams
+            layoutParams.width = layoutParams.width + 10
+            flChart.layoutParams = layoutParams
+            flChart.requestLayout()
         }
         rg.setOnCheckedChangeListener{_,resId->
             when (resId) {

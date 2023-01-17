@@ -1,6 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.android.stockapp">
+
+    <uses-permission android:name="android.permission.READ_PRIVILEGED_PHONE_STATE"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!-- 权限  begin -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" tools:node="remove" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" tools:node="remove"
+        tools:ignore="ProtectedPermissions" />
+
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" android:required="false"/>
+    <!-- 阿里移动推送相关权限 -->
+    <!-- 网络库使用，当网络操作时需要确保事务完成不被杀掉 -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" android:required="false"/>
+    <!-- 选举使用，当应用有删除或者更新时需要重新选举，复用推送通道 -->
+    <uses-permission android:name="android.permission.BROADCAST_PACKAGE_CHANGED" android:required="false"/>
+    <uses-permission android:name="android.permission.BROADCAST_PACKAGE_REPLACED" android:required="false"/>
+    <uses-permission android:name="android.permission.RESTART_PACKAGES" android:required="false"/>
+    <!-- 补偿通道小米PUSH使用，不用可去除 -->
+    <uses-permission android:name="android.permission.GET_TASKS" android:required="false"/>
+    <!-- 允许监听启动完成事件 -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" android:required="false"/>
+    <!-- 允许访问震动器 -->
+    <uses-permission android:name="android.permission.VIBRATE" android:required="false"/>
+    <!-- 允许task重排序 -->
+    <uses-permission android:name="android.permission.REORDER_TASKS" android:required="false"/>
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
+    <!--    &lt;!&ndash; 小米通道相关权限 &ndash;&gt;-->
+    <!--    <permission-->
+    <!--        android:name="${APPLICATION_ID}.permission.MIPUSH_RECEIVE"-->
+    <!--        android:protectionLevel="signatureOrSystem"-->
+    <!--        tools:replace="android:protectionLevel"-->
+    <!--        android:required="false"-->
+    <!--        />-->
+
+    <!--    <uses-permission android:name="${APPLICATION_ID}.permission.MIPUSH_RECEIVE" android:required="false"/>-->
+
+    <!-- 需要使用Feature -->
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.front"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.flash"
+        android:required="false" />
 
     <application
         android:name=".application.MyApplication"
@@ -17,7 +77,21 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.main.CustomStockActivity" />
+        <activity android:name=".ui.main.CustomStockActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".ui.main.TestActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
 
         <activity android:name=".ui.market.activity.StockDetailActivity" />
         <activity android:name=".ui.market.activity.StockDetailLandActivity"
@@ -90,6 +164,18 @@
             android:theme="@style/MPAppTheme"/>
         <activity android:name=".ui.mpchartexample.HalfPieChartActivity"
             android:theme="@style/MPAppTheme"/>
+
+
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${APPLICATION_ID}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
 
 </manifest>

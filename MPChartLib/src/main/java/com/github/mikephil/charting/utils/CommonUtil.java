@@ -142,10 +142,27 @@ public class CommonUtil {
 		return m.matches();
 	}
 
-	public static boolean isNUM(String mobiles) {
-		Pattern p = Pattern.compile("[1-9]");
-		Matcher m = p.matcher(mobiles);
-		return m.matches();
+	public static boolean isNUM(Object mobiles) {
+    	if(mobiles==null) return false;
+    	return mobiles instanceof Integer || mobiles instanceof Double || mobiles instanceof Long|| mobiles instanceof Float;
+	}
+	public static Object addNum(Object mobiles,long addNum) {
+		if(isNUM(mobiles)){
+			if(mobiles instanceof Double){
+				return ((Double) mobiles) + addNum;
+			}
+			if(mobiles instanceof Integer){
+				return ((Integer) mobiles) + addNum;
+			}
+			if(mobiles instanceof Float){
+				return ((Float) mobiles) + addNum;
+			}
+			if(mobiles instanceof Long){
+				return ((Long) mobiles) + addNum;
+			}
+
+		}
+		return null;
 	}
 
 	public static boolean isZeroString(String str) {

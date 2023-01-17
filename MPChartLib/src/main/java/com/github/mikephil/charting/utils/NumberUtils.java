@@ -189,6 +189,9 @@ public class NumberUtils {
      * @return
      */
     public static String formatVol(Context context, String assetId, double vol) {
+        if(true){
+            return Math.round(vol)+"";
+        }
         DecimalFormat df = new DecimalFormat();
         df.setMaximumFractionDigits(2);
         df.setGroupingUsed(true);
