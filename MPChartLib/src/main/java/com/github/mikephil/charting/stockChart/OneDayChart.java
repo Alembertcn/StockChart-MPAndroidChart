@@ -1,6 +1,7 @@
 package com.github.mikephil.charting.stockChart;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import androidx.annotation.Nullable;
@@ -82,14 +83,6 @@ public class OneDayChart extends BaseChart {
     TimeXAxis xAxisBar;
     YAxis axisLeftBar;
     YAxis axisRightBar;
-    boolean hideSub = false;
-
-    public void setHideAvgIcon(boolean hideAvgIcon) {
-        this.hideAvgIcon = hideAvgIcon;
-        flAvPrice.setVisibility(hideAvgIcon?View.GONE:View.VISIBLE);
-    }
-
-    boolean hideAvgIcon = false;
 
     private int maxCount = ChartType.HK_ONE_DAY.getPointNum();//最大可见数量，即分时一天最大数据点数
     private SparseArray<String> xLabels = new SparseArray<>();//X轴刻度label
@@ -163,6 +156,8 @@ public class OneDayChart extends BaseChart {
         xAxisLine.setGridColor(ContextCompat.getColor(mContext, R.color.grid_color));
         xAxisLine.setGridLineWidth(0.7f);
         xAxisLine.setYOffset(2F);
+        xAxisLine.setSpaceMax(0.5f);
+        xAxisLine.setSpaceMin(0.4f);
 
         //主图左Y轴
         axisLeftLine = lineChart.getAxisLeft();
@@ -235,6 +230,7 @@ public class OneDayChart extends BaseChart {
                     mHighlightValueSelectedListener.onDayHighlightValueListener(mData, (int) e.getX(), true);
                 }
                 updateText((int) e.getX(), true);
+                flAvPrice.setVisibility(VISIBLE);
             }
 
             @Override
@@ -243,6 +239,7 @@ public class OneDayChart extends BaseChart {
                 if (mHighlightValueSelectedListener != null) {
                     mHighlightValueSelectedListener.onDayHighlightValueListener(mData, 0, false);
                 }
+                flAvPrice.setVisibility(GONE);
             }
         });
         barChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
@@ -282,6 +279,11 @@ public class OneDayChart extends BaseChart {
         super.onSizeChanged(w, h, oldW, oldH);
         lineChart.getDescription().setEnabled(false);
         barChart.getDescription().setPosition(0, CommonUtil.dip2px(mContext, 10));
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        super.onLayout(changed, l, t, r, b);
         if(tPoint2.getVisibility() == View.VISIBLE && mData!=null && mData.getLastData()!=null){
             TimeDataModel lastData = mData.getLastData();
             Transformer transformer = lineChart.getTransformer(YAxis.AxisDependency.LEFT);
@@ -347,7 +349,6 @@ public class OneDayChart extends BaseChart {
             barChart.getData().notifyDataChanged();
             barChart.notifyDataSetChanged();
         }else {
-            flAvPrice.setVisibility(hideAvgIcon?View.GONE:View.VISIBLE);
             setPrecision(mData.getAssetId().contains("IDX") ? 2 : 3);
             setMaxCount(mData.getDataTypeMaxCount());
 
@@ -438,18 +439,21 @@ public class OneDayChart extends BaseChart {
 
 
             //右边3是为了适配小圆点遮挡问题
-            lineChart.setViewPortOffsets(defaultCircleWith/2, CommonUtil.dip2px(mContext, 0), defaultCircleWith/2, CommonUtil.dip2px(mContext, hideSub?15:22));
-            barChart.setViewPortOffsets(defaultCircleWith/2, CommonUtil.dip2px(mContext, 15), defaultCircleWith/2, 2);
-
-
-            //下面方法需在填充数据后调用
-            xAxisLine.setXLabels(mData.getOneDayXLabels(landscape));
-            xAxisLine.setLabelCount(mData.getOneDayXLabels(landscape).size(), true);
-            xAxisBar.setXLabels(mData.getOneDayXLabels(landscape));
-            xAxisBar.setLabelCount(mData.getOneDayXLabels(landscape).size(), true);
-            lineChart.setVisibleXRange(maxCount, maxCount);
-            barChart.setVisibleXRange(maxCount, maxCount);
+//            lineChart.setViewPortOffsets(defaultCircleWith/2, CommonUtil.dip2px(mContext, 0), defaultCircleWith/2, CommonUtil.dip2px(mContext, hideSub?15:22));
+//            barChart.setViewPortOffsets(defaultCircleWith/2, CommonUtil.dip2px(mContext, 15), defaultCircleWith/2, 2);
+            lineChart.setViewPortOffsets(0, CommonUtil.dip2px(mContext, 0), 0, CommonUtil.dip2px(mContext, 20));
+            barChart.setViewPortOffsets(0, CommonUtil.dip2px(mContext, 15), 0, 0);
         }
+
+        //下面方法需在填充数据后调用
+        xAxisLine.setXLabels(mData.getOneDayXLabels(landscape));
+        xAxisLine.setLabelCount(mData.getOneDayXLabels(landscape).size(), true);
+        xAxisBar.setXLabels(mData.getOneDayXLabels(landscape));
+        xAxisBar.setLabelCount(mData.getOneDayXLabels(landscape).size(), true);
+//        maxCount=30;
+        lineChart.setVisibleXRange(maxCount, maxCount);
+        barChart.setVisibleXRange(maxCount, maxCount);
+
         //moveViewTo(...) 方法会自动调用 invalidate()
         updateAxisLeft();
         lineChart.moveViewToX(mData.getDatas().size() - 1);
