@@ -12,7 +12,6 @@ import com.github.mikephil.charting.stockChart.dataManage.TimeDataManage;
 import com.github.mikephil.charting.stockChart.markerView.BarBottomMarkerView;
 import com.github.mikephil.charting.stockChart.renderer.TimeBarChartRenderer;
 import com.github.mikephil.charting.stockChart.renderer.TimeXAxisRenderer;
-import com.github.mikephil.charting.utils.DataTimeUtil;
 
 public class TimeBarChart extends BarChart {
     private BarBottomMarkerView markerBottom;
@@ -34,7 +33,6 @@ public class TimeBarChart extends BarChart {
      * @param markerBottom
      * @param kTimeData
      */
-
     public void setMarker(BarBottomMarkerView markerBottom, TimeDataManage kTimeData) {
         this.markerBottom = markerBottom;
         this.kTimeData = kTimeData;

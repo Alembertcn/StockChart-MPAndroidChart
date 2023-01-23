@@ -26,7 +26,7 @@
         android:id="@+id/circle_frame_time"
         android:layout_width="@dimen/circle_size"
         android:layout_height="@dimen/circle_size"
-        android:visibility="invisible">
+        android:visibility="gone">
 
         <ImageView
             android:visibility="invisible"

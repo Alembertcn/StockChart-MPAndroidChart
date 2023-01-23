@@ -240,6 +240,7 @@ public class OneDayChart extends BaseChart {
                     mHighlightValueSelectedListener.onDayHighlightValueListener(mData, 0, false);
                 }
                 flAvPrice.setVisibility(GONE);
+                updateText(mData.getDatas().size() - 1, false);
             }
         });
         barChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
@@ -267,6 +268,7 @@ public class OneDayChart extends BaseChart {
             mHighlightValueSelectedListener.onDayHighlightValueListener(mData,index, isSelect);
         }
         TimeDataModel timeDataModel = mData.getDatas().get(index);
+
         barChart.setDescriptionCustom(new int[]{ContextCompat.getColor(mContext, R.color.fit_black), ContextCompat.getColor(mContext, R.color.theme)}, new String[]{getResources().getString(R.string.vol_name), "VOL:" + NumberUtils.formatVol(mContext, mData.getAssetId(), timeDataModel.getVolume())}, 2);
 //        lineChart.setDescriptionCustom(new int[]{ContextCompat.getColor(mContext, R.color.fit_black), GlobaleConfig.getColorByCompare(timeDataModel.getNowPrice()-timeDataModel.getPreClose())}, new String[]{getResources().getString(R.string.age_price),NumberUtils.stringNoE10(timeDataModel.getAveragePrice())}, 2);
         flAvPrice.setSelected(timeDataModel.getAveragePrice()-timeDataModel.getPreClose()>=0);
@@ -284,6 +286,12 @@ public class OneDayChart extends BaseChart {
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        // 实时更新小圆点位置
         if(tPoint2.getVisibility() == View.VISIBLE && mData!=null && mData.getLastData()!=null){
             TimeDataModel lastData = mData.getLastData();
             Transformer transformer = lineChart.getTransformer(YAxis.AxisDependency.LEFT);
@@ -470,8 +478,6 @@ public class OneDayChart extends BaseChart {
     public void dynamicsAddOne(TimeDataModel timeDatamodel) {
         if(mData ==null)return;
 
-        cirCleView.setVisibility(View.GONE);
-
         if(timeDatamodel.getTimeMills()==0 && mData.getLastData()!=null && mData.getDatas().size()>=2){
             long l = mData.getDatas().get(1).getTimeMills() - mData.getDatas().get(0).getTimeMills();
             timeDatamodel.setTimeMills(mData.getLastData().getTimeMills()+l);
@@ -520,7 +526,6 @@ public class OneDayChart extends BaseChart {
         TimeDataModel lastData = mData.getLastData();
         if(mData ==null || lastData==null || NumberUtils.keepPrecision(lastData.getNowPrice(),3) == NumberUtils.keepPrecision(timeDatamodel.getNowPrice(),3))return;
 
-        cirCleView.setVisibility(View.GONE);
         tPoint2.setVisibility(View.VISIBLE);
         timeDatamodel.setTimeMills(lastData.getTimeMills());
 
@@ -553,7 +558,9 @@ public class OneDayChart extends BaseChart {
 //        barData.notifyDataChanged();
 //        barChart.notifyDataSetChanged();
 //        barChart.moveViewToX(index);
-        double compare = timeDatamodel.getNowPrice()>=lastData.getNowPrice()?1:-1;
+
+//        double compare = timeDatamodel.getNowPrice()>=lastData.getNowPrice()?1:-1;
+        double compare = timeDatamodel.getNowPrice()>=mData.getPreClose()?1:-1;
         MPPointD startPosition = lineChart.getTransformer(YAxis.AxisDependency.LEFT).getPixelForValues(mData.getDatas().size()-1, (float) lastData.getNowPrice());
         int endX = mData.getDatas().size();
         float endY = (float) timeDatamodel.getNowPrice();
