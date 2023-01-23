@@ -286,12 +286,7 @@ public class OneDayChart extends BaseChart {
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
-    }
-
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-        // 实时更新小圆点位置
+        // 实时更新小圆点位置 应对尺寸变化
         if(tPoint2.getVisibility() == View.VISIBLE && mData!=null && mData.getLastData()!=null){
             TimeDataModel lastData = mData.getLastData();
             Transformer transformer = lineChart.getTransformer(YAxis.AxisDependency.LEFT);
@@ -302,6 +297,7 @@ public class OneDayChart extends BaseChart {
             tPoint2.setCoordinateY((float) updatePointion.y,tPoint2.getSrcY());
         }
     }
+
 
     /**
      * 设置分时数据
@@ -502,7 +498,7 @@ public class OneDayChart extends BaseChart {
         int endX = mData.getDatas().size() - 1;
         float endY = (float) timeDatamodel.getNowPrice();
         MPPointD startPointion = lineChart.getTransformer(YAxis.AxisDependency.LEFT).getPixelForValues(endX, (float) lastData.getNowPrice());
-        MPPointD updatePointion = lineChart.getTransformer(YAxis.AxisDependency.LEFT).getPixelForValues(endX, endY);
+        MPPointD updatePointion = lineChart.getTransformer(YAxis.AxisDependency.LEFT).getPixelForValues(endX+1, endY);
             tPoint2.setLineStartPoint((float)startPointion.x,(float) startPointion.y);
             tPoint2.setCoordinateX((float) updatePointion.x, endX);
             tPoint2.setCoordinateY((float) updatePointion.y, endY);
