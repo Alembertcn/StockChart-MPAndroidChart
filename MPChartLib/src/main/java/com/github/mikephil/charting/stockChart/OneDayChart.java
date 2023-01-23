@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -83,8 +84,6 @@ public class OneDayChart extends BaseChart {
     TimeXAxis xAxisBar;
     YAxis axisLeftBar;
     YAxis axisRightBar;
-
-    private int maxCount = ChartType.HK_ONE_DAY.getPointNum();//最大可见数量，即分时一天最大数据点数
     private SparseArray<String> xLabels = new SparseArray<>();//X轴刻度label
     private TimeDataManage mData;
     private int[] colorArray;
@@ -354,7 +353,6 @@ public class OneDayChart extends BaseChart {
             barChart.notifyDataSetChanged();
         }else {
             setPrecision(mData.getAssetId().contains("IDX") ? 2 : 3);
-            setMaxCount(mData.getDataTypeMaxCount());
 
             setXLabels(mData.getOneDayXLabels(landscape));
             setMarkerView(mData);
@@ -454,7 +452,7 @@ public class OneDayChart extends BaseChart {
         xAxisLine.setLabelCount(mData.getOneDayXLabels(landscape).size(), true);
         xAxisBar.setXLabels(mData.getOneDayXLabels(landscape));
         xAxisBar.setLabelCount(mData.getOneDayXLabels(landscape).size(), true);
-//        maxCount=30;
+        int maxCount =mData.getDataTypeMaxCount();
         lineChart.setVisibleXRange(maxCount, maxCount);
         barChart.setVisibleXRange(maxCount, maxCount);
 
@@ -512,72 +510,37 @@ public class OneDayChart extends BaseChart {
 //        playHeaderAnimation(4);
     }
     public void dynamicsUpdateOne(TimeDataModel timeDatamodel) {
-        dynamicsUpdateOne(timeDatamodel, true);
-    }
-    /**
-     * 动态更新最后一点数据
-     * @param timeDatamodel
-     */
-    public void dynamicsUpdateOne(TimeDataModel timeDatamodel,boolean playAnim) {
         TimeDataModel lastData = mData.getLastData();
         if(mData ==null || lastData==null || NumberUtils.keepPrecision(lastData.getNowPrice(),3) == NumberUtils.keepPrecision(timeDatamodel.getNowPrice(),3))return;
 
         tPoint2.setVisibility(View.VISIBLE);
         timeDatamodel.setTimeMills(lastData.getTimeMills());
 
-//        mData.updateLastData(timeDatamodel);
-//        int index = mData.getDatas().size() - 1;
-//        LineData lineData = lineChart.getData();
-//        ILineDataSet d1 = lineData.getDataSetByIndex(0);
-//        Entry e = d1.getEntryForIndex(index);
-//        d1.removeEntry(e);
-//        d1.addEntry(new Entry(index, (float) timeDatamodel.getNowPrice()));
-//
-//        ILineDataSet d2 = lineData.getDataSetByIndex(1);
-//        Entry e2 = d2.getEntryForIndex(index);
-//        d2.removeEntry(e2);
-//        d2.addEntry(new Entry(index, (float) timeDatamodel.getAveragePrice()));
-//
-//        BarData barData = barChart.getData();
-//        IBarDataSet barDataSet = barData.getDataSetByIndex(0);
-//        barDataSet.removeEntry(index);
-//        float color = timeDatamodel.getNowPrice() == d1.getEntryForIndex(index - 1).getY() ? 0f : timeDatamodel.getNowPrice() > d1.getEntryForIndex(index - 1).getY() ? 1f : -1f;
-//        barDataSet.addEntry(new BarEntry(index, timeDatamodel.getVolume(),color));
+        // 更新坐标轴极点
+        updateAxisLeft((float) timeDatamodel.getNowPrice());
 
-        updateAxisLeft();
-
-
-//        lineData.notifyDataChanged();
-//        lineChart.notifyDataSetChanged();
-//        lineChart.moveViewToX(index);
-//
-//        barData.notifyDataChanged();
-//        barChart.notifyDataSetChanged();
-//        barChart.moveViewToX(index);
-
-//        double compare = timeDatamodel.getNowPrice()>=lastData.getNowPrice()?1:-1;
         double compare = timeDatamodel.getNowPrice()>=mData.getPreClose()?1:-1;
         MPPointD startPosition = lineChart.getTransformer(YAxis.AxisDependency.LEFT).getPixelForValues(mData.getDatas().size()-1, (float) lastData.getNowPrice());
         int endX = mData.getDatas().size();
+        //最大为最后一个点坐标
+        if(endX>=mData.getDataTypeMaxCount()){
+            endX=mData.getDataTypeMaxCount()-1;
+        }
+
         float endY = (float) timeDatamodel.getNowPrice();
         MPPointD updatePointion = lineChart.getTransformer(YAxis.AxisDependency.LEFT).getPixelForValues(endX, endY);
-            tPoint2.setLineStartPoint((float)startPosition.x,(float) startPosition.y);
-            tPoint2.setCoordinateX((float) updatePointion.x,endX);
-            tPoint2.setCoordinateY((float) updatePointion.y,endY);
-            if(playAnim){
-                tPoint2.setCenterColor(GlobaleConfig.getColorByCompare(compare));
-                tPoint2.setTwinkleColor(GlobaleConfig.getColorByCompare(compare));
-                tPoint2.startTwinkle(2);
-            }else{
-                tPoint2.invalidate();
-            }
-
+        tPoint2.setLineStartPoint((float)startPosition.x,(float) startPosition.y);
+        tPoint2.setCoordinateX((float) updatePointion.x,endX);
+        tPoint2.setCoordinateY((float) updatePointion.y,endY);
+            tPoint2.setCenterColor(GlobaleConfig.getColorByCompare(compare));
+            tPoint2.setTwinkleColor(GlobaleConfig.getColorByCompare(compare));
+            tPoint2.startTwinkle(2);
 
 //            double compare = timeDatamodel.getNowPrice() == mData.getPreClose() ? 1 : (timeDatamodel.getNowPrice() - mData.getPreClose());
 //            twinklePoint.setCenterColor(GlobaleConfig.getColorByCompare(compare));
 //            twinklePoint.setTwinkleColor(GlobaleConfig.getColorByCompare(compare));
 //            twinklePoint.startTwinkle(2);
-            //        playHeaderAnimation(4);
+        //        playHeaderAnimation(4);
 
         if(!lineChart.valuesToHighlight()){
             updateText(mData.getDatas().size()-1,false);
@@ -594,6 +557,17 @@ public class OneDayChart extends BaseChart {
         }
         if(axisMinimum>mData.getMin()){
             axisLeftLine.setAxisMinimum(mData.getMin());
+        }
+    }
+
+    public void updateAxisLeft(float currentPrice) {
+        float axisMinimum = axisLeftLine.getAxisMinimum();
+        float axisMaximum = axisLeftLine.getAxisMaximum();
+        if(axisMaximum<currentPrice){
+            axisLeftLine.setAxisMaximum(currentPrice);
+        }
+        if(axisMinimum>currentPrice){
+            axisLeftLine.setAxisMinimum(currentPrice);
         }
     }
 
@@ -621,8 +595,10 @@ public class OneDayChart extends BaseChart {
     public void onEventMainThread(BaseEvent event) {
         if (event.method == 1) {
             CirclePositionTime position = (CirclePositionTime) event.obj;
-            cirCleView.setX(position.cx - cirCleView.getWidth() / 2);
-            cirCleView.setY(position.cy - cirCleView.getHeight() / 2);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                cirCleView.setX(position.cx - cirCleView.getWidth() / 2);
+                cirCleView.setY(position.cy - cirCleView.getHeight() / 2);
+            }
         }
     }
 
@@ -634,9 +610,6 @@ public class OneDayChart extends BaseChart {
         return xLabels;
     }
 
-    public void setMaxCount(int maxCount) {
-        this.maxCount = maxCount;
-    }
 
     public void eventBusUnregister() {
         EventBus.getDefault().unregister(this);

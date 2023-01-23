@@ -1,6 +1,7 @@
 package com.github.mikephil
 
 import android.content.Context
+import android.os.Build
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
@@ -221,7 +222,9 @@ class CustomSimpleQuotationChartView @JvmOverloads constructor (context: Context
                 volume = temVolume.toLong()
             }
            var animView:ImageView = oneDayChart.findViewById(com.github.mikephil.charting.R.id.anim_view)
-            animView.setColorFilter(GlobaleConfig.getColorByCompare(data.nowPrice - kTimeData.preClose))
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO) {
+                animView.setColorFilter(GlobaleConfig.getColorByCompare(data.nowPrice - kTimeData.preClose))
+            }
 
             if(isAdd){
                 oneDayChart.dynamicsAddOne(data)
