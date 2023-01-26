@@ -139,6 +139,10 @@ public class TimeDataManage extends IDataManager {
         max = Math.max(last.getNowPrice(), max);
         min = Math.min(last.getNowPrice(), min);
     }
+    public synchronized void updateLastDataWithOutAdd(TimeDataModel last) {
+        max = Math.max(last.getNowPrice(), max);
+        min = Math.min(last.getNowPrice(), min);
+    }
     public synchronized void addLastData(TimeDataModel last) {
         getRealTimeData().add(last);
         max = Math.max(last.getNowPrice(), max);
