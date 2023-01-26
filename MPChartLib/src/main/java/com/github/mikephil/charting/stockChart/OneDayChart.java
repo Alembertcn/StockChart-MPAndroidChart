@@ -228,8 +228,13 @@ public class OneDayChart extends BaseChart {
                 if (mHighlightValueSelectedListener != null) {
                     mHighlightValueSelectedListener.onDayHighlightValueListener(mData, (int) e.getX(), true);
                 }
-                updateText((int) e.getX(), true);
+                updateText((int) e.getX());
+
                 flAvPrice.setVisibility(VISIBLE);
+
+                if (mHighlightValueSelectedListener != null) {
+                    mHighlightValueSelectedListener.onDayHighlightValueListener(mData,(int)e.getX(), true);
+                }
             }
 
             @Override
@@ -239,7 +244,11 @@ public class OneDayChart extends BaseChart {
                     mHighlightValueSelectedListener.onDayHighlightValueListener(mData, 0, false);
                 }
                 flAvPrice.setVisibility(GONE);
-                updateText(mData.getDatas().size() - 1, false);
+                updateText(mData.getDatas().size() - 1);
+
+                if (mHighlightValueSelectedListener != null) {
+                    mHighlightValueSelectedListener.onDayHighlightValueListener(mData,mData.getDatas().size() - 1, false);
+                }
             }
         });
         barChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
@@ -247,25 +256,31 @@ public class OneDayChart extends BaseChart {
             public void onValueSelected(Entry e, Highlight h) {
                 barChart.highlightValue(h);
                 lineChart.highlightValue(new Highlight(h.getX(), h.getDataSetIndex(), -1));
-                updateText((int) e.getX(), true);
+                updateText((int) e.getX());
+
+                if (mHighlightValueSelectedListener != null) {
+                    mHighlightValueSelectedListener.onDayHighlightValueListener(mData,(int) e.getX(), true);
+                }
             }
 
             @Override
             public void onNothingSelected() {
                 lineChart.highlightValues(null);
-                updateText(mData.getDatas().size() - 1, false);
+                updateText(mData.getDatas().size() - 1);
+
+
+                if (mHighlightValueSelectedListener != null) {
+                    mHighlightValueSelectedListener.onDayHighlightValueListener(mData,mData.getDatas().size() - 1, false);
+                }
             }
         });
 
     }
 
 
-    private void updateText(int index, boolean isSelect) {
+    private void updateText(int index) {
         if(index<0||index>mData.getDatas().size()-1)return;
 
-        if (mHighlightValueSelectedListener != null) {
-            mHighlightValueSelectedListener.onDayHighlightValueListener(mData,index, isSelect);
-        }
         TimeDataModel timeDataModel = mData.getDatas().get(index);
 
         barChart.setDescriptionCustom(new int[]{ContextCompat.getColor(mContext, R.color.fit_black), ContextCompat.getColor(mContext, R.color.theme)}, new String[]{getResources().getString(R.string.vol_name), "VOL:" + NumberUtils.formatVol(mContext, mData.getAssetId(), timeDataModel.getVolume())}, 2);
@@ -461,7 +476,7 @@ public class OneDayChart extends BaseChart {
         lineChart.moveViewToX(mData.getDatas().size() - 1);
         barChart.moveViewToX(mData.getDatas().size() - 1);
 
-        updateText(mData.getDatas().size() - 1, false);
+        updateText(mData.getDatas().size() - 1);
 
     }
 
@@ -505,13 +520,13 @@ public class OneDayChart extends BaseChart {
             tPoint2.startTwinkle(2);
 
         if(!lineChart.valuesToHighlight()){
-            updateText(endX,false);
+            updateText(endX);
         }
 //        playHeaderAnimation(4);
     }
     public void dynamicsUpdateOne(TimeDataModel timeDatamodel) {
+        if(mData ==null ||  mData.getLastData()==null || NumberUtils.keepPrecision( mData.getLastData().getNowPrice(),3) == NumberUtils.keepPrecision(timeDatamodel.getNowPrice(),3))return;
         TimeDataModel lastData = mData.getLastData();
-        if(mData ==null || lastData==null || NumberUtils.keepPrecision(lastData.getNowPrice(),3) == NumberUtils.keepPrecision(timeDatamodel.getNowPrice(),3))return;
 
         tPoint2.setVisibility(View.VISIBLE);
         timeDatamodel.setTimeMills(lastData.getTimeMills());
@@ -543,7 +558,7 @@ public class OneDayChart extends BaseChart {
         //        playHeaderAnimation(4);
 
         if(!lineChart.valuesToHighlight()){
-            updateText(mData.getDatas().size()-1,false);
+            updateText(mData.getDatas().size()-1);
         }
 
     }
@@ -638,7 +653,4 @@ public class OneDayChart extends BaseChart {
     public boolean valuesToHighlight(){
         return lineChart.valuesToHighlight() || barChart.valuesToHighlight();
     }
-
-
-
 }
