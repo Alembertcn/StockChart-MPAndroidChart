@@ -225,9 +225,6 @@ public class OneDayChart extends BaseChart {
             public void onValueSelected(Entry e, Highlight h) {
                 lineChart.highlightValue(h);
                 barChart.highlightValue(new Highlight(h.getX(), h.getDataSetIndex(), -1));
-                if (mHighlightValueSelectedListener != null) {
-                    mHighlightValueSelectedListener.onDayHighlightValueListener(mData, (int) e.getX(), true);
-                }
                 updateText((int) e.getX());
 
                 flAvPrice.setVisibility(VISIBLE);
@@ -258,6 +255,8 @@ public class OneDayChart extends BaseChart {
                 lineChart.highlightValue(new Highlight(h.getX(), h.getDataSetIndex(), -1));
                 updateText((int) e.getX());
 
+                flAvPrice.setVisibility(VISIBLE);
+
                 if (mHighlightValueSelectedListener != null) {
                     mHighlightValueSelectedListener.onDayHighlightValueListener(mData,(int) e.getX(), true);
                 }
@@ -268,7 +267,7 @@ public class OneDayChart extends BaseChart {
                 lineChart.highlightValues(null);
                 updateText(mData.getDatas().size() - 1);
 
-
+                flAvPrice.setVisibility(GONE);
                 if (mHighlightValueSelectedListener != null) {
                     mHighlightValueSelectedListener.onDayHighlightValueListener(mData,mData.getDatas().size() - 1, false);
                 }
