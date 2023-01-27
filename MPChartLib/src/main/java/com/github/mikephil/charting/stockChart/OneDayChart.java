@@ -4,12 +4,15 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -118,6 +121,7 @@ public class OneDayChart extends BaseChart {
     public void stopHeaderAnimation() {
         stopHeartbeatAnimation(cirCleView.findViewById(R.id.anim_view));
     }
+
 
 
     /**
@@ -298,19 +302,13 @@ public class OneDayChart extends BaseChart {
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        Log.d("oneDayChart", "onLayout");
         super.onLayout(changed, l, t, r, b);
         // 实时更新小圆点位置 应对尺寸变化
         if(tPoint2.getVisibility() == View.VISIBLE && mData!=null && mData.getLastData()!=null){
-            TimeDataModel lastData = mData.getLastData();
-            Transformer transformer = lineChart.getTransformer(YAxis.AxisDependency.LEFT);
-            MPPointD startPointion = transformer.getPixelForValues(mData.getDatas().size()-1, (float) lastData.getNowPrice());
-            MPPointD updatePointion = transformer.getPixelForValues(tPoint2.getSrcX(), tPoint2.getSrcY());
-            tPoint2.setLineStartPoint((float)startPointion.x,(float) startPointion.y);
-            tPoint2.setCoordinateX((float) updatePointion.x,tPoint2.getSrcX());
-            tPoint2.setCoordinateY((float) updatePointion.y,tPoint2.getSrcY());
+            updateLastPoint((float)tPoint2.getSrcY());
         }
     }
-
 
     /**
      * 设置分时数据
@@ -456,7 +454,7 @@ public class OneDayChart extends BaseChart {
 
 
             //右边3是为了适配小圆点遮挡问题
-//            lineChart.setViewPortOffsets(defaultCircleWith/2, CommonUtil.dip2px(mContext, 0), defaultCircleWith/2, CommonUtil.dip2px(mContext, hideSub?15:22));
+//            lineChart.setViewPortOffsets(defaultCircleWith/2, CommonUtil.dip2px(mContext, 0), defaultCircleWith/2, CommonUtil.dip2px(mContext, 20));
 //            barChart.setViewPortOffsets(defaultCircleWith/2, CommonUtil.dip2px(mContext, 15), defaultCircleWith/2, 2);
             lineChart.setViewPortOffsets(0, CommonUtil.dip2px(mContext, 0), 0, CommonUtil.dip2px(mContext, 20));
             barChart.setViewPortOffsets(0, CommonUtil.dip2px(mContext, 15), 0, 0);
@@ -479,6 +477,29 @@ public class OneDayChart extends BaseChart {
 
         updateText(mData.getDatas().size() - 1);
 
+        // 实时更新小圆点位置 应对尺寸变化
+        updateLastPoint((float) mData.getLastData().getNowPrice());
+    }
+
+    private void updateLastPoint(float lastPrice) {
+        if(tPoint2.getVisibility() == View.VISIBLE && mData !=null){
+            Transformer transformer = lineChart.getTransformer(YAxis.AxisDependency.LEFT);
+            TimeDataModel lastData = mData.getLastData();
+            MPPointD startPointion;
+            MPPointD updatePointion;
+            if(lastData !=null){
+                startPointion = transformer.getPixelForValues(mData.getDatas().size()-1, (float) lastData.getNowPrice());
+                updatePointion = transformer.getPixelForValues(mData.getDatas().size(), lastPrice);
+            }else{
+                startPointion = transformer.getPixelForValues(0, lastPrice);
+                updatePointion = startPointion;
+            }
+
+            tPoint2.setLineStartPoint((float)startPointion.x,(float) startPointion.y);
+            tPoint2.setCoordinateX((float) updatePointion.x,mData.getDatas().size());
+            tPoint2.setCoordinateY((float) updatePointion.y,lastPrice);
+            tPoint2.postInvalidate();
+        }
     }
 
     /**
