@@ -5,15 +5,14 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Handler;
 import android.os.Message;
-
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
+
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 import com.github.mikephil.charting.R;
 import com.github.mikephil.charting.charts.Chart;
@@ -40,14 +39,14 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.renderer.BarChartRenderer;
 import com.github.mikephil.charting.renderer.CandleStickChartRenderer;
 import com.github.mikephil.charting.renderer.DataRenderer;
-import com.github.mikephil.charting.stockChart.markerView.BarBottomMarkerView;
 import com.github.mikephil.charting.stockChart.charts.CandleCombinedChart;
 import com.github.mikephil.charting.stockChart.charts.CoupleChartGestureListener;
-import com.github.mikephil.charting.stockChart.markerView.KRightMarkerView;
-import com.github.mikephil.charting.stockChart.markerView.LeftMarkerView;
 import com.github.mikephil.charting.stockChart.charts.MyCombinedChart;
 import com.github.mikephil.charting.stockChart.dataManage.KLineDataManage;
 import com.github.mikephil.charting.stockChart.enums.TimeType;
+import com.github.mikephil.charting.stockChart.markerView.BarBottomMarkerView;
+import com.github.mikephil.charting.stockChart.markerView.KRightMarkerView;
+import com.github.mikephil.charting.stockChart.markerView.LeftMarkerView;
 import com.github.mikephil.charting.stockChart.model.KLineDataModel;
 import com.github.mikephil.charting.stockChart.renderer.DynicDateXAxisRenderer;
 import com.github.mikephil.charting.stockChart.renderer.MyCombinedChartRenderer;
@@ -77,7 +76,7 @@ public class KLineChart extends BaseChart {
 
     private int maxVisibleXCount = 150;
     private int minVisibleXCount = 30;
-    private float visiableRadio = 0.8f;
+    private float visiableRadio =0.4f;// 0.746667f;
     private boolean isFirst = true;//是否是第一次加载数据
     private int zbColor[];
     private float macdBarWith = 0.95f;//默认是缩放是5
@@ -815,10 +814,11 @@ public class KLineChart extends BaseChart {
 
         float xScale = count/120;
         if(true){
-            if(count<(maxVisibleXCount *visiableRadio)){
+            float pageSize = maxVisibleXCount * visiableRadio;
+            if(count< pageSize){
                 return 1;
             }
-            return count/(maxVisibleXCount *visiableRadio);
+            return count/ pageSize;
         }
         if (count >= 800) {
             xScale = 10f;

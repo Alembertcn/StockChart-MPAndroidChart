@@ -227,6 +227,8 @@ public class ViewPortHandler {
      */
     public void resetZoom(Matrix outputMatrix) {
         outputMatrix.reset();
+        // TODO: 设置了这个 手动调用resetZoom方法仿佛都失效了 这里先禁用使其可以手动调用缩放
+        outputMatrix.set(mMatrixTouch);
         outputMatrix.postScale(1.0f, 1.0f, 0.0f, 0.0f);
     }
 
@@ -268,7 +270,8 @@ public class ViewPortHandler {
 
     public void zoom(float scaleX, float scaleY, float x, float y, Matrix outputMatrix) {
         outputMatrix.reset();
-        outputMatrix.set(mMatrixTouch);
+        // TODO: 设置了这个 手动调用zoom方法仿佛都失效了 这里先禁用使其可以手动调用缩放
+//        outputMatrix.set(mMatrixTouch);
         outputMatrix.postScale(scaleX, scaleY, x, y);
     }
 
