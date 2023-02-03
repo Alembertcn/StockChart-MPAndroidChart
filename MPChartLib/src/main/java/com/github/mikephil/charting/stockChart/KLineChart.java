@@ -433,11 +433,6 @@ public class KLineChart extends BaseChart {
             candleChart.setAutoScaleMinMaxEnabled(true);
             barChart.setAutoScaleMinMaxEnabled(true);
 
-            candleChart.setVisibleXRangeMinimum(minVisibleXCount);
-            barChart.setVisibleXRangeMinimum(minVisibleXCount);
-            barChart.setVisibleXRangeMaximum(maxVisibleXCount);
-            candleChart.setVisibleXRangeMaximum(maxVisibleXCount);
-
 
 //            candleChart.setVisibleXRange(minVisibleXCount,maxVisibleXCount);
 //            barChart.setVisibleXRange(minVisibleXCount,maxVisibleXCount);
@@ -450,6 +445,11 @@ public class KLineChart extends BaseChart {
         barChart.getXAxis().setAxisMinimum(barChartData.getXMin() - 0.5f);
         candleChart.getXAxis().setAxisMaximum(mData.getKLineDatas().size() < 70 ? 70 : candleChartData.getXMax() + 0.5f);
         barChart.getXAxis().setAxisMaximum(mData.getKLineDatas().size() < 70 ? 70 : barChartData.getXMax() +0.5f);
+
+        candleChart.setVisibleXRangeMinimum(minVisibleXCount);
+        barChart.setVisibleXRangeMinimum(minVisibleXCount);
+        barChart.setVisibleXRangeMaximum(maxVisibleXCount);
+        candleChart.setVisibleXRangeMaximum(maxVisibleXCount);
 
         float xScale = calMaxScale(mData.getKLineDatas().size());
         //根据所给的参数进行放大或缩小。 参数 x 和 y 是变焦中心的坐标（单位：像素）。 记住，1f = 无放缩 。

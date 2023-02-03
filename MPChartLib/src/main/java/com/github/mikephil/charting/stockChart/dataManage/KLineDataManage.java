@@ -542,7 +542,7 @@ public class KLineDataManage extends IDataManager {
                 case K_15MIN:
                 case K_30MIN:
                 case K_60MIN:
-                    timeFormat = DataTimeUtil.secToTime(dateMills, "yy/MM/dd hh:mm");
+                    timeFormat = DataTimeUtil.secToTime(dateMills, "yy/MM/dd HH:mm");
                     break;
                 case K_1MONTH:
                     timeFormat = DataTimeUtil.secToTime(dateMills, "yy/MM");

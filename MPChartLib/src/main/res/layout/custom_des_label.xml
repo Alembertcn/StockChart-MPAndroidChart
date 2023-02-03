@@ -14,7 +14,7 @@
             android:id="@+id/tvLabel"
             android:paddingHorizontal="4dp"
             android:text="@string/bfq"
-            android:textSize="10sp"
+            android:textSize="9sp"
             android:textColor="@color/equal_color"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>

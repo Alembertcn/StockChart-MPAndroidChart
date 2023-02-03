@@ -99,19 +99,13 @@ public class DynicDateXAxisRenderer extends XAxisRenderer {
                 String label = mXAxis.getValueFormatter().getAxisLabel(mXAxis.mEntries[i / 2], mXAxis);
 
                 if (mXAxis.isAvoidFirstLastClippingEnabled()) {
-
+                    float width = Utils.calcTextWidth(mAxisLabelPaint, label);
                     // avoid clipping of the last
-                    if (i / 2 == mXAxis.mEntryCount - 1 && mXAxis.mEntryCount > 1) {
-                        float width = Utils.calcTextWidth(mAxisLabelPaint, label);
-                        if ((width / 2 +x) > mViewPortHandler.contentRight()) {
-                            x = mViewPortHandler.contentRight() - width / 2;
-                        }
-                        // avoid clipping of the first
-                    } else if (i == 0) {
-                        float width = Utils.calcTextWidth(mAxisLabelPaint, label);
-                        if ((x - width / 2) < mViewPortHandler.contentLeft()) {
-                            x =  mViewPortHandler.contentLeft() + width / 2;
-                        }
+                    if(!mViewPortHandler.isInBoundsX(width / 2 +x)){
+                        x = mViewPortHandler.contentRight() - width / 2;
+                    }
+                    if(!mViewPortHandler.isInBoundsX( x -width / 2)){
+                        x =  mViewPortHandler.contentLeft() + width / 2;
                     }
                 }
 

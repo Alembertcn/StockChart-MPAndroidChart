@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.icu.lang.UCharacter.GraphemeClusterBreak.V
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
@@ -14,6 +15,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
@@ -52,6 +54,15 @@ class TestActivity: AppCompatActivity() {
 
     fun onViewClicked(v: View){
 //        AppUtils.tackPick(this)
+        for (i in 0..10){
+            ivTest.postDelayed({
+                ViewCompat.animate(ivTest).apply {
+                    cancel()
+                    alpha(1.0f).setDuration(500).start()
+                }
+            },200)
+        }
+        ViewCompat.animate(ivTest).alpha(1.0f).setDuration(500).start()
 
         val rxPermissions = RxPermissions(this)
         rxPermissions.request(Manifest.permission.CAMERA,

@@ -454,10 +454,10 @@ public class OneDayChart extends BaseChart {
 
 
             //右边3是为了适配小圆点遮挡问题
-//            lineChart.setViewPortOffsets(defaultCircleWith/2, CommonUtil.dip2px(mContext, 0), defaultCircleWith/2, CommonUtil.dip2px(mContext, 20));
-//            barChart.setViewPortOffsets(defaultCircleWith/2, CommonUtil.dip2px(mContext, 15), defaultCircleWith/2, 2);
-            lineChart.setViewPortOffsets(0, CommonUtil.dip2px(mContext, 0), 0, CommonUtil.dip2px(mContext, 20));
-            barChart.setViewPortOffsets(0, CommonUtil.dip2px(mContext, 15), 0, 0);
+            lineChart.setViewPortOffsets(defaultCircleWith/2, CommonUtil.dip2px(mContext, 0), defaultCircleWith/2, CommonUtil.dip2px(mContext, 20));
+            barChart.setViewPortOffsets(defaultCircleWith/2, CommonUtil.dip2px(mContext, 15), defaultCircleWith/2, 2);
+//            lineChart.setViewPortOffsets(0, CommonUtil.dip2px(mContext, 0), 0, CommonUtil.dip2px(mContext, 20));
+//            barChart.setViewPortOffsets(0, CommonUtil.dip2px(mContext, 15), 0, 0);
         }
 
         //下面方法需在填充数据后调用
