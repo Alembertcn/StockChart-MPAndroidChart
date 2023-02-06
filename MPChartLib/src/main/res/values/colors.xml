@@ -7,11 +7,15 @@
     <color name="up_color">#F7385C</color><!-- 行情UP颜色  涨-->
     <color name="down_color">#06B098</color><!-- 行情DOWN颜色  跌 -->
     <color name="equal_color">#8C9FAD</color><!-- 行情Equal颜色  不变 -->
-
+<!--这些颜色可以在主项目中覆写达到自定义效果-->
     <color name="ma5">#F26227</color>
     <color name="ma10">#FBCD0F</color>
     <color name="ma20">#A653F6</color>
     <color name="ma30">#06B098</color>
+
+    <color name="boll_m">#35A1DA</color>
+    <color name="boll_u">#FBCD0F</color>
+    <color name="boll_l">#A653F6</color>
 
     <color name="axis_x_label">#881F1F1F</color>
     <color name="axis_y_label">#8C9FAD</color>

@@ -188,9 +188,9 @@ public class KLineDataManage extends IDataManager {
                 candleDataSet = setACandle(candleEntries);
                 bollCandleDataSet = setBOLLCandle(candleEntries);
                 volumeDataSet = setABar(barEntries, "成交量",colors);
-                lineDataMA.add(setALine(ColorType.blue, line5Entries, false));
-                lineDataMA.add(setALine(ColorType.yellow, line10Entries, false));
-                lineDataMA.add(setALine(ColorType.purple, line20Entries, false));
+                lineDataMA.add(setALine(ContextCompat.getColor(mContext, R.color.ma5), line5Entries, false));
+                lineDataMA.add(setALine(ContextCompat.getColor(mContext, R.color.ma10), line10Entries, false));
+                lineDataMA.add(setALine(ContextCompat.getColor(mContext, R.color.ma20), line20Entries, false));
                 //主图boll线直接初始化
                 initBOLL();
             }
@@ -213,8 +213,8 @@ public class KLineDataManage extends IDataManager {
             difData.add(new Entry(i + offSet, macdEntity.getDIF().get(i)));
         }
         barDataMACD = setABar(macdData);
-        lineDataMACD.add(setALine(ColorType.blue, deaData));
-        lineDataMACD.add(setALine(ColorType.yellow, difData));
+        lineDataMACD.add(setALine(ContextCompat.getColor(mContext, R.color.ma5), deaData));
+        lineDataMACD.add(setALine(ContextCompat.getColor(mContext, R.color.ma10), difData));
     }
 
     /**
@@ -232,9 +232,9 @@ public class KLineDataManage extends IDataManager {
             dData.add(new Entry(i + offSet, kdjEntity.getD().get(i)));
             jData.add(new Entry(i + offSet, kdjEntity.getJ().get(i)));
         }
-        lineDataKDJ.add(setALine(ColorType.blue, kData, "KDJ" + N1, false));
-        lineDataKDJ.add(setALine(ColorType.yellow, dData, "KDJ" + N2, false));
-        lineDataKDJ.add(setALine(ColorType.purple, jData, "KDJ" + N3, true));
+        lineDataKDJ.add(setALine(ContextCompat.getColor(mContext, R.color.ma5), kData, "KDJ" + N1, false));
+        lineDataKDJ.add(setALine(ContextCompat.getColor(mContext, R.color.ma10), dData, "KDJ" + N2, false));
+        lineDataKDJ.add(setALine(ContextCompat.getColor(mContext, R.color.ma20), jData, "KDJ" + N3, true));
     }
 
     /**
@@ -253,9 +253,9 @@ public class KLineDataManage extends IDataManager {
             bollDataMB.add(new Entry(i + offSet, bollEntity.getMBs().get(i)));
             bollDataDN.add(new Entry(i + offSet, bollEntity.getDNs().get(i)));
         }
-        lineDataBOLL.add(setALine(ColorType.blue, bollDataUP, false));
-        lineDataBOLL.add(setALine(ColorType.yellow, bollDataMB, false));
-        lineDataBOLL.add(setALine(ColorType.purple, bollDataDN, false));
+        lineDataBOLL.add(setALine(ContextCompat.getColor(mContext, R.color.boll_u), bollDataUP, false));
+        lineDataBOLL.add(setALine(ContextCompat.getColor(mContext, R.color.boll_m), bollDataMB, false));
+        lineDataBOLL.add(setALine(ContextCompat.getColor(mContext, R.color.boll_l), bollDataDN, false));
     }
 
     /**
@@ -275,9 +275,9 @@ public class KLineDataManage extends IDataManager {
             rsiData12.add(new Entry(i + offSet, rsiEntity12.getRSIs().get(i)));
             rsiData24.add(new Entry(i + offSet, rsiEntity24.getRSIs().get(i)));
         }
-        lineDataRSI.add(setALine(ColorType.blue, rsiData6, "RSI" + RSIN1, false));
-        lineDataRSI.add(setALine(ColorType.yellow, rsiData12, "RSI" + RSIN2, false));
-        lineDataRSI.add(setALine(ColorType.purple, rsiData24, "RSI" + RSIN3, true));
+        lineDataRSI.add(setALine(ContextCompat.getColor(mContext, R.color.ma5), rsiData6, "RSI" + RSIN1, false));
+        lineDataRSI.add(setALine(ContextCompat.getColor(mContext, R.color.ma10), rsiData12, "RSI" + RSIN2, false));
+        lineDataRSI.add(setALine(ContextCompat.getColor(mContext, R.color.ma20), rsiData24, "RSI" + RSIN3, true));
     }
 
     private CandleDataSet setACandle(ArrayList<CandleEntry> candleEntries) {
@@ -317,35 +317,36 @@ public class KLineDataManage extends IDataManager {
         return candleDataSet;
     }
 
-    private LineDataSet setALine(ColorType ma, List<Entry> lineEntries) {
+    private LineDataSet setALine(int ma, List<Entry> lineEntries) {
         String label = "ma" + ma;
         return setALine(ma, lineEntries, label);
     }
 
-    private LineDataSet setALine(ColorType ma, List<Entry> lineEntries, boolean highlightEnable) {
+    private LineDataSet setALine(int ma, List<Entry> lineEntries, boolean highlightEnable) {
         String label = "ma" + ma;
         return setALine(ma, lineEntries, label, highlightEnable);
     }
 
-    private LineDataSet setALine(ColorType ma, List<Entry> lineEntries, String label) {
+    private LineDataSet setALine(int ma, List<Entry> lineEntries, String label) {
         boolean highlightEnable = false;
         return setALine(ma, lineEntries, label, highlightEnable);
     }
 
     //行情走势线属性设置
-    private LineDataSet setALine(ColorType colorType, List<Entry> lineEntries, String label, boolean highlightEnable) {
+    private LineDataSet setALine(int color, List<Entry> lineEntries, String label, boolean highlightEnable) {
         LineDataSet lineDataSetMa = new LineDataSet(lineEntries, label);
         lineDataSetMa.setDrawHorizontalHighlightIndicator(false);
         lineDataSetMa.setHighlightEnabled(highlightEnable);//是否画高亮十字线
         lineDataSetMa.setHighLightColor(ContextCompat.getColor(mContext, R.color.highLight_Color));//高亮十字线颜色
         lineDataSetMa.setDrawValues(false);//是否画出每个蜡烛线的数值
-        if (colorType == ColorType.blue) {
-            lineDataSetMa.setColor(ContextCompat.getColor(mContext, R.color.ma5));
-        } else if (colorType == ColorType.yellow) {
-            lineDataSetMa.setColor(ContextCompat.getColor(mContext, R.color.ma10));
-        } else if (colorType == ColorType.purple) {
-            lineDataSetMa.setColor(ContextCompat.getColor(mContext, R.color.ma20));
-        }
+//        if (colorType == ColorType.blue) {
+//            lineDataSetMa.setColor(ContextCompat.getColor(mContext, R.color.ma5));
+//        } else if (colorType == ColorType.yellow) {
+//            lineDataSetMa.setColor(ContextCompat.getColor(mContext, R.color.ma10));
+//        } else if (colorType == ColorType.purple) {
+//            lineDataSetMa.setColor(ContextCompat.getColor(mContext, R.color.ma20));
+//        }
+        lineDataSetMa.setColor(color);
         lineDataSetMa.setLineWidth(0.6f);
         lineDataSetMa.setDrawCircles(false);
         lineDataSetMa.setAxisDependency(YAxis.AxisDependency.LEFT);

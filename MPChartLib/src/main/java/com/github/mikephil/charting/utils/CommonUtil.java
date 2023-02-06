@@ -106,13 +106,13 @@ public class CommonUtil {
 	}
 
 	public static int getStatusBarHeight(Context context) {
-		int result = 0;
+		int result = (int) (context.getResources().getDisplayMetrics().density * 24);
 		int resourceId = context.getResources().getIdentifier(
 				"status_bar_height", "dimen", "android");
 		if (resourceId > 0) {
 			result = context.getResources().getDimensionPixelSize(resourceId);
 		}
-		return result;
+		return result >0 ? result: (int) (context.getResources().getDisplayMetrics().density * 24);
 	}
 
 	public static int sp2px(Context context, float spValue) {

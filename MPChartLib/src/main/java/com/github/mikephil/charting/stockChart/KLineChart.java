@@ -547,6 +547,9 @@ public class KLineChart extends BaseChart {
             default:
                 break;
         }
+        if(mOnChartChangeListener!=null){
+            mOnChartChangeListener.onChartChange(chartType1);
+        }
         chartSwitch(mData.getKLineDatas().size() - 1);
     }
 
@@ -576,7 +579,7 @@ public class KLineChart extends BaseChart {
             combinedData.setData(data);
             combinedData.setData(new LineData());
             barChart.notifyDataSetChanged();
-            barChart.animateY(1000);
+//            barChart.animateY(1000);
         }
     }
 
@@ -864,7 +867,7 @@ public class KLineChart extends BaseChart {
                 ma20Entry = ma20.getEntriesForXValue(index * 1.0f).get(0);
             }
 
-            candleChart.setDescriptionCustom(zbColor, new String[]{"MA5:" + (ma5Entry == null ? "--" : NumberUtils.keepPrecision(ma5Entry.getY(), 3)), "MA10:" + (ma10Entry == null ? "--" : NumberUtils.keepPrecision(ma10Entry.getY(), 3)), "MA20:" + (ma20Entry == null ? "--" : NumberUtils.keepPrecision(ma20Entry.getY(), 3))});
+            candleChart.setDescriptionCustom(new int[]{ ContextCompat.getColor(getContext(), R.color.fit_black), ContextCompat.getColor(getContext(), R.color.ma5), ContextCompat.getColor(getContext(), R.color.ma10), ContextCompat.getColor(getContext(), R.color.ma20)}, new String[]{"MA","MA5:" + (ma5Entry == null ? "--" : NumberUtils.keepPrecision(ma5Entry.getY(), 3)), "MA10:" + (ma10Entry == null ? "--" : NumberUtils.keepPrecision(ma10Entry.getY(), 3)), "MA20:" + (ma20Entry == null ? "--" : NumberUtils.keepPrecision(ma20Entry.getY(), 3))});
         } else {
             ILineDataSet up = lineData.getDataSetByIndex(0);
             ILineDataSet mid = lineData.getDataSetByIndex(1);
@@ -884,7 +887,7 @@ public class KLineChart extends BaseChart {
                 lowEntry = low.getEntriesForXValue(index * 1.0f).get(0);
             }
 
-            candleChart.setDescriptionCustom(new int[]{Color.BLACK, ContextCompat.getColor(getContext(), R.color.ma5), ContextCompat.getColor(getContext(), R.color.ma10), ContextCompat.getColor(getContext(), R.color.ma20)},
+            candleChart.setDescriptionCustom(new int[]{ ContextCompat.getColor(getContext(), R.color.fit_black), ContextCompat.getColor(getContext(), R.color.boll_m), ContextCompat.getColor(getContext(), R.color.boll_u), ContextCompat.getColor(getContext(), R.color.boll_l)},
                     new String[]{"BOLL(20,2)", "MID:" + (midEntry == null ? "--" : NumberUtils.keepPrecision(midEntry.getY(), 3)), "UPPER:" + (upEntry == null ? "--" : NumberUtils.keepPrecision(upEntry.getY(), 3)), "LOWER:" + (lowEntry == null ? "--" : NumberUtils.keepPrecision(lowEntry.getY(), 3))});
         }
         chartSwitch(index);
@@ -947,5 +950,20 @@ public class KLineChart extends BaseChart {
 
     public boolean valuesToHighlight(){
         return candleChart.valuesToHighlight() || barChart.valuesToHighlight();
+    }
+
+    public OnChartChangeListener getmOnChartChangeListener() {
+        return mOnChartChangeListener;
+    }
+
+    public void setOnChartChangeListener(OnChartChangeListener mOnChartChangeListener) {
+        this.mOnChartChangeListener = mOnChartChangeListener;
+    }
+
+    OnChartChangeListener mOnChartChangeListener;
+
+
+    public interface OnChartChangeListener{
+        void onChartChange(int charType);
     }
 }

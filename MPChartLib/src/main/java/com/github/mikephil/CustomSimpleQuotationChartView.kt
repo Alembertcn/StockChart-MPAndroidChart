@@ -9,6 +9,7 @@ import android.widget.ImageView
 import com.github.mikephil.charting.GlobaleConfig
 import com.github.mikephil.charting.R
 import com.github.mikephil.charting.stockChart.BaseChart
+import com.github.mikephil.charting.stockChart.KLineChart.OnChartChangeListener
 import com.github.mikephil.charting.stockChart.OneDayChart
 import com.github.mikephil.charting.stockChart.charts.CoupleChartGestureListener.CoupleClick
 import com.github.mikephil.charting.stockChart.dataManage.IDataManager
@@ -76,23 +77,24 @@ class CustomSimpleQuotationChartView @JvmOverloads constructor (context: Context
         combinedchart.initChart(land)
 
 
-        combinedchart.getGestureListenerBar().setCoupleClick {
-            if (land) {
-                combinedchart.doBarChartSwitch((mSubChartType++)%4+1)
-            } else {
+            combinedchart.getGestureListenerBar().setCoupleClick {
+                if (land) {
+                    combinedchart.doBarChartSwitch((mSubChartType++)%4+1)
+                } else {
 //                val intent = Intent(context, StockDetailLandActivity::class.java)
 //                context.startActivity(intent)
+                }
             }
-        }
-        combinedchart.getGestureListenerCandle().setCoupleClick {
+            combinedchart.getGestureListenerCandle().setCoupleClick {
 //            combinedchart.doMainChartSwitch((mMainLineType++)%2 + 1)
-        }
+            }
+
         val value = object :
             BaseChart.OnHighlightValueSelectedListener {
             override fun onDayHighlightValueListener(
                 mData: TimeDataManage?,
                 index: Int,
-                isSelect: Boolean
+                isSelect: Boolean,
             ) {
                 if (isSelect) {
                     mOnCrossLineMoveListener?.onCrossLineMove(index, -1)
@@ -204,11 +206,16 @@ class CustomSimpleQuotationChartView @JvmOverloads constructor (context: Context
        setLastPointData(newPrice, avgPrice, newVolume,false)
     }
 
+
+    fun setOnChartChangeListener(mOnChartChangeListener: OnChartChangeListener) {
+        combinedchart.setOnChartChangeListener(mOnChartChangeListener)
+    }
+
     override fun  setLastPointData(
         newPrice: Double,
         avgPrice: Double,
         newVolume: Int,
-        isAdd: Boolean
+        isAdd: Boolean,
     ) {
         if ( flOneDayChart.visibility == View.VISIBLE) {
             val lastData = kTimeData.lastData
