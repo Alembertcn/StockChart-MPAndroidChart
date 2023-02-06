@@ -98,6 +98,7 @@ public class KLineChart extends BaseChart {
     public KLineChart(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         mContext = context;
+        maxVisibleXCount = mContext.getResources().getInteger(R.integer.chart_max_visible_x_count);
         LayoutInflater.from(context).inflate(R.layout.view_kline, this);
         candleChart = (CandleCombinedChart) findViewById(R.id.candleChart);
         barChart = (MyCombinedChart) findViewById(R.id.barchart);
