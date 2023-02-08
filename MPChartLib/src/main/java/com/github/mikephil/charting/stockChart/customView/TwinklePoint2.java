@@ -182,28 +182,26 @@ public class TwinklePoint2 extends View{
         return mCoordinateX;
     }
 
-    public float getSrcX() {
-        return srcX;
-    }
 
     public float getSrcY() {
         return srcY;
     }
 
-    float srcX;
-    public void setCoordinateX(float coordinateX,float srcX) {
+    public void setCoordinateX(float coordinateX) {
         this.mCoordinateX = coordinateX;
-        this.srcX = srcX;
     }
 
     public float getCoordinateY() {
         return mCoordinateY;
     }
 
+    public void setSrcY(float srcY) {
+        this.srcY = srcY;
+    }
+
     float srcY;
-    public void setCoordinateY(float coordinateY,float srcY) {
+    public void setCoordinateY(float coordinateY) {
         this.mCoordinateY = coordinateY;
-        this.srcY=srcY;
     }
 
     public void setLineStartPoint(float startX,float startY) {

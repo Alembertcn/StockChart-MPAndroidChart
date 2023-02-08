@@ -478,10 +478,13 @@ public class OneDayChart extends BaseChart {
         updateText(mData.getDatas().size() - 1);
 
         // 实时更新小圆点位置 应对尺寸变化
-        updateLastPoint((float) mData.getLastData().getNowPrice());
+        //刷新数据的时候初始化一下小圆点
+        tPoint2.setVisibility(View.GONE);
+//        updateLastPoint((float) mData.getLastData().getNowPrice());
     }
 
     private void updateLastPoint(float lastPrice) {
+        tPoint2.setSrcY(lastPrice);
         if(tPoint2.getVisibility() == View.VISIBLE && mData !=null){
             Transformer transformer = lineChart.getTransformer(YAxis.AxisDependency.LEFT);
             TimeDataModel lastData = mData.getLastData();
@@ -496,8 +499,8 @@ public class OneDayChart extends BaseChart {
             }
 
             tPoint2.setLineStartPoint((float)startPointion.x,(float) startPointion.y);
-            tPoint2.setCoordinateX((float) updatePointion.x,mData.getDatas().size());
-            tPoint2.setCoordinateY((float) updatePointion.y,lastPrice);
+            tPoint2.setCoordinateX((float) updatePointion.x);
+            tPoint2.setCoordinateY((float) updatePointion.y);
             tPoint2.postInvalidate();
         }
     }
@@ -508,6 +511,8 @@ public class OneDayChart extends BaseChart {
      */
     public void dynamicsAddOne(TimeDataModel timeDatamodel) {
         if(mData ==null)return;
+
+        tPoint2.setSrcY((float)timeDatamodel.getNowPrice());
 
         if(timeDatamodel.getTimeMills()==0 && mData.getLastData()!=null && mData.getDatas().size()>=2){
             long l = mData.getDatas().get(1).getTimeMills() - mData.getDatas().get(0).getTimeMills();
@@ -532,14 +537,15 @@ public class OneDayChart extends BaseChart {
         TimeDataModel lastData = mData.getLastData();
         int endX = mData.getDatas().size() - 1;
         float endY = (float) timeDatamodel.getNowPrice();
+
         MPPointD startPointion = lineChart.getTransformer(YAxis.AxisDependency.LEFT).getPixelForValues(endX, (float) lastData.getNowPrice());
         MPPointD updatePointion = lineChart.getTransformer(YAxis.AxisDependency.LEFT).getPixelForValues(endX+1, endY);
-            tPoint2.setLineStartPoint((float)startPointion.x,(float) startPointion.y);
-            tPoint2.setCoordinateX((float) updatePointion.x, endX);
-            tPoint2.setCoordinateY((float) updatePointion.y, endY);
-            tPoint2.setCenterColor(GlobaleConfig.getColorByCompare(color));
-            tPoint2.setTwinkleColor(GlobaleConfig.getColorByCompare(color));
-            tPoint2.startTwinkle(2);
+        tPoint2.setLineStartPoint((float)startPointion.x,(float) startPointion.y);
+        tPoint2.setCoordinateX((float) updatePointion.x);
+        tPoint2.setCoordinateY((float) updatePointion.y);
+        tPoint2.setCenterColor(GlobaleConfig.getColorByCompare(color));
+        tPoint2.setTwinkleColor(GlobaleConfig.getColorByCompare(color));
+        tPoint2.startTwinkle(2);
 
         if(!lineChart.valuesToHighlight()){
             updateText(endX);
@@ -548,7 +554,15 @@ public class OneDayChart extends BaseChart {
     }
     public void dynamicsUpdateOne(TimeDataModel timeDatamodel) {
         double updateNowPrice = timeDatamodel.getNowPrice();
-        if(mData ==null ||  mData.getLastData()==null || NumberUtils.keepPrecision( mData.getLastData().getNowPrice(),3) == NumberUtils.keepPrecision(updateNowPrice,3))return;
+
+        if(mData ==null
+           || mData.getLastData()==null
+           || NumberUtils.keepPrecision(mData.getLastData().getNowPrice(),3) == NumberUtils.keepPrecision(updateNowPrice,3))
+            return;
+
+        if(tPoint2!=null){
+            tPoint2.setSrcY((float) updateNowPrice);
+        }
 
         //更新极坐标
         mData.updateLastDataWithOutAdd(timeDatamodel);
@@ -570,11 +584,11 @@ public class OneDayChart extends BaseChart {
         float endY = (float) updateNowPrice;
         MPPointD updatePointion = lineChart.getTransformer(YAxis.AxisDependency.LEFT).getPixelForValues(endX, endY);
         tPoint2.setLineStartPoint((float)startPosition.x,(float) startPosition.y);
-        tPoint2.setCoordinateX((float) updatePointion.x,endX);
-        tPoint2.setCoordinateY((float) updatePointion.y,endY);
-            tPoint2.setCenterColor(GlobaleConfig.getColorByCompare(compare));
-            tPoint2.setTwinkleColor(GlobaleConfig.getColorByCompare(compare));
-            tPoint2.startTwinkle(2);
+        tPoint2.setCoordinateX((float) updatePointion.x);
+        tPoint2.setCoordinateY((float) updatePointion.y);
+        tPoint2.setCenterColor(GlobaleConfig.getColorByCompare(compare));
+        tPoint2.setTwinkleColor(GlobaleConfig.getColorByCompare(compare));
+        tPoint2.startTwinkle(2);
 
 //            double compare = timeDatamodel.getNowPrice() == mData.getPreClose() ? 1 : (timeDatamodel.getNowPrice() - mData.getPreClose());
 //            twinklePoint.setCenterColor(GlobaleConfig.getColorByCompare(compare));

@@ -77,17 +77,17 @@ class CustomSimpleQuotationChartView @JvmOverloads constructor (context: Context
         combinedchart.initChart(land)
 
 
-            combinedchart.getGestureListenerBar().setCoupleClick {
-                if (land) {
-                    combinedchart.doBarChartSwitch((mSubChartType++)%4+1)
-                } else {
+        combinedchart.getGestureListenerBar().setCoupleClick {
+            if (land) {
+                combinedchart.doBarChartSwitch((mSubChartType++)%4+1)
+            } else {
 //                val intent = Intent(context, StockDetailLandActivity::class.java)
 //                context.startActivity(intent)
-                }
             }
-            combinedchart.getGestureListenerCandle().setCoupleClick {
+        }
+        combinedchart.getGestureListenerCandle().setCoupleClick {
 //            combinedchart.doMainChartSwitch((mMainLineType++)%2 + 1)
-            }
+        }
 
         val value = object :
             BaseChart.OnHighlightValueSelectedListener {
