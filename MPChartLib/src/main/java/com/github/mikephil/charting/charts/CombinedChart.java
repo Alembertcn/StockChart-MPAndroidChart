@@ -3,6 +3,7 @@ package com.github.mikephil.charting.charts;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
 
@@ -117,6 +118,12 @@ public class CombinedChart extends BarLineChartBase<CombinedData> implements Com
             Log.e(LOG_TAG, "Can't select by touch. No data set.");
             return null;
         } else {
+            // 矫正高亮项防止控件左右不满屏时滑动到外部
+            Rect r=new Rect();
+            getLocalVisibleRect(r);
+            x=x<=r.left?r.left+1:x;
+            x=x>=r.right?r.right-1:x;
+
             Highlight h = getHighlighter().getHighlight(x, y);
             if (h == null || !isHighlightFullBarEnabled()) {
                 return h;
