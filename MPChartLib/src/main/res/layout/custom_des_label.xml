@@ -13,7 +13,7 @@
             android:paddingVertical="2dp"
             android:id="@+id/tvLabel"
             android:paddingHorizontal="4dp"
-            android:text="@string/bfq"
+            android:text="@string/quo_chart_no_restoration"
             android:textSize="9sp"
             android:textColor="@color/equal_color"
             android:layout_width="wrap_content"

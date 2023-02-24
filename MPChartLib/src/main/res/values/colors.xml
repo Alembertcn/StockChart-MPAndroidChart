@@ -29,8 +29,8 @@
     <color name="grid_color">#e8e8e8</color>
     <color name="label_text">#A7ADBC</color>
     <color name="minute_jizhun">#7F9976</color>
-    <color name="minute_blue">#5198FA</color>
-    <color name="minute_yellow">#E7B448</color>
+    <color name="minute_blue">#2BBAFF</color>
+    <color name="minute_yellow">#FF9A2E</color>
     <color name="highLight_Color">#aa424242</color>
     <color name="fill_Color">#D0F1FF</color>
     <color name="fit_black">#000</color>

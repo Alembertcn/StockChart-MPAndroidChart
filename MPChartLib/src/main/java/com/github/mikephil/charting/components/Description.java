@@ -4,7 +4,7 @@ import android.graphics.Paint;
 import android.view.View;
 import android.widget.RelativeLayout;
 
-import com.github.mikephil.charting.GlobaleConfig;
+import com.github.mikephil.charting.GlobalConfig;
 import com.github.mikephil.charting.utils.MPPointF;
 import com.github.mikephil.charting.utils.Utils;
 
@@ -32,7 +32,7 @@ public class Description extends ComponentBase {
         super();
 
         // default size
-        mTextSize = Utils.convertDpToPixel(GlobaleConfig.COMMON_TEXT_SIZE);
+        mTextSize = Utils.convertDpToPixel(GlobalConfig.COMMON_TEXT_SIZE);
     }
 
     /**

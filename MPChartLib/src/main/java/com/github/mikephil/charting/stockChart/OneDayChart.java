@@ -1,11 +1,8 @@
 package com.github.mikephil.charting.stockChart;
 
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
@@ -20,7 +17,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import com.github.mikephil.charting.GlobaleConfig;
+import com.github.mikephil.charting.GlobalConfig;
 import com.github.mikephil.charting.R;
 import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.components.AxisBase;
@@ -36,7 +33,6 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.formatter.VolFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
-import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.stockChart.customView.TwinklePoint;
@@ -50,7 +46,6 @@ import com.github.mikephil.charting.stockChart.charts.TimeLineChart;
 import com.github.mikephil.charting.stockChart.markerView.TimeRightMarkerView;
 import com.github.mikephil.charting.stockChart.charts.TimeXAxis;
 import com.github.mikephil.charting.stockChart.dataManage.TimeDataManage;
-import com.github.mikephil.charting.stockChart.enums.ChartType;
 import com.github.mikephil.charting.stockChart.event.BaseEvent;
 import com.github.mikephil.charting.stockChart.model.CirclePositionTime;
 import com.github.mikephil.charting.stockChart.model.TimeDataModel;
@@ -109,7 +104,7 @@ public class OneDayChart extends BaseChart {
 
         EventBus.getDefault().register(this);
 
-        colorArray = new int[]{ ContextCompat.getColor(mContext, R.color.up_color), ContextCompat.getColor(mContext, R.color.equal_color),ContextCompat.getColor(mContext, R.color.down_color)};
+        colorArray = new int[]{ GlobalConfig.getColorByCompare(1), GlobalConfig.getColorByCompare(0),GlobalConfig.getColorByCompare(-1)};
         initTwinklePoint();
     }
 
@@ -174,6 +169,7 @@ public class OneDayChart extends BaseChart {
         axisLeftLine.setGridLineWidth(0.7f);
         axisLeftLine.setXOffset(0);
         axisLeftLine.setValueLineInside(true);
+        axisLeftLine.setGranularity(0.001f);
         axisLeftLine.setDrawTopBottomGridLine(false);
 //        axisLeftK.setPosition(landscape ? YAxis.YAxisLabelPosition.OUTSIDE_CHART : YAxis.YAxisLabelPosition.INSIDE_CHART);
         axisLeftLine.setPosition(YAxis.YAxisLabelPosition.INSIDE_CHART);
@@ -199,7 +195,7 @@ public class OneDayChart extends BaseChart {
         axisLeftBar.setDrawGridLines(false);
         axisLeftBar.setDrawAxisLine(false);
         axisLeftBar.setTextColor(ContextCompat.getColor(mContext, R.color.axis_text));
-        axisLeftBar.setPosition(landscape ? YAxis.YAxisLabelPosition.OUTSIDE_CHART : YAxis.YAxisLabelPosition.INSIDE_CHART);
+        axisLeftBar.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
         axisLeftBar.setDrawLabels(false);
         axisLeftBar.setLabelCount(2, true);
         axisLeftBar.setAxisMinimum(0);
@@ -228,7 +224,7 @@ public class OneDayChart extends BaseChart {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
                 lineChart.highlightValue(h);
-                barChart.highlightValue(new Highlight(h.getX(), h.getDataSetIndex(), -1));
+                barChart.highlightValue(new Highlight(h.getX(), 0, -1));
                 updateText((int) e.getX());
 
                 flAvPrice.setVisibility(VISIBLE);
@@ -256,7 +252,9 @@ public class OneDayChart extends BaseChart {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
                 barChart.highlightValue(h);
-                lineChart.highlightValue(new Highlight(h.getX(), h.getDataSetIndex(), -1));
+//                lineChart.highlightValue(new Highlight(h.getX(), h.getDataSetIndex(), -1));
+                //高亮 d1代表分时线
+                lineChart.highlightValue(new Highlight(h.getX(),lineChart.getData().getDataSets().indexOf(d1), -1));
                 updateText((int) e.getX());
 
                 flAvPrice.setVisibility(VISIBLE);
@@ -289,26 +287,33 @@ public class OneDayChart extends BaseChart {
         barChart.setDescriptionCustom(new int[]{ContextCompat.getColor(mContext, R.color.fit_black), ContextCompat.getColor(mContext, R.color.theme)}, new String[]{getResources().getString(R.string.vol_name), "VOL:" + NumberUtils.formatVol(mContext, mData.getAssetId(), timeDataModel.getVolume())}, 2);
 //        lineChart.setDescriptionCustom(new int[]{ContextCompat.getColor(mContext, R.color.fit_black), GlobaleConfig.getColorByCompare(timeDataModel.getNowPrice()-timeDataModel.getPreClose())}, new String[]{getResources().getString(R.string.age_price),NumberUtils.stringNoE10(timeDataModel.getAveragePrice())}, 2);
         flAvPrice.setSelected(timeDataModel.getAveragePrice()-timeDataModel.getPreClose()>=0);
-        tvAgPrice.setTextColor(GlobaleConfig.getColorByCompare(timeDataModel.getAveragePrice()-timeDataModel.getPreClose()));
+        tvAgPrice.setTextColor(GlobalConfig.getColorByCompare(timeDataModel.getAveragePrice()-timeDataModel.getPreClose()));
         tvAgPrice.setText(NumberUtils.keepPrecisionR(timeDataModel.getAveragePrice(), 3));
     }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldW, int oldH) {
+        Log.d("OneDayChart", "onSizeChanged");
         super.onSizeChanged(w, h, oldW, oldH);
         lineChart.getDescription().setEnabled(false);
         barChart.getDescription().setPosition(0, CommonUtil.dip2px(mContext, 10));
+
+        // 实时更新小圆点位置 应对尺寸变化
+        if(tPoint2.getVisibility() == View.VISIBLE && mData!=null && mData.getLastData()!=null){
+            updateLastPoint((float)tPoint2.getSrcY());
+        }
     }
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        Log.d("oneDayChart", "onLayout");
+        Log.d("OneDayChart", "onLayout");
         super.onLayout(changed, l, t, r, b);
         // 实时更新小圆点位置 应对尺寸变化
         if(tPoint2.getVisibility() == View.VISIBLE && mData!=null && mData.getLastData()!=null){
             updateLastPoint((float)tPoint2.getSrcY());
         }
     }
+
 
     /**
      * 设置分时数据
@@ -349,10 +354,11 @@ public class OneDayChart extends BaseChart {
 
         if(lineChart.getData() != null &&lineChart.getData().getDataSetCount() > 0
                 &&barChart.getData() != null &&barChart.getData().getDataSetCount() > 0){
-            d1 = (LineDataSet) lineChart.getData().getDataSetByIndex(0);
+            // d1放在了上面即後面 防止均线遮盖分时线取的时候反正取 getDataSetByIndex(1)
+            d1 = (LineDataSet) lineChart.getData().getDataSetByIndex(1);
             d1.setValues(lineCJEntries);
             d1.notifyDataSetChanged();
-            d2 = (LineDataSet) lineChart.getData().getDataSetByIndex(1);
+            d2 = (LineDataSet) lineChart.getData().getDataSetByIndex(0);
             d2.setValues(lineJJEntries);
             d2.notifyDataSetChanged();
             lineChart.getData().notifyDataChanged();
@@ -420,8 +426,8 @@ public class OneDayChart extends BaseChart {
             d1.setTimeDayType(1);//设置分时图类型
             d2.setTimeDayType(1);
             ArrayList<ILineDataSet> sets = new ArrayList<>();
-            sets.add(d1);
             sets.add(d2);
+            sets.add(d1);
             LineData cd = new LineData(sets);
             lineChart.setData(cd);
 
@@ -429,9 +435,9 @@ public class OneDayChart extends BaseChart {
             barDataSet.setHighLightColor(ContextCompat.getColor(mContext, R.color.highLight_Color));
             barDataSet.setHighlightEnabled(true);//是否显示高亮十字线
             barDataSet.setDrawValues(false);
-            barDataSet.setNeutralColor(ContextCompat.getColor(mContext, R.color.equal_color));
-            barDataSet.setIncreasingColor(ContextCompat.getColor(mContext, R.color.up_color));
-            barDataSet.setDecreasingColor(ContextCompat.getColor(mContext, R.color.down_color));
+            barDataSet.setNeutralColor(GlobalConfig.getColorByCompare(0));
+            barDataSet.setIncreasingColor(GlobalConfig.getColorByCompare(1));
+            barDataSet.setDecreasingColor(GlobalConfig.getColorByCompare(-1));
             barDataSet.setIncreasingPaintStyle(Paint.Style.FILL);
             barDataSet.setDecreasingPaintStyle(Paint.Style.FILL);
             BarData barData = new BarData(barDataSet);
@@ -479,8 +485,13 @@ public class OneDayChart extends BaseChart {
 
         // 实时更新小圆点位置 应对尺寸变化
         //刷新数据的时候初始化一下小圆点
-        tPoint2.setVisibility(View.GONE);
-//        updateLastPoint((float) mData.getLastData().getNowPrice());
+//        tPoint2.setVisibility(View.GONE);
+        tPoint2.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                updateLastPoint((float) OneDayChart.this.mData.getLastData().getNowPrice());
+            }
+        },20);
     }
 
     private void updateLastPoint(float lastPrice) {
@@ -511,6 +522,7 @@ public class OneDayChart extends BaseChart {
      */
     public void dynamicsAddOne(TimeDataModel timeDatamodel) {
         if(mData ==null)return;
+        Log.d("OneDayChart","dynamicsAddOne nowPrice"+timeDatamodel.getNowPrice());
 
         tPoint2.setSrcY((float)timeDatamodel.getNowPrice());
 
@@ -543,8 +555,8 @@ public class OneDayChart extends BaseChart {
         tPoint2.setLineStartPoint((float)startPointion.x,(float) startPointion.y);
         tPoint2.setCoordinateX((float) updatePointion.x);
         tPoint2.setCoordinateY((float) updatePointion.y);
-        tPoint2.setCenterColor(GlobaleConfig.getColorByCompare(color));
-        tPoint2.setTwinkleColor(GlobaleConfig.getColorByCompare(color));
+        tPoint2.setCenterColor(GlobalConfig.getColorByCompare(color));
+        tPoint2.setTwinkleColor(GlobalConfig.getColorByCompare(color));
         tPoint2.startTwinkle(2);
 
         if(!lineChart.valuesToHighlight()){
@@ -559,6 +571,9 @@ public class OneDayChart extends BaseChart {
            || mData.getLastData()==null
            || NumberUtils.keepPrecision(mData.getLastData().getNowPrice(),3) == NumberUtils.keepPrecision(updateNowPrice,3))
             return;
+
+        Log.d("OneDayChart","dynamicsUpdateOne nowPrice "+timeDatamodel.getNowPrice()+" "+mData.getDatas().size());
+
 
         if(tPoint2!=null){
             tPoint2.setSrcY((float) updateNowPrice);
@@ -586,8 +601,8 @@ public class OneDayChart extends BaseChart {
         tPoint2.setLineStartPoint((float)startPosition.x,(float) startPosition.y);
         tPoint2.setCoordinateX((float) updatePointion.x);
         tPoint2.setCoordinateY((float) updatePointion.y);
-        tPoint2.setCenterColor(GlobaleConfig.getColorByCompare(compare));
-        tPoint2.setTwinkleColor(GlobaleConfig.getColorByCompare(compare));
+        tPoint2.setCenterColor(GlobalConfig.getColorByCompare(compare));
+        tPoint2.setTwinkleColor(GlobalConfig.getColorByCompare(compare));
         tPoint2.startTwinkle(2);
 
 //            double compare = timeDatamodel.getNowPrice() == mData.getPreClose() ? 1 : (timeDatamodel.getNowPrice() - mData.getPreClose());
@@ -604,6 +619,24 @@ public class OneDayChart extends BaseChart {
 
 
     public void updateAxisLeft(float min,float max) {
+
+        //矫正最大值适配
+        boolean granularityEnabled = axisLeftLine.isGranularityEnabled();
+        float granularity = axisLeftLine.getGranularity();
+        int labelCount = axisLeftLine.getLabelCount();
+        float minDiff = granularity * (labelCount - 1);
+        float diff = max - min;
+        if(granularityEnabled && diff < minDiff){
+            float half = (minDiff - diff) / 2;
+            if( min >= half){
+                max = max + half;
+                min = min - half;
+            }else{
+                min =0;
+                max = min + minDiff;
+            }
+        }
+
         float axisMinimum = axisLeftLine.getAxisMinimum();
         float axisMaximum = axisLeftLine.getAxisMaximum();
         boolean isChange=false;
@@ -699,7 +732,7 @@ public class OneDayChart extends BaseChart {
     private void initTwinklePoint() {
         twinklePoint = new TwinklePoint.Builder(getContext())
                 .setTwinkleColor(getResources().getColor(R.color.fit_black))
-                .setCenterColor(getResources().getColor(R.color.up_color))
+                .setCenterColor(GlobalConfig.getColorByCompare(1))
                 .setDuration(1000)
                 .build();
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);

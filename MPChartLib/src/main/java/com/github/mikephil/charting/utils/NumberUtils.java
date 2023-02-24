@@ -51,6 +51,9 @@ public class NumberUtils {
      * @return float 如果数值较大，则使用科学计数法表示
      */
     public static String keepPrecision(float number, int precision) {
+        if(Float.isNaN(number)|| Float.isInfinite(number)){
+            return "0";
+        }
         BigDecimal bg = new BigDecimal(number);
         return bg.setScale(precision, BigDecimal.ROUND_HALF_UP).toPlainString();
     }
@@ -197,11 +200,11 @@ public class NumberUtils {
         df.setGroupingUsed(true);
         String str;
         if (vol >= 100000000) {
-            str = df.format(vol / 100000000) + (assetId.endsWith(".HK") ? context.getResources().getString(R.string.billions_gu) : context.getResources().getString(R.string.billions_shou));
+            str = df.format(vol / 100000000) + (assetId.endsWith(".US") ?  context.getResources().getString(R.string.billions_shou):context.getResources().getString(R.string.billions_gu) );
         } else if (vol >= 10000) {
-            str = df.format(vol / 10000) + (assetId.endsWith(".HK") ? context.getResources().getString(R.string.millions_gu) : context.getResources().getString(R.string.millions_shou));
+            str = df.format(vol / 10000) + (assetId.endsWith(".US") ?  context.getResources().getString(R.string.millions_shou):context.getResources().getString(R.string.millions_gu) );
         } else {
-            str = df.format(Math.round(vol)) + (assetId.endsWith(".HK") ? context.getResources().getString(R.string.gu) : context.getResources().getString(R.string.shou));
+            str = df.format(Math.round(vol)) + (assetId.endsWith(".US") ? context.getResources().getString(R.string.shou) : context.getResources().getString(R.string.gu));
         }
         return str;
     }

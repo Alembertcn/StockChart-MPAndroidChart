@@ -53,7 +53,17 @@ public class DynicDateXAxisRenderer extends XAxisRenderer {
             }
             int j = 0;
             for (int i = startIndex; i <= lastIndex; i++, j++) {
-                mAxis.mEntries[j] = suggesLabelIndxs[i];
+                Integer suggesLabelIndx = suggesLabelIndxs[i];
+//                if(i!=lastIndex){
+//                    Integer suggesLabelIndx2 = suggesLabelIndxs[i+1];
+//                    // 去除相邻的点位防止显示重叠
+//                    if(Math.abs(suggesLabelIndx-suggesLabelIndx2)<=3){
+//                        mAxis.mEntryCount--;
+//                        continue;
+//                    }
+//                }
+
+                mAxis.mEntries[j] = suggesLabelIndx;
             }
         } else {
             mAxis.mEntryCount = n;
@@ -89,7 +99,7 @@ public class DynicDateXAxisRenderer extends XAxisRenderer {
         }
 
         mTrans.pointValuesToPixel(positions);
-
+        float lastX=-1;
         for (int i = 0; i < positions.length; i += 2) {
 
             float x = positions[i];
@@ -97,9 +107,9 @@ public class DynicDateXAxisRenderer extends XAxisRenderer {
             if (mViewPortHandler.isInBoundsX(x)) {
 
                 String label = mXAxis.getValueFormatter().getAxisLabel(mXAxis.mEntries[i / 2], mXAxis);
+                float width = Utils.calcTextWidth(mAxisLabelPaint, label);
 
                 if (mXAxis.isAvoidFirstLastClippingEnabled()) {
-                    float width = Utils.calcTextWidth(mAxisLabelPaint, label);
                     // avoid clipping of the last
                     if(!mViewPortHandler.isInBoundsX(width / 2 +x)){
                         x = mViewPortHandler.contentRight() - width / 2;
@@ -108,7 +118,21 @@ public class DynicDateXAxisRenderer extends XAxisRenderer {
                         x =  mViewPortHandler.contentLeft() + width / 2;
                     }
                 }
-
+//                if(i>=2 && lastX!=-1){
+//                    int lastI=i-2;
+//                    String labelLast = mXAxis.getValueFormatter().getAxisLabel(mXAxis.mEntries[lastI / 2], mXAxis);
+//                    float widthLast = Utils.calcTextWidth(mAxisLabelPaint, labelLast);
+//
+//                    if(x-widthLast<lastX){
+//                        continue;
+//                    }
+//                }
+                if(i<positions.length-2){
+                    if(x+width>=positions[i+2]){
+                        continue;
+                    }
+                }
+                lastX = x;
                 drawLabel(c, label, x, pos, anchor, labelRotationAngleDegrees);
             }
         }

@@ -14,7 +14,7 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.CandleDataSet;
 import com.github.mikephil.charting.data.CandleEntry;
 import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.GlobaleConfig;
+import com.github.mikephil.charting.GlobalConfig;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.ValueFormatter;
@@ -164,7 +164,11 @@ public class KLineDataManage extends IDataManager {
                     kDatas.add(klineDatamodel);
 
                     if(isMinKType()){
-                        if (DataTimeUtil.isHalfHourTimePoint(getKLineDatas().get(i).getDateMills()) && i > 0 && !DataTimeUtil.isSameMini(getKLineDatas().get(i).getDateMills(), getKLineDatas().get(i - 1).getDateMills())) {
+                        boolean b = DataTimeUtil.isHalfHourTimePoint(getKLineDatas().get(i).getDateMills()) && i > 0 && !DataTimeUtil.isSameMini(getKLineDatas().get(i).getDateMills(), getKLineDatas().get(i - 1).getDateMills());
+                        int j = Math.min(data.length() - 1, i + 1);
+//                        boolean nextOk = DataTimeUtil.isHalfHourTimePoint(getKLineDatas().get(j).getDateMills()) && j > 0 && !DataTimeUtil.isSameMini(getKLineDatas().get(j).getDateMills(), getKLineDatas().get(j - 1).getDateMills());
+
+                        if (b) {
                             xCanUseIndexes.add(i);
                         }
                     }else{
@@ -177,7 +181,7 @@ public class KLineDataManage extends IDataManager {
 
                     float color = getKLineDatas().get(i).getOpen() == getKLineDatas().get(i).getClose() ? 0f : getKLineDatas().get(i).getOpen() > getKLineDatas().get(i).getClose() ? -1f : 1f;
                     barEntries.add(new BarEntry(i + offSet, (float) getKLineDatas().get(i).getVolume(), color));
-                    colors.add(GlobaleConfig.getColorByCompare(getKLineDatas().get(i).getClose()-getKLineDatas().get(i).getOpen()));
+                    colors.add(GlobalConfig.getColorByCompare(getKLineDatas().get(i).getClose()-getKLineDatas().get(i).getOpen()));
                     line5Entries.add(new Entry(i + offSet, (float) getKLineDatas().get(i).getMa5()));
                     line10Entries.add(new Entry(i + offSet, (float) getKLineDatas().get(i).getMa10()));
                     line20Entries.add(new Entry(i + offSet, (float) getKLineDatas().get(i).getMa20()));
@@ -286,15 +290,15 @@ public class KLineDataManage extends IDataManager {
         candleDataSet.setHighlightEnabled(true);
         candleDataSet.setHighLightColor(ContextCompat.getColor(mContext, R.color.highLight_Color));
         candleDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
-        candleDataSet.setDecreasingColor(ContextCompat.getColor(mContext, R.color.down_color));
+        candleDataSet.setDecreasingColor(GlobalConfig.getColorByCompare(-1));
         candleDataSet.setDecreasingPaintStyle(Paint.Style.STROKE);
         candleDataSet.setBarSpace(0.15f);
-        candleDataSet.setIncreasingColor(ContextCompat.getColor(mContext, R.color.up_color));
+        candleDataSet.setIncreasingColor(GlobalConfig.getColorByCompare(1));
         candleDataSet.setIncreasingPaintStyle(Paint.Style.FILL_AND_STROKE);
-        candleDataSet.setNeutralColor(ContextCompat.getColor(mContext, R.color.equal_color));
+        candleDataSet.setNeutralColor(GlobalConfig.getColorByCompare(0));
         candleDataSet.setShadowColorSameAsCandle(true);
-        candleDataSet.setValueTextSize(GlobaleConfig.COMMON_TEXT_SIZE);
-        candleDataSet.setValueTextColor(GlobaleConfig.VALUE_COLOR);
+        candleDataSet.setValueTextSize(GlobalConfig.COMMON_TEXT_SIZE);
+        candleDataSet.setValueTextColor(GlobalConfig.VALUE_COLOR);
         candleDataSet.setDrawValues(true);
         return candleDataSet;
     }
@@ -305,11 +309,11 @@ public class KLineDataManage extends IDataManager {
         candleDataSet.setHighlightEnabled(true);
         candleDataSet.setHighLightColor(ContextCompat.getColor(mContext, R.color.highLight_Color));
         candleDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
-        candleDataSet.setDecreasingColor(ContextCompat.getColor(mContext, R.color.down_color));
+        candleDataSet.setDecreasingColor(GlobalConfig.getColorByCompare(-1));
         candleDataSet.setDecreasingPaintStyle(Paint.Style.FILL_AND_STROKE);
-        candleDataSet.setIncreasingColor(ContextCompat.getColor(mContext, R.color.up_color));
+        candleDataSet.setIncreasingColor(GlobalConfig.getColorByCompare(1));
         candleDataSet.setIncreasingPaintStyle(Paint.Style.FILL_AND_STROKE);
-        candleDataSet.setNeutralColor(ContextCompat.getColor(mContext, R.color.equal_color));
+        candleDataSet.setNeutralColor(GlobalConfig.getColorByCompare(0));
 
         candleDataSet.setDrawValues(false);
         candleDataSet.setDrawIcons(false);
@@ -365,9 +369,9 @@ public class KLineDataManage extends IDataManager {
         barDataSet.setHighLightColor(ContextCompat.getColor(mContext, R.color.highLight_Color));//高亮十字线颜色
         barDataSet.setValueTextSize(10);
         barDataSet.setDrawValues(false);//是否画出每个蜡烛线的数值
-        barDataSet.setNeutralColor(ContextCompat.getColor(mContext, R.color.equal_color));//行情平势时蜡烛的标识颜色
-        barDataSet.setIncreasingColor(ContextCompat.getColor(mContext, R.color.up_color));//行情涨势时蜡烛的标识颜色
-        barDataSet.setDecreasingColor(ContextCompat.getColor(mContext, R.color.down_color));//行情跌势时蜡烛的标识颜色
+        barDataSet.setNeutralColor(GlobalConfig.getEqualColor());//行情平势时蜡烛的标识颜色
+        barDataSet.setIncreasingColor(GlobalConfig.getRiseColor());//行情涨势时蜡烛的标识颜色
+        barDataSet.setDecreasingColor(GlobalConfig.getFallColor());//行情跌势时蜡烛的标识颜色
         barDataSet.setIncreasingPaintStyle(Paint.Style.FILL);
         barDataSet.setDecreasingPaintStyle(Paint.Style.FILL);
         barDataSet.setBarBorderWidth(Utils.convertPixelsToDp(1.5f));

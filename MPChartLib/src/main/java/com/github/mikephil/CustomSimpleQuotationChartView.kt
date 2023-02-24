@@ -6,7 +6,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
-import com.github.mikephil.charting.GlobaleConfig
+import com.github.mikephil.charting.GlobalConfig
 import com.github.mikephil.charting.R
 import com.github.mikephil.charting.stockChart.BaseChart
 import com.github.mikephil.charting.stockChart.KLineChart.OnChartChangeListener
@@ -58,32 +58,27 @@ class CustomSimpleQuotationChartView @JvmOverloads constructor (context: Context
         //初始化
         oneDayChart.initChart(land)
         //非横屏页单击转横屏页
-        if (!land) {
-            oneDayChart.getGestureListenerLine().setCoupleClick(CoupleClick {
-                mOnChartClickListener?.onClick(oneDayChart)
-            })
-
-            oneDayChart.getGestureListenerBar().setCoupleClick(CoupleClick {
-                mOnChartClickListener?.onClick(oneDayChart)
-                if (land) {
-//                    loadIndexDataOneDay(if (indexTypeOnyDay < 4) ++indexTypeOnyDay else 1)
-                } else {
-//                    val intent = Intent(context, StockDetailLandActivity::class.java)
-//                    context.startActivity(intent)
-                }
-            })
-        }
+//        if (!land) {
+//            oneDayChart.getGestureListenerLine().setCoupleClick(CoupleClick {
+//                mOnChartClickListener?.onClick(oneDayChart)
+//            })
+//
+//            oneDayChart.getGestureListenerBar().setCoupleClick(CoupleClick {
+//                mOnChartClickListener?.onClick(oneDayChart)
+//                if (land) {
+////                    loadIndexDataOneDay(if (indexTypeOnyDay < 4) ++indexTypeOnyDay else 1)
+//                } else {
+////                    val intent = Intent(context, StockDetailLandActivity::class.java)
+////                    context.startActivity(intent)
+//                }
+//            })
+//        }
 
         combinedchart.initChart(land)
 
 
         combinedchart.getGestureListenerBar().setCoupleClick {
-            if (land) {
-                combinedchart.doBarChartSwitch((mSubChartType++)%4+1)
-            } else {
-//                val intent = Intent(context, StockDetailLandActivity::class.java)
-//                context.startActivity(intent)
-            }
+            combinedchart.doBarChartSwitch((mSubChartType++)%4+1)
         }
         combinedchart.getGestureListenerCandle().setCoupleClick {
 //            combinedchart.doMainChartSwitch((mMainLineType++)%2 + 1)
@@ -230,7 +225,7 @@ class CustomSimpleQuotationChartView @JvmOverloads constructor (context: Context
             }
            var animView:ImageView = oneDayChart.findViewById(com.github.mikephil.charting.R.id.anim_view)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO) {
-                animView.setColorFilter(GlobaleConfig.getColorByCompare(data.nowPrice - kTimeData.preClose))
+                animView.setColorFilter(GlobalConfig.getColorByCompare(data.nowPrice - kTimeData.preClose))
             }
 
             if(isAdd){
@@ -273,5 +268,15 @@ class CustomSimpleQuotationChartView @JvmOverloads constructor (context: Context
     override fun subViewLoadFinish() {
     }
 
+
+    fun changeRestoration(restoration:String){
+        if(flKChart.visibility == View.VISIBLE){
+            combinedchart.changeRestoration(restoration)
+        }else{
+
+        }
+    }
+
+    fun getRestoration()=combinedchart.restoration
 
 }

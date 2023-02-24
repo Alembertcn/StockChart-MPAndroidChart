@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">StockApp</string>
     <string name="loading">加載中...</string>
+    <string name="age_price">均价</string>
     <string name="no_data">暫無數據</string>
     <string name="vol_name">成交量</string>
     <string name="billions_shou">億手</string>
@@ -10,4 +11,7 @@
     <string name="billions_gu">億股</string>
     <string name="millions_gu">萬股</string>
     <string name="gu">股</string>
+    <string name="quo_chart_no_restoration">不复权</string>
+    <string name="quo_chart_front_restoration">前复权</string>
+    <string name="quo_chart_back_restoration">后复权</string>
 </resources>

@@ -24,6 +24,7 @@
 
         <Button
             android:onClick="onViewClicked"
+            android:text="测试动画"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
@@ -34,5 +35,11 @@
             android:background="@color/border_color"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
+        <ImageView
+            android:id="@+id/ivTest"
+            android:src="@android:drawable/alert_dark_frame"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
     </LinearLayout>
 </ScrollView>

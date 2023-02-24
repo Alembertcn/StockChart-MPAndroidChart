@@ -4,7 +4,13 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/StockChart-MPAndroidChart.iml" filepath="$PROJECT_DIR$/.idea/modules/StockChart-MPAndroidChart.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/MPChartLib/StockChart-MPAndroidChart.MPChartLib.iml" filepath="$PROJECT_DIR$/.idea/modules/MPChartLib/StockChart-MPAndroidChart.MPChartLib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/MPChartLib/StockChart-MPAndroidChart.MPChartLib.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/MPChartLib/StockChart-MPAndroidChart.MPChartLib.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/MPChartLib/StockChart-MPAndroidChart.MPChartLib.main.iml" filepath="$PROJECT_DIR$/.idea/modules/MPChartLib/StockChart-MPAndroidChart.MPChartLib.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/MPChartLib/StockChart-MPAndroidChart.MPChartLib.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/MPChartLib/StockChart-MPAndroidChart.MPChartLib.unitTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/StockChart-MPAndroidChart.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/StockChart-MPAndroidChart.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/StockChart-MPAndroidChart.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/StockChart-MPAndroidChart.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/StockChart-MPAndroidChart.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/StockChart-MPAndroidChart.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/StockChart-MPAndroidChart.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/StockChart-MPAndroidChart.app.unitTest.iml" />
     </modules>
   </component>
 </project>

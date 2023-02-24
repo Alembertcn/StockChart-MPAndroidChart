@@ -4,7 +4,7 @@ package com.github.mikephil.charting.components;
 import android.graphics.Color;
 import android.graphics.Typeface;
 
-import com.github.mikephil.charting.GlobaleConfig;
+import com.github.mikephil.charting.GlobalConfig;
 import com.github.mikephil.charting.utils.Utils;
 
 /**
@@ -37,7 +37,7 @@ public abstract class ComponentBase {
     /**
      * the text size of the labels
      */
-    protected float mTextSize = Utils.convertSpToPixel(GlobaleConfig.COMMON_TEXT_SIZE);
+    protected float mTextSize = Utils.convertSpToPixel(GlobalConfig.COMMON_TEXT_SIZE);
 
     /**
      * the text color to use for the labels

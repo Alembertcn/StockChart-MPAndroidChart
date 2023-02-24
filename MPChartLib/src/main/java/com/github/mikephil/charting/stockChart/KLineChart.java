@@ -43,6 +43,7 @@ import com.github.mikephil.charting.stockChart.charts.CandleCombinedChart;
 import com.github.mikephil.charting.stockChart.charts.CoupleChartGestureListener;
 import com.github.mikephil.charting.stockChart.charts.MyCombinedChart;
 import com.github.mikephil.charting.stockChart.dataManage.KLineDataManage;
+import com.github.mikephil.charting.stockChart.enums.AdjustType;
 import com.github.mikephil.charting.stockChart.enums.TimeType;
 import com.github.mikephil.charting.stockChart.markerView.BarBottomMarkerView;
 import com.github.mikephil.charting.stockChart.markerView.KRightMarkerView;
@@ -191,6 +192,7 @@ public class KLineChart extends BaseChart {
                 return NumberUtils.keepPrecisionR(value, precision);
             }
         });
+        axisLeftK.setAxisMinimum(0.0f);
 
         //蜡烛图右Y轴
         axisRightK = candleChart.getAxisRight();
@@ -580,6 +582,7 @@ public class KLineChart extends BaseChart {
             combinedData.setData(data);
             combinedData.setData(new LineData());
             barChart.notifyDataSetChanged();
+            barChart.invalidate();
 //            barChart.animateY(1000);
         }
     }
@@ -963,6 +966,25 @@ public class KLineChart extends BaseChart {
 
     OnChartChangeListener mOnChartChangeListener;
 
+    private String mRestoration;
+    public void changeRestoration(String restoration) {
+        mRestoration = restoration;
+        switch (mRestoration) {
+            case AdjustType.FRONT_ADJUST:
+                fqLable.setText(R.string.quo_chart_front_restoration);
+                break;
+            case AdjustType.BACK_ADJUST:
+                fqLable.setText(R.string.quo_chart_back_restoration);
+                break;
+            default:
+                fqLable.setText(R.string.quo_chart_no_restoration);
+                break;
+        }
+    }
+
+    public String getRestoration() {
+        return mRestoration;
+    }
 
     public interface OnChartChangeListener{
         void onChartChange(int charType);

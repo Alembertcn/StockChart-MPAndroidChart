@@ -68,6 +68,7 @@ public class TimeDataManage extends IDataManager {
                     timeDatamodel.setAveragePrice(Double.isNaN(data.optJSONArray(i).optDouble(2)) ? 0 : data.optJSONArray(i).optDouble(2));
                     timeDatamodel.setVolume(Double.valueOf(data.optJSONArray(i).optString(3)).longValue());
                     timeDatamodel.setOpen(Double.isNaN(data.optJSONArray(i).optDouble(4)) ? 0 : data.optJSONArray(i).optDouble(4));
+                    timeDatamodel.setTotal(Double.isNaN(data.optJSONArray(i).optDouble(5)) ? 0 : data.optJSONArray(i).optDouble(5));
                     timeDatamodel.setPreClose(preClose == 0 ? (preClosePrice == 0 ? timeDatamodel.getOpen() : preClosePrice) : preClose);
 
                     if (i == 0) {

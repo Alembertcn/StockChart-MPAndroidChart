@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import com.github.mikephil.charting.GlobalConfig;
 import com.github.mikephil.charting.R;
 import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.components.AxisBase;
@@ -93,7 +94,7 @@ public class FiveDayChart extends BaseChart {
 
         EventBus.getDefault().register(this);
 
-        colorArray = new int[]{ContextCompat.getColor(mContext, R.color.up_color), ContextCompat.getColor(mContext, R.color.equal_color), ContextCompat.getColor(mContext, R.color.down_color)};
+        colorArray = new int[]{GlobalConfig.getColorByCompare(1), GlobalConfig.getColorByCompare(0), GlobalConfig.getColorByCompare(-1)};
 
         playHeartbeatAnimation(cirCleView.findViewById(R.id.anim_view));
 
@@ -387,9 +388,9 @@ public class FiveDayChart extends BaseChart {
             barDataSet.setHighLightColor(ContextCompat.getColor(mContext, R.color.highLight_Color));
             barDataSet.setDrawValues(false);
             barDataSet.setHighlightEnabled(true);
-            barDataSet.setNeutralColor(ContextCompat.getColor(mContext, R.color.equal_color));
-            barDataSet.setIncreasingColor(ContextCompat.getColor(mContext, R.color.up_color));
-            barDataSet.setDecreasingColor(ContextCompat.getColor(mContext, R.color.down_color));
+            barDataSet.setNeutralColor(GlobalConfig.getColorByCompare(0));
+            barDataSet.setIncreasingColor(GlobalConfig.getColorByCompare(1));
+            barDataSet.setDecreasingColor(GlobalConfig.getColorByCompare(-1));
             barDataSet.setIncreasingPaintStyle(Paint.Style.FILL);
             barDataSet.setDecreasingPaintStyle(Paint.Style.FILL);
             BarData barData = new BarData(barDataSet);
