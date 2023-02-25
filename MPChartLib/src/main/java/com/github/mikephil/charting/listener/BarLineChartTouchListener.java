@@ -442,9 +442,10 @@ public class BarLineChartTouchListener extends ChartTouchListener<BarLineChartBa
                             h.canZoomInMoreX();
 
                     if (canZoomMoreX) {
-
                         mMatrix.set(mSavedMatrix);
-                        mMatrix.postScale(scaleX, 1f, t.x, t.y);
+                        // 矫正缩放点防止缩放到外部
+                        float px = !mChart.isDragXEnabled() ? mChart.getXAxis().mAxisMinimum : t.x;
+                        mMatrix.postScale(scaleX, 1f, px, t.y);
 
                         if (l != null) {
                             l.onChartScale(event, scaleX, 1f);

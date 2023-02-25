@@ -12,7 +12,6 @@ import com.github.mikephil.charting.stockChart.dataManage.KLineDataManage;
 import com.github.mikephil.charting.stockChart.enums.TimeType;
 import com.github.mikephil.charting.stockChart.markerView.BarBottomMarkerView;
 import com.github.mikephil.charting.stockChart.renderer.MyCombinedChartRenderer;
-import com.github.mikephil.charting.utils.DataTimeUtil;
 
 /**
  * Created by ly on 2018/3/14.
@@ -94,5 +93,10 @@ public class MyCombinedChart extends CombinedChart {
         }
     }
 
-
+    @Override
+    public boolean isDragXEnabled() {
+        float highestVisibleX = getHighestVisibleX();
+        int entryCount = getData().getMaxEntryCountSet().getEntryCount();
+        return highestVisibleX < entryCount;
+    }
 }

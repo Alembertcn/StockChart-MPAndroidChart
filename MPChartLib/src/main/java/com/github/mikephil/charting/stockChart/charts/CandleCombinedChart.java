@@ -18,6 +18,8 @@ import com.github.mikephil.charting.stockChart.renderer.MyCombinedChartRenderer;
 import com.github.mikephil.charting.utils.CommonUtil;
 import com.github.mikephil.charting.utils.DataTimeUtil;
 
+import kotlin.jvm.functions.Function0;
+
 
 /**
  * Created by ly on 2016/9/12.
@@ -134,5 +136,10 @@ public class CandleCombinedChart extends CombinedChart {
             }
         }
     }
-
+    @Override
+    public boolean isDragXEnabled() {
+        float highestVisibleX = getHighestVisibleX();
+        int entryCount = getData().getMaxEntryCountSet().getEntryCount();
+        return highestVisibleX < entryCount;
+    }
 }
