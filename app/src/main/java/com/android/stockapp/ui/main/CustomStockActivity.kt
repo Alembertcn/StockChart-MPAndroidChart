@@ -7,6 +7,8 @@ import android.os.Message
 import androidx.appcompat.app.AppCompatActivity
 import com.android.stockapp.R
 import com.android.stockapp.application.MyApplication
+import com.android.stockapp.common.data.ChartData
+import com.android.stockapp.ui.main.Constains.oneDK
 import com.github.mikephil.charting.stockChart.dataManage.KLineDataManage
 import kotlinx.android.synthetic.main.activity_custom_stock.*
 import org.json.JSONObject
@@ -64,7 +66,9 @@ class CustomStockActivity: AppCompatActivity() {
         }
 
         test2.setOnClickListener {
-            chartView.setLastPointData(2.0 + Random.nextDouble(2.0),2.0,2000,true)
+//            chartView.setLastPointData(2.0 + Random.nextDouble(2.0),2.0,2000,true)
+           chartView.setKData(JSONObject(Constains.oneMinKData),"601818.SH",2.82,KLineDataManage.K_1DAY)
+
         }
         test3.setOnClickListener {
             val layoutParams = flChart.layoutParams
@@ -78,7 +82,8 @@ class CustomStockActivity: AppCompatActivity() {
                     chartView.setKData(JSONObject(Constains.oneDayData),"601818.SH",2.82,0)
                 }
                 R.id.rb02 -> {
-                    chartView.setKData(JSONObject(Constains.oneDK),"601818.SH",2.82,KLineDataManage.K_1WEEK)
+//                    chartView.setKData(JSONObject(Constains.oneDK),"601818.SH",2.82,KLineDataManage.K_1DAY)
+                    chartView.setKData(JSONObject(ChartData.KLINEDATA),"601818.SH",2.82,KLineDataManage.K_1DAY)
                 }
                 R.id.rb03 -> {
                     chartView.setKData(JSONObject(Constains.oneDK),"601818.SH",2.82,KLineDataManage.K_1MONTH)

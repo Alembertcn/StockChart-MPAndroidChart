@@ -57,6 +57,9 @@ import com.github.mikephil.charting.utils.Utils;
 
 import java.util.List;
 
+import kotlin.jvm.functions.Function0;
+
+
 /**
  * K线
  */
@@ -75,9 +78,9 @@ public class KLineChart extends BaseChart {
 
     private KLineDataManage mData;
 
-    private int maxVisibleXCount = 150;
-    private int minVisibleXCount = 30;
-    private float visiableRadio =0.4f;// 0.746667f;
+    private int maxVisibleXCount = 150;//最大可見數量
+    private int minVisibleXCount = 30;//最小可見數量
+    private float visiableRadio = 0.4f;// 0.746667f;// 初始化可見數量比例
     private boolean isFirst = true;//是否是第一次加载数据
     private int zbColor[];
     private float macdBarWith = 0.95f;//默认是缩放是5
@@ -192,7 +195,6 @@ public class KLineChart extends BaseChart {
                 return NumberUtils.keepPrecisionR(value, precision);
             }
         });
-        axisLeftK.setAxisMinimum(0.0f);
 
         //蜡烛图右Y轴
         axisRightK = candleChart.getAxisRight();
@@ -349,7 +351,7 @@ public class KLineChart extends BaseChart {
         candleDataSet.setPrecision(precision);
         candleChartData = new CombinedData();
         candleChartData.setData(new CandleData(candleDataSet));
-        candleChartData.setData(new LineData(chartTypeMain!=2?mData.getLineDataMA():mData.getLineDataBOLL()));
+        candleChartData.setData(new LineData(chartTypeMain != 2 ? mData.getLineDataMA() : mData.getLineDataBOLL()));
         candleChart.setData(candleChartData);
         /*************************************成交量数据*****************************************************/
         barChartData = new CombinedData();
@@ -389,7 +391,7 @@ public class KLineChart extends BaseChart {
             //组合视图需要在setData后设置sub renderer 因为setData中会重新初始化sub renderer  (((CombinedChartRenderer)mRenderer).createRenderers();)
             MyCombinedChartRenderer renderer = (MyCombinedChartRenderer) candleChart.getRenderer();
             for (DataRenderer subRenderer : renderer.getSubRenderers()) {
-                if(subRenderer instanceof CandleStickChartRenderer){
+                if (subRenderer instanceof CandleStickChartRenderer) {
                     //设置默认样式 因为有空心描边的蜡烛图为了间隙和宽度一致设置蜡烛图和柱壮填充和描边
                     subRenderer.getPaintRender().setStyle(Paint.Style.FILL_AND_STROKE);
                     //防止为0的时候太细看不到
@@ -398,7 +400,7 @@ public class KLineChart extends BaseChart {
             }
             MyCombinedChartRenderer renderer2 = (MyCombinedChartRenderer) barChart.getRenderer();
             for (DataRenderer subRenderer : renderer2.getSubRenderers()) {
-                if(subRenderer instanceof BarChartRenderer){
+                if (subRenderer instanceof BarChartRenderer) {
                     //设置默认样式 因为有空心描边的蜡烛图为了间隙和宽度一致设置蜡烛图和柱壮填充和描边
                     subRenderer.getPaintRender().setStyle(Paint.Style.FILL_AND_STROKE);
                     //防止为0的时候太细看不到
@@ -447,7 +449,7 @@ public class KLineChart extends BaseChart {
         candleChart.getXAxis().setAxisMinimum(candleChartData.getXMin() - 0.5f);
         barChart.getXAxis().setAxisMinimum(barChartData.getXMin() - 0.5f);
         candleChart.getXAxis().setAxisMaximum(mData.getKLineDatas().size() < 70 ? 70 : candleChartData.getXMax() + 0.5f);
-        barChart.getXAxis().setAxisMaximum(mData.getKLineDatas().size() < 70 ? 70 : barChartData.getXMax() +0.5f);
+        barChart.getXAxis().setAxisMaximum(mData.getKLineDatas().size() < 70 ? 70 : barChartData.getXMax() + 0.5f);
 
         candleChart.setVisibleXRangeMinimum(minVisibleXCount);
         barChart.setVisibleXRangeMinimum(minVisibleXCount);
@@ -462,7 +464,7 @@ public class KLineChart extends BaseChart {
         barChart.zoom(xScale, 1, 0, 0);
 
 
-        if (mData.getKLineDatas().size() > maxVisibleXCount*visiableRadio) {
+        if (mData.getKLineDatas().size() > getPageSize()) {
             //moveViewTo(...) 方法会自动调用 invalidate()
             candleChart.moveViewToX(mData.getKLineDatas().size() - 1);
             barChart.moveViewToX(mData.getKLineDatas().size() - 1);
@@ -550,7 +552,7 @@ public class KLineChart extends BaseChart {
             default:
                 break;
         }
-        if(mOnChartChangeListener!=null){
+        if (mOnChartChangeListener != null) {
             mOnChartChangeListener.onChartChange(chartType1);
         }
         chartSwitch(mData.getKLineDatas().size() - 1);
@@ -723,8 +725,8 @@ public class KLineChart extends BaseChart {
      * @param kLineData 最新数据集
      */
     public void dynamicsAddOne(KLineDataModel kLineData) {
-        if(mData ==null)return;
-        
+        if (mData == null) return;
+
         int size = mData.getKLineDatas().size();
         CombinedData candleChartData = candleChart.getData();
         CandleData candleData = candleChartData.getCandleData();
@@ -759,8 +761,8 @@ public class KLineChart extends BaseChart {
             barChart.invalidate();
         }
 
-        if(!candleChart.valuesToHighlight()){
-            updateText(mData.getKLineDatas().size()-1,false);
+        if (!candleChart.valuesToHighlight()) {
+            updateText(mData.getKLineDatas().size() - 1, false);
         }
     }
 
@@ -770,7 +772,7 @@ public class KLineChart extends BaseChart {
      * @param data
      */
     public void dynamicsUpdateOne(KLineDataModel data) {
-        if(mData ==null)return;
+        if (mData == null) return;
 
         int size = mData.getKLineDatas().size();
         int i = size - 1;
@@ -796,8 +798,8 @@ public class KLineChart extends BaseChart {
         candleChart.invalidate();
         barChart.invalidate();
 
-        if(!candleChart.valuesToHighlight()){
-            updateText(mData.getKLineDatas().size()-1,false);
+        if (!candleChart.valuesToHighlight()) {
+            updateText(mData.getKLineDatas().size() - 1, false);
         }
     }
 
@@ -819,13 +821,13 @@ public class KLineChart extends BaseChart {
 
     public float calMaxScale(float count) {
 
-        float xScale = count/120;
-        if(true){
-            float pageSize = maxVisibleXCount * visiableRadio;
-            if(count< pageSize){
-                return 1;
-            }
-            return count/ pageSize;
+        float xScale = count / 120;
+        if (true) {
+            float pageSize = getPageSize();
+//            if (count < pageSize) {
+//                return 1;
+//            }
+            return count / pageSize;
         }
         if (count >= 800) {
             xScale = 10f;
@@ -845,7 +847,7 @@ public class KLineChart extends BaseChart {
 
     //移动十字标更新数据
     public void updateText(int index, boolean isSelect) {
-        if(index<0||index>mData.getKLineDatas().size()-1)return;
+        if (index < 0 || index > mData.getKLineDatas().size() - 1) return;
 
         if (mHighlightValueSelectedListener != null) {
             mHighlightValueSelectedListener.onKHighlightValueListener(mData, index, isSelect);
@@ -871,7 +873,7 @@ public class KLineChart extends BaseChart {
                 ma20Entry = ma20.getEntriesForXValue(index * 1.0f).get(0);
             }
 
-            candleChart.setDescriptionCustom(new int[]{ ContextCompat.getColor(getContext(), R.color.fit_black), ContextCompat.getColor(getContext(), R.color.ma5), ContextCompat.getColor(getContext(), R.color.ma10), ContextCompat.getColor(getContext(), R.color.ma20)}, new String[]{"MA","MA5:" + (ma5Entry == null ? "--" : NumberUtils.keepPrecision(ma5Entry.getY(), 3)), "MA10:" + (ma10Entry == null ? "--" : NumberUtils.keepPrecision(ma10Entry.getY(), 3)), "MA20:" + (ma20Entry == null ? "--" : NumberUtils.keepPrecision(ma20Entry.getY(), 3))});
+            candleChart.setDescriptionCustom(new int[]{ContextCompat.getColor(getContext(), R.color.fit_black), ContextCompat.getColor(getContext(), R.color.ma5), ContextCompat.getColor(getContext(), R.color.ma10), ContextCompat.getColor(getContext(), R.color.ma20)}, new String[]{"MA", "MA5:" + (ma5Entry == null ? "--" : NumberUtils.keepPrecision(ma5Entry.getY(), 3)), "MA10:" + (ma10Entry == null ? "--" : NumberUtils.keepPrecision(ma10Entry.getY(), 3)), "MA20:" + (ma20Entry == null ? "--" : NumberUtils.keepPrecision(ma20Entry.getY(), 3))});
         } else {
             ILineDataSet up = lineData.getDataSetByIndex(0);
             ILineDataSet mid = lineData.getDataSetByIndex(1);
@@ -891,7 +893,7 @@ public class KLineChart extends BaseChart {
                 lowEntry = low.getEntriesForXValue(index * 1.0f).get(0);
             }
 
-            candleChart.setDescriptionCustom(new int[]{ ContextCompat.getColor(getContext(), R.color.fit_black), ContextCompat.getColor(getContext(), R.color.boll_m), ContextCompat.getColor(getContext(), R.color.boll_u), ContextCompat.getColor(getContext(), R.color.boll_l)},
+            candleChart.setDescriptionCustom(new int[]{ContextCompat.getColor(getContext(), R.color.fit_black), ContextCompat.getColor(getContext(), R.color.boll_m), ContextCompat.getColor(getContext(), R.color.boll_u), ContextCompat.getColor(getContext(), R.color.boll_l)},
                     new String[]{"BOLL(20,2)", "MID:" + (midEntry == null ? "--" : NumberUtils.keepPrecision(midEntry.getY(), 3)), "UPPER:" + (upEntry == null ? "--" : NumberUtils.keepPrecision(upEntry.getY(), 3)), "LOWER:" + (lowEntry == null ? "--" : NumberUtils.keepPrecision(lowEntry.getY(), 3))});
         }
         chartSwitch(index);
@@ -931,16 +933,16 @@ public class KLineChart extends BaseChart {
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
         float chartHeight = candleChart.getViewPortHandler().getChartHeight();
-        if(event.getY()<=chartHeight){
+        if (event.getY() <= chartHeight) {
             //防止点击主图触发幅图的点击事件 幅图点击一般是切换幅图类型
             int action = event.getAction();
             if (action == MotionEvent.ACTION_UP) {
-                event.setAction( MotionEvent.ACTION_CANCEL);
+                event.setAction(MotionEvent.ACTION_CANCEL);
             }
 //            不能直接替换只能偏移源event 替换后缩放会发生 point outof range异常
 //            event=MotionEvent.obtain(event.getDownTime(), event.getEventTime(), event.getAction(), event.getX(), event.getY(),event.getMetaState());
 
-            event.setLocation(event.getX(),chartHeight+10);
+            event.setLocation(event.getX(), chartHeight + 10);
         }
         return super.dispatchTouchEvent(event);
     }
@@ -952,7 +954,7 @@ public class KLineChart extends BaseChart {
         }
     }
 
-    public boolean valuesToHighlight(){
+    public boolean valuesToHighlight() {
         return candleChart.valuesToHighlight() || barChart.valuesToHighlight();
     }
 
@@ -967,6 +969,7 @@ public class KLineChart extends BaseChart {
     OnChartChangeListener mOnChartChangeListener;
 
     private String mRestoration;
+
     public void changeRestoration(String restoration) {
         mRestoration = restoration;
         switch (mRestoration) {
@@ -986,7 +989,18 @@ public class KLineChart extends BaseChart {
         return mRestoration;
     }
 
-    public interface OnChartChangeListener{
+    public interface OnChartChangeListener {
         void onChartChange(int charType);
+    }
+
+
+    public boolean isDragXEnabled() {
+        //x轴的当前可见最大值<k线的数量
+        float highestVisibleX = candleChart.getHighestVisibleX();
+        return highestVisibleX < mData.getKLineDatas().size();
+    }
+
+    public float getPageSize(){
+        return maxVisibleXCount * visiableRadio;
     }
 }
