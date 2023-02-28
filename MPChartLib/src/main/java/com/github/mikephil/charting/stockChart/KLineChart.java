@@ -335,6 +335,10 @@ public class KLineChart extends BaseChart {
             return;
         }
 
+        int size = mData.getKLineDatas().size();
+        xAxisK.setLabelCount(size>minVisibleXCount ? 4 :Math.max(1,(int) Math.round(size * 1.0 / minVisibleXCount * 4)), false);
+
+
         axisLeftBar.setValueFormatter(new VolFormatter(mContext, data.getAssetId()));
 
         if (data.getAssetId().endsWith(".HK") && !data.getAssetId().contains("IDX")) {

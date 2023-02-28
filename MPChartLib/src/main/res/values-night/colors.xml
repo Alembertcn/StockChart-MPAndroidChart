@@ -10,5 +10,6 @@
     <color name="fill_Color">#7F2C3840</color>
     <color name="marker_text_color">#000</color>
     <color name="fit_black">#fff</color>
+    <color name="axis_x_label">#A7ADBC</color>
 
 </resources>

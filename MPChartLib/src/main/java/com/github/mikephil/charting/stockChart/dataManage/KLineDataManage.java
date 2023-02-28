@@ -164,7 +164,10 @@ public class KLineDataManage extends IDataManager {
                     kDatas.add(klineDatamodel);
 
                     if(isMinKType()){
-                        boolean b = DataTimeUtil.isHalfHourTimePoint(getKLineDatas().get(i).getDateMills()) && i > 0 && !DataTimeUtil.isSameMini(getKLineDatas().get(i).getDateMills(), getKLineDatas().get(i - 1).getDateMills());
+                        boolean b = DataTimeUtil.isHalfHourTimePoint(getKLineDatas().get(i).getDateMills()) && i < data.length()-1 && !DataTimeUtil.isSameMini(klineDatamodel.getDateMills(), data.optJSONArray(i+1).optLong(0, 0L));
+                        if(i>0 && i== data.length()-1 && !DataTimeUtil.isSameMini(klineDatamodel.getDateMills(), data.optJSONArray(i-1).optLong(0, 0L))){
+                            b=true;
+                        }
                         int j = Math.min(data.length() - 1, i + 1);
 //                        boolean nextOk = DataTimeUtil.isHalfHourTimePoint(getKLineDatas().get(j).getDateMills()) && j > 0 && !DataTimeUtil.isSameMini(getKLineDatas().get(j).getDateMills(), getKLineDatas().get(j - 1).getDateMills());
 
@@ -172,9 +175,12 @@ public class KLineDataManage extends IDataManager {
                             xCanUseIndexes.add(i);
                         }
                     }else{
-                        if (i > 0 && !DataTimeUtil.isSameMoth(getKLineDatas().get(i).getDateMills(), getKLineDatas().get(i - 1).getDateMills())) {
+                        if (i < data.length()-1 && !DataTimeUtil.isSameMoth(klineDatamodel.getDateMills(), data.optJSONArray(i+1).optLong(0, 0L))) {
+                            xCanUseIndexes.add(i);
+                        }else if(i>0 && i== data.length()-1 && !DataTimeUtil.isSameMoth(klineDatamodel.getDateMills(), data.optJSONArray(i-1).optLong(0, 0L))){
                             xCanUseIndexes.add(i);
                         }
+
                     }
                     
                     candleEntries.add(new CandleEntry(i + offSet, (float) getKLineDatas().get(i).getHigh(), (float) getKLineDatas().get(i).getLow(), (float) getKLineDatas().get(i).getOpen(), (float) getKLineDatas().get(i).getClose()));
@@ -592,6 +598,9 @@ public class KLineDataManage extends IDataManager {
                     if (mEntries[i] == value) {
                         if (i != 0) {
                             lastIndex = Math.round(mEntries[i - 1]);
+                            if(lastIndex==-1){
+
+                            }
                         }
                         //数组是增量的只需要绘制和获取最前面的 后面的是缓存其他的数据
                         break;
